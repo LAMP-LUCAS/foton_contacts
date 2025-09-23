@@ -41,5 +41,5 @@ lib_path = File.join(File.dirname(__FILE__), 'lib')
 $LOAD_PATH.unshift(lib_path) unless $LOAD_PATH.include?(lib_path)
 
 # Hooks e patches
-require_dependency 'foton_contacts/hooks/views_layouts_hook'
+require_dependency 'hooks/views_layouts_hook'
 require_dependency 'patches/user_patch'
