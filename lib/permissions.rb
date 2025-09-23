@@ -1,5 +1,4 @@
-module FotonContacts
-  class Permissions
+class Permissions
     def self.register
       Redmine::AccessControl.map do |map|
         map.project_module :contacts do
@@ -41,5 +40,4 @@ module FotonContacts
         end
       end
     end
-  end
 end
