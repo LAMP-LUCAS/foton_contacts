@@ -8,6 +8,17 @@ Redmine::Plugin.register :foton_contacts do
   url 'https://mundoaec.com/'
   author_url 'https://mundoaec.com/'
 
+  settings default: {
+    'contact_types' => ['person', 'company'],
+    'role_statuses' => ['active', 'inactive', 'discontinued'],
+    'default_visibility' => 'private',
+    'enable_groups' => true,
+    'enable_issue_links' => true,
+    'enable_custom_fields' => true,
+    'enable_attachments' => true,
+    'create_user_contact' => 1
+  }, partial: 'settings/contact_settings'
+
   # Permissões
   project_module :contacts do
     permission :view_contacts, { 
