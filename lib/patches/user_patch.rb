@@ -3,8 +3,6 @@ module FotonContacts
     module UserPatch
       def self.included(base)
         base.class_eval do
-          unloadable
-          
           has_one :contact, dependent: :nullify
           
           after_create :create_contact_profile, if: :create_contact_profile?

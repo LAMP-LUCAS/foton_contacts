@@ -36,6 +36,10 @@ Redmine::Plugin.register :foton_contacts do
        caption: :label_contact_settings
 end
 
+# Adicionar lib ao $LOAD_PATH
+lib_path = File.join(File.dirname(__FILE__), 'lib')
+$LOAD_PATH.unshift(lib_path) unless $LOAD_PATH.include?(lib_path)
+
 # Hooks e patches
 require_dependency 'foton_contacts/hooks/views_layouts_hook'
-require_dependency 'foton_contacts/patches/user_patch'
+require_dependency 'patches/user_patch'
