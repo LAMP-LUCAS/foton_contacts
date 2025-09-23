@@ -12,10 +12,16 @@ class ContactsController < ApplicationController
   include AttachmentsHelper
   
   def index
-    @contacts = Contact.visible(User.current)
+    sort_init 'name', 'asc'
+    sort_update %w(name status created_at)
+
+    scope = Contact.visible(User.current)
                       .includes(:author, :project)
                       .order(sort_clause)
-                      .page(params[:page])
+
+    @contact_count = scope.count
+    @contact_pages = Paginator.new @contact_count, per_page_option, params['page']
+    @contacts = scope.limit(@contact_pages.per_page).offset(@contact_pages.offset)
     
     respond_to do |format|
       format.html

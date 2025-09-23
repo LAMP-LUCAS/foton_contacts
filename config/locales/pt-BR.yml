@@ -1,21 +1,14 @@
 pt-BR:
-  # Menu e títulos
   label_contacts: "Contatos"
   label_contact_settings: "Configurações de Contatos"
   label_new_contact: "Novo Contato"
   label_edit_contact: "Editar Contato"
   label_contact_groups: "Grupos de Contatos"
-  
-  # Tipos de contato
   label_person: "Pessoa"
   label_company: "Empresa"
-  
-  # Status
   label_active: "Ativo"
   label_inactive: "Inativo"
   label_discontinued: "Descontinuado"
-  
-  # Campos
   field_name: "Nome"
   field_email: "E-mail"
   field_phone: "Telefone"
@@ -23,20 +16,19 @@ pt-BR:
   field_position: "Cargo"
   field_type: "Tipo"
   field_status: "Status"
-  
-  # Grupos
   field_group_name: "Nome do Grupo"
   field_group_description: "Descrição"
-  
-  # Mensagens
   notice_contact_created: "Contato criado com sucesso."
   notice_contact_updated: "Contato atualizado com sucesso."
   notice_contact_deleted: "Contato excluído com sucesso."
-  
-  # Permissões
   permission_view_contacts: "Visualizar contatos"
   permission_manage_contacts: "Gerenciar contatos"
-  
-  # Erros
   error_contact_not_found: "Contato não encontrado"
   error_invalid_contact_type: "Tipo de contato inválido"
+  # Traduções adicionadas para a página de configuração
+  label_contact_create_from_user: "Criar contato para novos usuários"
+  label_enable_groups: "Habilitar grupos de contatos"
+  label_enable_issue_links: "Habilitar associação com tarefas"
+  label_enable_custom_fields: "Habilitar campos personalizados"
+  label_enable_attachments: "Habilitar anexos"
+  label_default_visibility: "Visibilidade padrão"

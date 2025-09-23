@@ -6,6 +6,7 @@ module Hooks
       end
       
       def view_issues_show_description_bottom(context = {})
+        return unless ActiveRecord::Base.connection.table_exists? 'contacts'
         issue = context[:issue]
         controller = context[:controller]
         return unless issue && controller
@@ -20,6 +21,7 @@ module Hooks
       end
       
       def view_projects_show_sidebar_bottom(context = {})
+        return unless ActiveRecord::Base.connection.table_exists? 'contacts'
         project = context[:project]
         controller = context[:controller]
         return unless project && controller

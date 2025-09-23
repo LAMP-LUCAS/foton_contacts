@@ -27,7 +27,3 @@ module Patches
     end
   end
 end
-
-unless User.included_modules.include?(Patches::UserPatch)
-  User.send(:include, Patches::UserPatch)
-end
