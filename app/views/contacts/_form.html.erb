@@ -2,52 +2,69 @@
 <%= error_messages_for @contact %>
 
 <div class="box tabular">
-  <p>
+  <p class="required">
+    <%= f.label :contact_type, l(:field_type) %>
     <%= f.select :contact_type,
                 [[l(:label_person), 'person'], [l(:label_company), 'company']],
                 required: true %>
+    <br><span class="description">Selecione se o contato é uma pessoa ou uma empresa.</span>
+  </p>
+
+  <p class="required">
+    <%= f.label :name %>
+    <%= f.text_field :name, required: true, size: 60, placeholder: "Nome completo ou razão social" %>
+    <br><span class="description">Nome do contato ou da empresa.</span>
   </p>
 
   <p>
-    <%= f.text_field :name, required: true, size: 60 %>
+    <%= f.label :email %>
+    <%= f.text_field :email, size: 60, placeholder: "exemplo@dominio.com" %>
+    <br><span class="description">Endereço de e-mail principal do contato.</span>
   </p>
 
   <p>
-    <%= f.text_field :email, size: 60 %>
+    <%= f.label :phone %>
+    <%= f.text_field :phone, size: 30, placeholder: "(99) 99999-9999" %>
+    <br><span class="description">Telefone principal para contato.</span>
   </p>
 
   <p>
-    <%= f.text_field :phone, size: 30 %>
+    <%= f.label :address %>
+    <%= f.text_area :address, rows: 5, placeholder: "Rua, número, bairro, cidade, estado, CEP" %>
+    <br><span class="description">Endereço completo do contato.</span>
   </p>
 
-  <p>
-    <%= f.text_area :address, rows: 5 %>
-  </p>
-
-  <p>
+  <p class="required">
+    <%= f.label :status %>
     <%= f.select :status,
-                [['Ativo', 'active'],
-                 ['Inativo', 'inactive'],
-                 ['Descontinuado', 'discontinued']],
+                [[l(:label_active), 'active'],
+                 [l(:label_inactive), 'inactive'],
+                 [l(:label_discontinued), 'discontinued']],
                 required: true %>
+    <br><span class="description">Status atual do contato.</span>
   </p>
 
   <p>
+    <%= f.label :project_id, l(:field_project) %>
     <%= f.select :project_id,
                 @contact.allowed_target_projects.collect { |p| [p.name, p.id] },
                 include_blank: true %>
+    <br><span class="description">Associe este contato a um projeto existente.</span>
   </p>
 
   <p>
+    <%= f.label :description, l(:field_group_description) %>
     <%= f.text_area :description,
                     cols: 60,
                     rows: 15,
                     class: 'wiki-edit',
-                    no_label: true %>
+                    placeholder: "Adicione uma descrição detalhada sobre o contato." %>
   </p>
 
   <p>
+    <%= f.label :is_private %>
     <%= f.check_box :is_private %>
+    <br><span class="description">Se marcado, o contato será visível apenas para você e para administradores.</span>
   </p>
 
   <%= call_hook(:view_contacts_form_details, contact: @contact, form: f) %>
