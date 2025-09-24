@@ -3,10 +3,10 @@
 
 <div class="contextual">
   <%= link_to l(:label_new_contact), new_contact_path,
-              class: 'icon icon-add' if User.current.allowed_to?(:manage_contacts, nil, global: true) %>
+              class: 'icon icon-add show-modal' if User.current.allowed_to?(:manage_contacts, nil, global: true) %>
   <%= link_to l(:button_import), '#',
               class: 'icon icon-import',
-              onclick: "showModal('import-dialog', '450px'); return false;" %>
+              onclick: "showModal('import-dialog', '450px'); return false;" if User.current.allowed_to?(:manage_contacts, nil, global: true) %>
 </div>
 
 <h2><%= l(:label_contacts) %></h2>
@@ -16,26 +16,26 @@
     <table class="list contacts">
       <thead>
         <tr>
-          <%= sort_header_tag('name', caption: l(:field_name)) %>
-          <%= sort_header_tag('contact_type', caption: l(:field_type)) %>
-          <%= sort_header_tag('status', caption: l(:field_status)) %>
-          <th><%= l(:field_project) %></th>
-          <th><%= l(:label_companies) %></th>
-          <th></th>
+          <%= sort_header_tag('name', caption: l(:field_name), class: 'name') %>
+          <%= sort_header_tag('contact_type', caption: l(:field_type), class: 'type') %>
+          <%= sort_header_tag('status', caption: l(:field_status), class: 'status') %>
+          <th class="project"><%= l(:field_project) %></th>
+          <th class="companies"><%= l(:label_companies) %></th>
+          <th class="buttons"></th>
         </tr>
       </thead>
       <tbody>
         <% @contacts.each do |contact| %>
-          <tr class="<%= contact.css_classes %>">
+          <tr class="contact <%= contact.css_classes %> <%= cycle('odd', 'even') %>">
             <td class="name"><%= link_to contact.name, contact_path(contact) %></td>
             <td class="type"><%= l("label_#{contact.contact_type}") %></td>
             <td class="status"><%= l("label_#{contact.status}") %></td>
             <td class="project"><%= link_to_project(contact.project) if contact.project %></td>
             <td class="companies">
               <% if contact.person? %>
-                <%= contact.companies.active.limit(3).map(&:name).join(', ') %>
+                <%= contact.companies.active.limit(3).map { |c| link_to c.name, contact_path(c) }.join(', ').html_safe %>
                 <% if contact.companies.count > 3 %>
-                  <%= l(:label_and_more, count: contact.companies.count - 3) %>
+                  <span class="additional-info">(<%= l(:label_and_more, count: contact.companies.count - 3) %>)</span>
                 <% end %>
               <% end %>
             </td>
@@ -53,12 +53,13 @@
     </table>
   </div>
   
-  <%= pagination_links_full @contacts %>
+  <span class="pagination"><%= pagination_links_full @contact_pages, @contact_count %></span>
   
 <% else %>
   <p class="nodata"><%= l(:label_no_data) %></p>
 <% end %>
 
+<% if User.current.allowed_to?(:manage_contacts, nil, global: true) %>
 <div id="import-dialog" style="display: none;">
   <h3 class="title"><%= l(:label_import_contacts) %></h3>
   <%= form_tag import_contacts_path, multipart: true do %>
@@ -71,6 +72,7 @@
     </p>
   <% end %>
 </div>
+<% end %>
 
 <% content_for :header_tags do %>
   <%= stylesheet_link_tag 'contacts', plugin: 'foton_contacts' %>

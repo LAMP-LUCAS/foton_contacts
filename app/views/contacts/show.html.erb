@@ -10,48 +10,40 @@
               data: { confirm: l(:text_are_you_sure) } if User.current.allowed_to?(:manage_contacts, @contact.project) %>
 </div>
 
-<h2><%= @contact.name %></h2>
+<h2><%= avatar(@contact.user, size: 32) if @contact.user %><%= @contact.name %></h2>
 
 <div class="contact-details <%= @contact.contact_type %>">
   <div class="splitcontentleft">
     <div class="box">
-      <h3><%= l(:label_details) %></h3>
       <table class="attributes">
-        <tr>
-          <th><%= l(:field_type) %>:</th>
-          <td><%= l("label_#{@contact.contact_type}") %></td>
-        </tr>
-        <tr>
-          <th><%= l(:field_status) %>:</th>
-          <td><%= l("label_#{@contact.status}") %></td>
-        </tr>
         <% if @contact.email.present? %>
           <tr>
-            <th><%= l(:field_email) %>:</th>
+            <th class="email"><%= l(:field_email) %>:</th>
             <td><%= mail_to @contact.email %></td>
           </tr>
         <% end %>
         <% if @contact.phone.present? %>
           <tr>
-            <th><%= l(:field_phone) %>:</th>
+            <th class="phone"><%= l(:field_phone) %>:</th>
             <td><%= @contact.phone %></td>
           </tr>
         <% end %>
         <% if @contact.address.present? %>
           <tr>
-            <th><%= l(:field_address) %>:</th>
+            <th class="address"><%= l(:field_address) %>:</th>
             <td><%= simple_format @contact.address %></td>
-          </tr>
-        <% end %>
-        <% if @contact.description.present? %>
-          <tr>
-            <th><%= l(:field_description) %>:</th>
-            <td><%= textilizable @contact.description %></td>
           </tr>
         <% end %>
       </table>
     </div>
-    
+
+    <% if @contact.description.present? %>
+      <div class="box wiki">
+        <h3><%= l(:field_description) %></h3>
+        <%= textilizable @contact.description %>
+      </div>
+    <% end %>
+
     <% if @contact.person? && @roles.any? %>
       <div class="box">
         <h3><%= l(:label_companies) %></h3>
@@ -83,7 +75,7 @@
         </table>
       </div>
     <% end %>
-    
+
     <% if @issues.any? %>
       <div class="box">
         <h3><%= l(:label_issue_plural) %></h3>
@@ -93,6 +85,32 @@
   </div>
 
   <div class="splitcontentright">
+    <div class="box">
+      <h3><%= l(:label_details_plural) %></h3>
+      <table class="attributes">
+        <tr>
+          <th><%= l(:field_type) %>:</th>
+          <td><%= l("label_#{@contact.contact_type}") %></td>
+        </tr>
+        <tr>
+          <th><%= l(:field_status) %>:</th>
+          <td><%= l("label_#{@contact.status}") %></td>
+        </tr>
+        <tr>
+          <th><%= l(:field_author) %>:</th>
+          <td><%= link_to_user @contact.author %></td>
+        </tr>
+        <tr>
+          <th><%= l(:field_created_on) %>:</th>
+          <td><%= format_time(@contact.created_at) %></td>
+        </tr>
+        <tr>
+          <th><%= l(:field_is_private) %>:</th>
+          <td><%= @contact.is_private? ? l(:general_text_yes) : l(:general_text_no) %></td>
+        </tr>
+      </table>
+    </div>
+
     <% if @contact.person? && User.current.allowed_to?(:manage_contacts, @contact.project) %>
       <div class="box">
         <h3><%= l(:label_add_company_role) %></h3>
@@ -102,7 +120,7 @@
               <%= f.hidden_field :contact_id, value: @contact.id %>
               <%= f.select :company_id,
                           Contact.companies.active.order(:name).map { |c| [c.name, c.id] },
-                          include_blank: true,
+                          { include_blank: true },
                           required: true %>
             </p>
             <p>
@@ -118,26 +136,19 @@
         <% end %>
       </div>
     <% end %>
-    
+
     <% if @groups.any? %>
       <div class="box">
         <h3><%= l(:label_group_plural) %></h3>
-        <ul>
+        <ul class="list">
           <% @groups.each do |group| %>
-            <li>
-              <%= link_to group.name, contact_group_path(group) %>
-              <% if group.description.present? %>
-                <div class="description"><%= truncate(group.description, length: 100) %></div>
-              <% end %>
-            </li>
+            <li><%= link_to group.name, contact_group_path(group) %></li>
           <% end %>
         </ul>
       </div>
     <% end %>
   </div>
 </div>
-
-<% html_title @contact.name %>
 
 <% content_for :header_tags do %>
   <%= stylesheet_link_tag 'contacts', plugin: 'foton_contacts' %>
