@@ -1,0 +1,12 @@
+<h3 class="title"><%= l(:label_new_contact) %></h3>
+
+<%# The form needs to be remote to be handled by AJAX %>
+<%= form_for @contact, url: contacts_path, remote: true do |f| %>
+  <%# Render the fields from the partial %>
+  <%= render partial: 'form', locals: { f: f } %>
+  
+  <div class="buttons">
+    <%= submit_tag l(:button_create) %>
+    <%= link_to_function l(:button_cancel), "hideModal(this);" %>
+  </div>
+<% end %>
