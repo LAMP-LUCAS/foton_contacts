@@ -1,35 +1,42 @@
-<%= form_tag({}) do %>
-  <div class="box tabular settings">
-    <p>
-      <label><%= l(:label_contact_create_from_user) %></label>
-      <%= check_box_tag 'settings[create_user_contact]', 1, @settings['create_user_contact'].to_i == 1 %>
-    </p>
+<%# Wraps the form in a fieldset for better grouping and styling %>
+<fieldset class="box">
+  <legend><%= l(:label_general_settings) %></legend>
+  
+  <p>
+    <%= label_tag 'settings[create_user_contact]', l(:label_contact_create_from_user) %>
+    <%= check_box_tag 'settings[create_user_contact]', 1, @settings['create_user_contact'].to_i == 1 %>
+    <br>
+    <em class="info"><%= l(:text_contact_create_from_user_info) %></em>
+  </p>
+  
+  <p>
+    <%= label_tag 'settings[default_visibility]', l(:label_default_visibility) %>
+    <%= select_tag 'settings[default_visibility]', 
+                   options_for_select([['private', 'private'], ['public', 'public']], 
+                   @settings['default_visibility']) %>
+  </p>
+</fieldset>
 
-    <p>
-      <label><%= l(:label_enable_groups) %></label>
-      <%= check_box_tag 'settings[enable_groups]', 1, @settings['enable_groups'] %>
-    </p>
-
-    <p>
-      <label><%= l(:label_enable_issue_links) %></label>
-      <%= check_box_tag 'settings[enable_issue_links]', 1, @settings['enable_issue_links'] %>
-    </p>
-
-    <p>
-      <label><%= l(:label_enable_custom_fields) %></label>
-      <%= check_box_tag 'settings[enable_custom_fields]', 1, @settings['enable_custom_fields'] %>
-    </p>
-
-    <p>
-      <label><%= l(:label_enable_attachments) %></label>
-      <%= check_box_tag 'settings[enable_attachments]', 1, @settings['enable_attachments'] %>
-    </p>
-
-    <p>
-      <label><%= l(:label_default_visibility) %></label>
-      <%= select_tag 'settings[default_visibility]', 
-                     options_for_select([['private', 'private'], ['public', 'public']], 
-                     @settings['default_visibility']) %>
-    </p>
-  </div>
-<% end %>
+<fieldset class="box">
+  <legend><%= l(:label_feature_activation) %></legend>
+  
+  <p>
+    <%= label_tag 'settings[enable_groups]', l(:label_enable_groups) %>
+    <%= check_box_tag 'settings[enable_groups]', 1, @settings['enable_groups'] %>
+  </p>
+  
+  <p>
+    <%= label_tag 'settings[enable_issue_links]', l(:label_enable_issue_links) %>
+    <%= check_box_tag 'settings[enable_issue_links]', 1, @settings['enable_issue_links'] %>
+  </p>
+  
+  <p>
+    <%= label_tag 'settings[enable_custom_fields]', l(:label_enable_custom_fields) %>
+    <%= check_box_tag 'settings[enable_custom_fields]', 1, @settings['enable_custom_fields'] %>
+  </p>
+  
+  <p>
+    <%= label_tag 'settings[enable_attachments]', l(:label_enable_attachments) %>
+    <%= check_box_tag 'settings[enable_attachments]', 1, @settings['enable_attachments'] %>
+  </p>
+</fieldset>
