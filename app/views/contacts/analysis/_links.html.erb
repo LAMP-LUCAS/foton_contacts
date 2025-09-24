@@ -1,0 +1,47 @@
+<%# app/views/contacts/analysis/_links.html.erb %>
+<div class="box">
+  <h3><%= l(:label_company_links) %></h3>
+  
+  <div class="splitcontentleft">
+    <h4><%= l(:label_active_links) %> (<%= @contact.roles.active.count %>)</h4>
+    <div class="chart">
+      <%= pie_chart @contact.roles.group(:status).count,
+                  colors: ['#4CAF50', '#FFC107', '#F44336'],
+                  donut: true,
+                  legend: 'bottom' %>
+    </div>
+  </div>
+  
+  <div class="splitcontentright">
+    <h4><%= l(:label_links_timeline) %></h4>
+    <div class="chart">
+      <%= line_chart @contact.roles.group_by_month(:created_at).count,
+                   points: true %>
+    </div>
+  </div>
+  
+  <% if @contact.roles.any? %>
+    <table class="list">
+      <thead>
+        <tr>
+          <th><%= l(:label_company) %></th>
+          <th><%= l(:field_position) %></th>
+          <th><%= l(:field_status) %></th>
+          <th><%= l(:field_created_on) %></th>
+          <th><%= l(:field_updated_on) %></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @contact.roles.includes(:company).each do |role| %>
+          <tr class="<%= role.status %>">
+            <td><%= link_to role.company.name, contact_path(role.company) %></td>
+            <td><%= role.position %></td>
+            <td><%= l("label_#{role.status}") %></td>
+            <td><%= format_date(role.created_at) %></td>
+            <td><%= format_date(role.updated_at) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+</div>
