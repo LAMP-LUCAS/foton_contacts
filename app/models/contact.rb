@@ -1,5 +1,20 @@
 class Contact < ActiveRecord::Base
   include Redmine::SafeAttributes
+  include Redmine::Acts::Customizable
+  include Redmine::Acts::Attachable
+  include Redmine::Acts::Searchable
+  include Redmine::Acts::Event
+  # include Redmine::I18n
+  acts_as_customizable
+  acts_as_attachable
+  acts_as_searchable columns: %w(name email address description),
+                     preload: [:author],
+                     date_column: :created_at
+  acts_as_event title: Proc.new { |o| "#{l(:label_contact)}: #{o.name}" },
+                description: :description,
+                datetime: :created_at,
+                type: 'contact',
+                url: Proc.new { |o| { controller: 'contacts', action: 'show', id: o.id } }
   
   belongs_to :author, class_name: 'User'
   belongs_to :project, optional: true
@@ -17,13 +32,16 @@ class Contact < ActiveRecord::Base
   has_many :issues, through: :issue_links
   
   validates :name, presence: true
-  validates :contact_type, presence: true, inclusion: { in: %w(person company) }
-  validates :status, presence: true, inclusion: { in: %w(active inactive discontinued) }
+  enum contact_type: { person: 0, company: 1 }
+  enum status: { active: 0, inactive: 1, discontinued: 2 }
+  
+  validates :contact_type, presence: true
+  validates :status, presence: true
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP, allow_blank: true }
   
-  scope :persons, -> { where(contact_type: 'person') }
-  scope :companies, -> { where(contact_type: 'company') }
-  scope :active, -> { where(status: 'active') }
+  scope :persons, -> { where(contact_type: contact_types[:person]) }
+  scope :companies, -> { where(contact_type: contact_types[:company]) }
+  scope :active, -> { where(status: statuses[:active]) }
   scope :visible, ->(user) do
     if user&.admin?
       all
@@ -56,6 +74,22 @@ class Contact < ActiveRecord::Base
   
   def active?
     status == 'active'
+  end
+  
+  def attachments_visible?(user=User.current)
+    visible?(user)
+  end
+  
+  def attachments_editable?(user=User.current)
+    visible?(user)
+  end
+  
+  def notified_users
+    []
+  end
+  
+  def recipients
+    notified_users.map(&:mail)
   end
   
   def visible?(user)
