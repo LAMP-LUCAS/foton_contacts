@@ -41,6 +41,10 @@ class Contact < ActiveRecord::Base
                  'is_private',
                  'project_id',
                  'description'
+
+  def allowed_target_projects
+    Project.allowed_to(User.current, :manage_contacts)
+  end
   
   def company?
     contact_type == 'company'

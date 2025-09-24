@@ -45,8 +45,9 @@ class ContactsController < ApplicationController
   def new
     @contact = Contact.new(author: User.current)
     @contact.safe_attributes = params[:contact]
+    render layout: false if request.xhr?
   end
-  
+
   def create
     @contact = Contact.new(author: User.current)
     @contact.safe_attributes = params[:contact]
@@ -57,11 +58,16 @@ class ContactsController < ApplicationController
           flash[:notice] = l(:notice_contact_created)
           redirect_to contact_path(@contact)
         }
+        format.js {
+          flash[:notice] = l(:notice_contact_created)
+          render js: "window.location.reload();"
+        }
         format.api { render action: 'show', status: :created, location: contact_url(@contact) }
       end
     else
       respond_to do |format|
         format.html { render action: 'new' }
+        format.js { render action: 'new', layout: false }
         format.api { render_validation_errors(@contact) }
       end
     end
