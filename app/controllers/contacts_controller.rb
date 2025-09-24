@@ -16,8 +16,23 @@ class ContactsController < ApplicationController
     sort_update %w(name status created_at)
 
     scope = Contact.visible(User.current)
-                      .includes(:author, :project)
-                      .order(sort_clause)
+                  .includes(:author, :project)
+                  
+    # Filtros
+    scope = scope.where(contact_type: params[:contact_type]) if params[:contact_type].present?
+    scope = scope.where(status: params[:status]) if params[:status].present?
+    scope = scope.where(project_id: params[:project_id]) if params[:project_id].present?
+    scope = scope.where(is_private: params[:is_private] == '1') if params[:is_private].present?
+    
+    if params[:search].present?
+      search = "%#{params[:search].downcase}%"
+      scope = scope.where(
+        'LOWER(name) LIKE ? OR LOWER(email) LIKE ? OR LOWER(description) LIKE ?',
+        search, search, search
+      )
+    end
+    
+    scope = scope.order(sort_clause)
 
     @contact_count = scope.count
     @contact_pages = Paginator.new @contact_count, per_page_option, params['page']

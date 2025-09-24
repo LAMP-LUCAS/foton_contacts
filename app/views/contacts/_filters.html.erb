@@ -1,0 +1,49 @@
+<%# app/views/contacts/_filters.html.erb %>
+<div class="filters">
+  <%= form_tag({}, method: :get) do %>
+    <fieldset>
+      <legend><%= l(:label_filter_plural) %></legend>
+      <div class="fields">
+        <label for="contact_type"><%= l(:field_type) %>:</label>
+        <%= select_tag :contact_type,
+                    options_for_select([[l(:label_all), ''],
+                                      [l(:label_person), 'person'],
+                                      [l(:label_company), 'company']],
+                                      params[:contact_type]),
+                    onchange: 'this.form.submit()' %>
+        
+        <label for="status"><%= l(:field_status) %>:</label>
+        <%= select_tag :status,
+                    options_for_select([[l(:label_all), ''],
+                                      [l(:label_active), 'active'],
+                                      [l(:label_inactive), 'inactive'],
+                                      [l(:label_discontinued), 'discontinued']],
+                                      params[:status]),
+                    onchange: 'this.form.submit()' %>
+        
+        <% if User.current.admin? || User.current.allowed_to?(:manage_contacts, nil, global: true) %>
+          <label for="project_id"><%= l(:field_project) %>:</label>
+          <%= select_tag :project_id,
+                      options_for_select([[l(:label_all), '']] + 
+                                      Project.allowed_to(User.current, :view_contacts).
+                                              order(:name).
+                                              map { |p| [p.name, p.id.to_s] },
+                                      params[:project_id]),
+                      onchange: 'this.form.submit()' %>
+        <% end %>
+        
+        <label for="is_private"><%= l(:field_is_private) %>:</label>
+        <%= check_box_tag :is_private, '1', params[:is_private] == '1',
+                      onchange: 'this.form.submit()' %>
+      </div>
+      
+      <div class="fields">
+        <label for="search"><%= l(:label_search) %>:</label>
+        <%= text_field_tag :search, params[:search], size: 30 %>
+        <%= submit_tag l(:button_apply), class: 'button-small', name: nil %>
+        <%= link_to l(:button_clear), contacts_path,
+                    class: 'icon icon-reload' %>
+      </div>
+    </fieldset>
+  <% end %>
+</div>

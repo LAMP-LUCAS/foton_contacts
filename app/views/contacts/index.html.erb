@@ -9,7 +9,12 @@
               onclick: "showModal('import-dialog', '450px'); return false;" if User.current.allowed_to?(:manage_contacts, nil, global: true) %>
 </div>
 
-<h2><%= l(:label_contacts) %></h2>
+<h2>
+  <%= l(:label_contacts) %>
+  <span class="count">(<%= @contact_count %>)</span>
+</h2>
+
+<%= render 'filters' %>
 
 <% if @contacts.any? %>
   <div class="autoscroll">
