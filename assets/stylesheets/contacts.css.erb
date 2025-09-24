@@ -9,6 +9,16 @@ table.contacts td.name {
   font-weight: bold;
 }
 
+/* Modal e formulários */
+.contact-modal {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.contact-form {
+  padding: 20px;
+}
+
 .contact-type-icon {
   padding-left: 20px;
   background-position: 0 50%;
@@ -58,6 +68,46 @@ tr.discontinued td.status {
 .box.tabular input[type="text"],
 .box.tabular textarea {
   width: 90%;
+}
+
+/* Abas e conteúdo */
+.tabs {
+  margin-bottom: 20px;
+}
+
+.tab-content {
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-top: none;
+}
+
+/* Filtros */
+.filters-section {
+  margin-bottom: 20px;
+  padding: 10px;
+  background: #f9f9f9;
+  border: 1px solid #e9e9e9;
+}
+
+/* Análise BI */
+.bi-modal {
+  max-width: 90%;
+  height: 80vh;
+}
+
+.analysis-section {
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.chart {
+  margin: 15px 0;
+}
+
+.alerts {
+  padding: 10px;
+  border-left: 3px solid <%= Rails.application.config.try(:warning_color) || '#ffeb3b' %>;
+  margin: 10px 0;
 }
 
 /* Grupos de contatos */

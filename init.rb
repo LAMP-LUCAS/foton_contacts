@@ -1,4 +1,5 @@
 require 'redmine'
+require_dependency 'foton_contacts/hooks'
 
 Redmine::Plugin.register :foton_contacts do
   name 'Foton Contacts'

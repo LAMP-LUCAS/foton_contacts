@@ -1,0 +1,11 @@
+<%# app/views/custom_fields/_show.html.erb %>
+<% custom_field_values.each do |value| %>
+  <% if value.custom_field.visible? %>
+    <div class="custom-field">
+      <p>
+        <strong><%= value.custom_field.name %>:</strong>
+        <%= show_value(value) %>
+      </p>
+    </div>
+  <% end %>
+<% end %>

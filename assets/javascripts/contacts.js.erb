@@ -1,0 +1,39 @@
+// Comportamentos do plugin de contatos
+$(document).ready(function() {
+  // Handler para links que devem abrir em modal
+  $('body').on('click', 'a.contact-new, a.contact-edit, a.bi-analysis', function(e) {
+    e.preventDefault();
+    var url = $(this).attr('href');
+    var isBI = $(this).hasClass('bi-analysis');
+    
+    $.get(url, function(data) {
+      var modal = $('<div/>', {
+        'class': isBI ? 'modal bi-modal' : 'modal contact-modal'
+      }).html(data).appendTo('body');
+      
+      modal.dialog({
+        modal: true,
+        resizable: isBI,
+        draggable: true,
+        width: isBI ? '90%' : 'auto',
+        height: isBI ? 'auto' : 'auto',
+        title: modal.find('h2').remove().text(),
+        close: function() {
+          $(this).remove();
+        }
+      });
+    });
+  });
+  
+  // Atualização dinâmica dos filtros
+  var filterTimeout;
+  $('#query_form').on('change', 'input, select', function() {
+    clearTimeout(filterTimeout);
+    filterTimeout = setTimeout(function() {
+      var form = $('#query_form');
+      $.get(form.attr('action'), form.serialize(), function(data) {
+        $('#contact-list').html($(data).find('#contact-list').html());
+      });
+    }, 300);
+  });
+});
