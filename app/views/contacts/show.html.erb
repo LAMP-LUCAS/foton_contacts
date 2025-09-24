@@ -2,6 +2,11 @@
 <% html_title(@contact.name) %>
 
 <div class="contextual">
+  <% if User.current.allowed_to?(:view_contact_analysis, @contact.project) %>
+    <%= link_to l(:button_analysis), '#',
+                class: 'icon icon-stats',
+                onclick: "showModal('analysis-dialog', '80%'); return false;" %>
+  <% end %>
   <%= link_to l(:button_edit), edit_contact_path(@contact),
               class: 'icon icon-edit' if User.current.allowed_to?(:manage_contacts, @contact.project) %>
   <%= link_to l(:button_delete), contact_path(@contact),
@@ -10,7 +15,19 @@
               data: { confirm: l(:text_are_you_sure) } if User.current.allowed_to?(:manage_contacts, @contact.project) %>
 </div>
 
-<h2><%= avatar(@contact.user, size: 32) if @contact.user %><%= @contact.name %></h2>
+<h2>
+  <%= avatar(@contact.user, size: 32) if @contact.user %>
+  <%= @contact.name %>
+  <span class="badge badge-<%= @contact.status %>"><%= l("label_#{@contact.status}") %></span>
+</h2>
+
+<% tabs = [] %>
+<% tabs << { name: 'details', partial: 'contacts/tabs/details', label: :label_details_plural } %>
+<% tabs << { name: 'companies', partial: 'contacts/tabs/companies', label: :label_companies } if @contact.person? && @roles.any? %>
+<% tabs << { name: 'tasks', partial: 'contacts/tabs/tasks', label: :label_issue_plural } if @issues.any? %>
+<% tabs << { name: 'groups', partial: 'contacts/tabs/groups', label: :label_group_plural } if @groups.any? %>
+<% tabs << { name: 'files', partial: 'contacts/tabs/files', label: :label_file_plural } if @contact.attachments.any? %>
+<% tabs << { name: 'history', partial: 'contacts/tabs/history', label: :label_history } %>
 
 <div class="contact-details <%= @contact.contact_type %>">
   <div class="splitcontentleft">
@@ -84,73 +101,59 @@
     <% end %>
   </div>
 
-  <div class="splitcontentright">
-    <div class="box">
-      <h3><%= l(:label_details_plural) %></h3>
-      <table class="attributes">
-        <tr>
-          <th><%= l(:field_type) %>:</th>
-          <td><%= l("label_#{@contact.contact_type}") %></td>
-        </tr>
-        <tr>
-          <th><%= l(:field_status) %>:</th>
-          <td><%= l("label_#{@contact.status}") %></td>
-        </tr>
-        <tr>
-          <th><%= l(:field_author) %>:</th>
-          <td><%= link_to_user @contact.author %></td>
-        </tr>
-        <tr>
-          <th><%= l(:field_created_on) %>:</th>
-          <td><%= format_time(@contact.created_at) %></td>
-        </tr>
-        <tr>
-          <th><%= l(:field_is_private) %>:</th>
-          <td><%= @contact.is_private? ? l(:general_text_yes) : l(:general_text_no) %></td>
-        </tr>
-      </table>
-    </div>
-
-    <% if @contact.person? && User.current.allowed_to?(:manage_contacts, @contact.project) %>
-      <div class="box">
-        <h3><%= l(:label_add_company_role) %></h3>
-        <%= form_for ContactRole.new, remote: true do |f| %>
-          <div class="box tabular">
-            <p>
-              <%= f.hidden_field :contact_id, value: @contact.id %>
-              <%= f.select :company_id,
-                          Contact.companies.active.order(:name).map { |c| [c.name, c.id] },
-                          { include_blank: true },
-                          required: true %>
-            </p>
-            <p>
-              <%= f.text_field :position, required: true, size: 30 %>
-            </p>
-            <p>
-              <%= f.select :status,
-                          ContactRole.statuses.map { |k, v| [l("label_#{k}"), v] },
-                          required: true %>
-            </p>
-            <%= submit_tag l(:button_add) %>
-          </div>
-        <% end %>
-      </div>
-    <% end %>
-
-    <% if @groups.any? %>
-      <div class="box">
-        <h3><%= l(:label_group_plural) %></h3>
-        <ul class="list">
-          <% @groups.each do |group| %>
-            <li><%= link_to group.name, contact_group_path(group) %></li>
-          <% end %>
-        </ul>
-      </div>
-    <% end %>
-  </div>
+  <%= render_tabs tabs %>
 </div>
+
+<% content_for :sidebar do %>
+  <% if @contact.attachments.any? %>
+    <div class="box">
+      <h3><%= l(:label_attachment_plural) %></h3>
+      <ul>
+        <% @contact.attachments.each do |attachment| %>
+          <li>
+            <%= link_to_attachment attachment, class: attachment.is_image? ? 'thumbnail' : nil %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+<% end %>
 
 <% content_for :header_tags do %>
   <%= stylesheet_link_tag 'contacts', plugin: 'foton_contacts' %>
   <%= javascript_include_tag 'contacts', plugin: 'foton_contacts' %>
 <% end %>
+
+<%# Modal de Análise (BI) %>
+<div id="analysis-dialog" style="display:none;">
+  <h3 class="title"><%= l(:label_contact_analysis) %> - <%= @contact.name %></h3>
+  
+  <div class="tabs">
+    <ul>
+      <li><a href="#tab-links"><%= l(:label_links_analysis) %></a></li>
+      <li><a href="#tab-projects"><%= l(:label_projects_analysis) %></a></li>
+      <li><a href="#tab-career"><%= l(:label_career_analysis) %></a></li>
+      <li><a href="#tab-alerts"><%= l(:label_alerts_analysis) %></a></li>
+    </ul>
+    
+    <div id="tab-links">
+      <%# Análise de vínculos será carregada via AJAX %>
+    </div>
+    
+    <div id="tab-projects">
+      <%# Análise de projetos será carregada via AJAX %>
+    </div>
+    
+    <div id="tab-career">
+      <%# Análise de carreira será carregada via AJAX %>
+    </div>
+    
+    <div id="tab-alerts">
+      <%# Análise de alertas será carregada via AJAX %>
+    </div>
+  </div>
+  
+  <div class="buttons">
+    <%= link_to_function l(:button_close), "hideModal(this);", class: 'icon icon-close' %>
+  </div>
+</div>

@@ -1,0 +1,23 @@
+<%# app/views/contacts/tabs/_tasks.html.erb %>
+<div class="box">
+  <h3><%= l(:label_issue_plural) %></h3>
+  <%= render partial: 'issues/list_simple', locals: { issues: @issues } %>
+</div>
+
+<% if User.current.allowed_to?(:manage_contact_issue_links, @contact.project) %>
+  <div class="box">
+    <h3><%= l(:label_add_issue_link) %></h3>
+    <%= form_for ContactIssueLink.new, remote: true do |f| %>
+      <div class="box tabular">
+        <p>
+          <%= f.hidden_field :contact_id, value: @contact.id %>
+          <%= f.select :issue_id,
+                    Issue.visible.where(project_id: @contact.project_id).map { |i| ["##{i.id} - #{i.subject}", i.id] },
+                    { include_blank: true },
+                    required: true %>
+        </p>
+        <%= submit_tag l(:button_add) %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
