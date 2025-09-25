@@ -1,8 +1,46 @@
 /* Scripts para o plugin de contatos */
 
 $(document).ready(function() {
+  // Funções de Modal (definidas globalmente para serem acessíveis por new.js.erb)
+  window.showModal = function(id) {
+    $('#' + id).dialog({
+      modal: true,
+      width: 'auto',
+      resizable: false,
+      close: function() {
+        $(this).dialog('destroy');
+      }
+    });
+  };
+
+  window.hideModal = function(element) {
+    $(element).closest('.ui-dialog-content').dialog('close');
+  };
+
+  // Handler para links que devem abrir em modal (lógica do antigo contacts.js.erb)
+  $('body').on('click', 'a.contact-new, a.contact-edit, a.bi-analysis', function(e) {
+    e.preventDefault();
+    var url = $(this).attr('href');
+    var isBI = $(this).hasClass('bi-analysis');
+    
+    // Se o modal já existe, não faz nada (previne duplo clique)
+    if ($('#ajax-modal').length > 0) {
+      return;
+    }
+
+    // Cria um placeholder para o modal
+    $('body').append('<div id="ajax-modal" style="display:none;"></div>');
+
+    // Busca o conteúdo do formulário
+    $.get(url, function(data) {
+      // O próprio new.js.erb vai preencher o #ajax-modal e chamar showModal()
+    }).fail(function() {
+      console.error('Falha ao carregar conteúdo do modal.');
+      $('#ajax-modal').remove(); // Limpa em caso de erro
+    });
+  });
+
   // Inicialização do Select2 para campos de seleção
-  // Verificar se Select2 está disponível antes de inicializar
   if ($.fn.select2) {
     $('.select2').select2({
       width: '60%',
@@ -56,24 +94,9 @@ $(document).ready(function() {
     }
   }
   
-  $('#contact_contact_type').change(updateFormFields);
+  // Dispara a função no change e no load
+  $('body').on('change', '#contact_contact_type', updateFormFields);
   updateFormFields();
-  
-  // Manipulação de modais
-  function showModal(id) {
-    $('#' + id).dialog({
-      modal: true,
-      width: 'auto',
-      resizable: false
-    });
-  }
-  
-  function hideModal(element) {
-    $(element).closest('.ui-dialog-content').dialog('close');
-  }
-  
-  window.showModal = showModal;
-  window.hideModal = hideModal;
   
   // Manipulação AJAX de formulários
   $(document).on('ajax:success', 'form[data-remote]', function(e, data) {
@@ -112,5 +135,16 @@ $(document).ready(function() {
     $(this).parent().fadeOut('fast', function() {
       $(this).remove();
     });
+  });
+
+  // Atualização dinâmica dos filtros (lógica do antigo contacts.js.erb)
+  var filterTimeout;
+  $('#query_form').on('change', 'input, select', function() {
+    clearTimeout(filterTimeout);
+    filterTimeout = setTimeout(function() {
+      var form = $('#query_form');
+      // Assegura que a requisição seja feita como JS para obter o HTML parcial
+      $.get(form.attr('action'), form.serialize(), null, 'script');
+    }, 500);
   });
 });

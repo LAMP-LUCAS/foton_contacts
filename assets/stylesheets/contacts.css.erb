@@ -26,7 +26,7 @@ table.contacts td.name {
 }
 
 .person .contact-type-icon {
-  background-image: url(../images/person.png);
+  background-image: url(<%= image_path('person.png', plugin: 'foton_contacts') %>);
 }
 
 .company .contact-type-icon {
@@ -135,11 +135,11 @@ ul.contact-groups li:last-child {
 
 /* Ícones e botões */
 .icon-contact {
-  background-image: url(../images/contact.png);
+  background-image: url(<%= image_path('contact.png', plugin: 'foton_contacts') %>);
 }
 
 .icon-group {
-  background-image: url(../images/group.png);
+  background-image: url(<%= image_path('group.png', plugin: 'foton_contacts') %>);
 }
 
 /* Responsividade */
