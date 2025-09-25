@@ -1,0 +1,10 @@
+<%# app/views/contacts/analytics.js.erb %>
+
+// Remove qualquer modal existente para evitar duplicidade
+$('#ajax-modal').remove();
+
+// Adiciona o HTML do modal ao corpo da página
+$('body').append('<div id="ajax-modal" style="display:none;"><%= j render(partial: "contacts/analysis/modal", locals: { contact: @contact }) %></div>');
+
+// Exibe o modal usando a função global
+showModal('ajax-modal', '80%');

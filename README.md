@@ -48,6 +48,36 @@ Outras soluções do ecossistema incluem:
 
 ---
 
+### ⚙️ Requisitos
+
+Para a funcionalidade completa, incluindo os gráficos de análise (BI), é **obrigatório** instalar as gems `chartkick`, `chartjs-ror` e `groupdate`.
+
+1.  **Adicione ao Gemfile do Redmine:**
+    Abra o arquivo `Gemfile` na raiz da sua instalação do Redmine e adicione a seguinte linha:
+    ```ruby
+    gem 'chartkick'
+    gem 'chartjs-ror'
+    gem 'groupdate'
+    ```
+
+2.  **Instale a gem:**
+    ```bash
+    bundle install
+    ```
+
+#### 🐳 Instalação com Docker
+
+Se você usa Docker, adicione as gems ao `Gemfile` do seu Redmine (você pode montá-lo como um volume ou criar um `Dockerfile` customizado) e reconstrua sua imagem para que o `bundle install` seja executado.
+
+Exemplo de `Dockerfile` para adicionar as gems:
+```Dockerfile
+FROM redmine:latest
+RUN echo "gem 'chartkick'" >> Gemfile && \
+    echo "gem 'chartjs-ror'" >> Gemfile && \
+    echo "gem 'groupdate'" >> Gemfile && \
+    bundle install
+```
+
 ### 📦 Instalação
 
 ```bash

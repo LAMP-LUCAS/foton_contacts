@@ -2,7 +2,8 @@ module Hooks
   class ViewsLayoutsHook < Redmine::Hook::ViewListener
       def view_layouts_base_html_head(context = {})
         stylesheet_link_tag('select2.min', plugin: 'foton_contacts') +
-        stylesheet_link_tag('contacts', plugin: 'foton_contacts') +
+        stylesheet_link_tag('contacts', plugin: 'foton_contacts') +        
+        javascript_include_tag('analytics', plugin: 'foton_contacts') +
         javascript_include_tag('select2.full.min', plugin: 'foton_contacts') +
         javascript_include_tag('contacts', plugin: 'foton_contacts')
       end

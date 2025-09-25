@@ -1,0 +1,33 @@
+<%# app/views/contacts/analysis/_modal.html.erb %>
+<div class="bi-modal-content">
+  <h2><%= l(:label_analysis) %> - <%= contact.name %></h2>
+  <div class="bi-export">
+    <%= link_to 'Exportar Análise (CSV)', analytics_contact_path(contact, format: :csv), class: 'icon icon-export', title: 'Exportar dados da análise para CSV', remote: true %>
+  </div>
+  <%= render partial: 'contacts/analysis/charts', locals: { contact: contact } %>
+  <div class="tabs">
+    <ul>
+      <li><a href="#bi-links"><%= l(:label_relationships) %></a></li>
+      <li><a href="#bi-projects"><%= l(:label_projects) %></a></li>
+      <li><a href="#bi-career"><%= l(:label_career) %></a></li>
+      <li><a href="#bi-alerts"><%= l(:label_alerts) %></a></li>
+    </ul>
+    <div id="bi-links">
+      <%= render partial: 'contacts/analysis/links', locals: { contact: contact } %>
+    </div>
+    <div id="bi-projects">
+      <%= render partial: 'contacts/analysis/projects', locals: { contact: contact } %>
+    </div>
+    <div id="bi-career">
+      <%= render partial: 'contacts/analysis/career', locals: { contact: contact } %>
+    </div>
+    <div id="bi-alerts">
+      <%= render partial: 'contacts/analysis/alerts', locals: { contact: contact } %>
+    </div>
+  </div>
+</div>
+<script>
+$(function() {
+  $('.bi-modal-content .tabs').tabs();
+});
+</script>
