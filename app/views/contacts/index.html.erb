@@ -1,12 +1,26 @@
 <%# app/views/contacts/index.html.erb %>
+
+<% if flash[:notice] %>
+  <div class="flash notice"><span class="icon icon-ok"></span> <%= flash[:notice] %></div>
+<% end %>
+<% if flash[:error] %>
+  <div class="flash error"><span class="icon icon-error"></span> <%= flash[:error] %></div>
+<% end %>
+
 <% html_title(l(:label_contacts)) %>
 
 <div class="contextual">
   <%= link_to l(:label_new_contact), new_contact_path,
-              class: 'icon icon-add show-modal' if User.current.allowed_to?(:manage_contacts, nil, global: true) %>
+              remote: true,
+              class: 'icon icon-add contact-new',
+              data: { modal: true } if User.current.allowed_to?(:manage_contacts, nil, global: true) %>
   <%= link_to l(:button_import), '#',
               class: 'icon icon-import',
               onclick: "showModal('import-dialog', '450px'); return false;" if User.current.allowed_to?(:manage_contacts, nil, global: true) %>
+  <%= link_to 'Exportar CSV', contacts_path(request.query_parameters.merge(format: :csv)),
+              class: 'icon icon-export',
+              title: 'Exportar contatos filtrados para CSV',
+              method: :get %>
 </div>
 
 <h2>
@@ -24,15 +38,18 @@
           <%= sort_header_tag('name', caption: l(:field_name), class: 'name') %>
           <%= sort_header_tag('contact_type', caption: l(:field_type), class: 'type') %>
           <%= sort_header_tag('status', caption: l(:field_status), class: 'status') %>
-          <th class="project"><%= l(:field_project) %></th>
-          <th class="companies"><%= l(:label_companies) %></th>
+          <%= sort_header_tag('project_id', caption: l(:field_project), class: 'project') %>
+          <%= sort_header_tag('companies_count', caption: l(:label_companies), class: 'companies') %>
           <th class="buttons"></th>
         </tr>
       </thead>
       <tbody>
         <% @contacts.each do |contact| %>
           <tr class="contact <%= contact.css_classes %> <%= cycle('odd', 'even') %>">
-            <td class="name"><%= link_to contact.name, contact_path(contact) %></td>
+            <td class="name">
+              <span class="contact-type-icon <%= contact.contact_type %>"></span>
+              <%= contact.name %>
+            </td>
             <td class="type"><%= l("label_#{contact.contact_type}") %></td>
             <td class="status"><%= l("label_#{contact.status}") %></td>
             <td class="project"><%= link_to_project(contact.project) if contact.project %></td>
@@ -45,12 +62,21 @@
               <% end %>
             </td>
             <td class="buttons">
-              <%= link_to l(:button_edit), edit_contact_path(contact),
-                        class: 'icon icon-edit' if contact.visible?(User.current) %>
-              <%= link_to l(:button_delete), contact_path(contact),
+              <%= link_to '', analytics_contact_path(contact),
+                        remote: true,
+                        class: 'icon icon-search bi-analysis',
+                        title: 'Análise',
+                        data: { contact_id: contact.id } %>
+              <%= link_to '', edit_contact_path(contact),
+                        remote: true,
+                        class: 'icon icon-edit contact-edit',
+                        title: l(:label_edit_contact),
+                        data: { contact_id: contact.id, modal: true } if contact.visible?(User.current) %>
+              <%= link_to '', contact_path(contact),
                         method: :delete,
                         data: { confirm: l(:text_are_you_sure) },
-                        class: 'icon icon-del' if contact.visible?(User.current) %>
+                        class: 'icon icon-del',
+                        title: l(:button_delete) if contact.visible?(User.current) %>
             </td>
           </tr>
         <% end %>
@@ -61,7 +87,14 @@
   <span class="pagination"><%= pagination_links_full @contact_pages, @contact_count %></span>
   
 <% else %>
-  <p class="nodata"><%= l(:label_no_data) %></p>
+  <div class="nodata">
+    <span class="icon icon-info"></span>
+    <strong>Nenhum contato encontrado.</strong><br>
+    Que tal começar cadastrando o primeiro?
+    <% if User.current.allowed_to?(:manage_contacts, nil, global: true) %>
+      <br><%= link_to l(:label_new_contact), new_contact_path, remote: true, class: 'button icon icon-add contact-new', data: { modal: true } %>
+    <% end %>
+  </div>
 <% end %>
 
 <% if User.current.allowed_to?(:manage_contacts, nil, global: true) %>

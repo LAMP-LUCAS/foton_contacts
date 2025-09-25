@@ -1,0 +1,55 @@
+<%# Gráficos para análise BI usando Chart.js %>
+<div class="bi-charts">
+  <canvas id="chart-links" width="400" height="180"></canvas>
+  <canvas id="chart-projects" width="400" height="180"></canvas>
+  <canvas id="chart-career" width="400" height="180"></canvas>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+$(function() {
+  // Exemplo de gráfico de vínculos
+  var ctxLinks = document.getElementById('chart-links').getContext('2d');
+  new Chart(ctxLinks, {
+    type: 'doughnut',
+    data: {
+      labels: ['Ativos', 'Inativos', 'Descontinuados'],
+      datasets: [{
+        data: [<%= contact.roles.active.count %>, <%= contact.roles.inactive.count %>, <%= contact.roles.discontinued.count %>],
+        backgroundColor: ['#019875', '#999', '#e74c3c']
+      }]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+  });
+
+  // Exemplo de gráfico de projetos
+  var ctxProjects = document.getElementById('chart-projects').getContext('2d');
+  new Chart(ctxProjects, {
+    type: 'bar',
+    data: {
+      labels: [<%= contact.issues.group_by(&:project).keys.map { |p| "'#{p.name}'" }.join(', ') %>],
+      datasets: [{
+        label: 'Tarefas por Projeto',
+        data: [<%= contact.issues.group_by(&:project).values.map(&:size).join(', ') %>],
+        backgroundColor: '#3498db'
+      }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } } }
+  });
+
+  // Exemplo de gráfico de carreira
+  var ctxCareer = document.getElementById('chart-career').getContext('2d');
+  new Chart(ctxCareer, {
+    type: 'line',
+    data: {
+      labels: [<%= contact.roles.order(:start_date).map { |r| "'#{r.start_date.try(:strftime, '%Y-%m') || ''}'" }.join(', ') %>],
+      datasets: [{
+        label: 'Evolução de vínculos',
+        data: [<%= contact.roles.order(:start_date).map { |r| r.position.inspect }.join(', ') %>],
+        borderColor: '#8e44ad',
+        fill: false
+      }]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+  });
+});
+</script>

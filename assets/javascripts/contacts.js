@@ -2,10 +2,15 @@
 
 $(document).ready(function() {
   // Inicialização do Select2 para campos de seleção
-  $('.select2').select2({
-    width: '60%',
-    allowClear: true
-  });
+  // Verificar se Select2 está disponível antes de inicializar
+  if ($.fn.select2) {
+    $('.select2').select2({
+      width: '60%',
+      allowClear: true
+    });
+  } else {
+    console.error('Select2 não está disponível. Verifique a ordem de carregamento dos scripts.');
+  }
   
   // Autocompletar para campos de contato
   $('.contact-autocomplete').each(function() {

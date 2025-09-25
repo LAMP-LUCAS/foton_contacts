@@ -1,5 +1,8 @@
 require 'redmine'
-require_dependency 'foton_contacts/hooks'
+#require_dependency 'foton_contacts/hooks'
+
+# Registrar assets
+Rails.application.config.assets.precompile += %w( jquery.js select2.min.js contacts.js )
 
 Redmine::Plugin.register :foton_contacts do
   name 'Foton Contacts'
