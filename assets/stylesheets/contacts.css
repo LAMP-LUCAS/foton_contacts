@@ -25,13 +25,13 @@ table.contacts td.name {
   background-repeat: no-repeat;
 }
 
-.person .contact-type-icon {
-  background-image: url(<%= image_path('person.png', plugin: 'foton_contacts') %>);
-}
+/* .person .contact-type-icon {
+  background-image: url('../images/person.png');
+} */
 
-.company .contact-type-icon {
-  background-image: url(<%= image_path('company.png', plugin: 'foton_contacts') %>);
-}
+/* .company .contact-type-icon {
+  background-image: url('../images/company.png');
+} */
 
 /* Detalhes do contato */
 .contact-details {
@@ -133,14 +133,22 @@ ul.contact-groups li:last-child {
   margin-top: 0.3em;
 }
 
-/* Ícones e botões */
-.icon-contact {
-  background-image: url(<%= image_path('contact.png', plugin: 'foton_contacts') %>);
-}
+/* Ícones e botões (Imagens desabilitadas para teste) */
+/* .icon-contact {
+  background-image: url('../images/contact.png');
+} */
 
-.icon-group {
-  background-image: url(<%= image_path('group.png', plugin: 'foton_contacts') %>);
-}
+/* .icon-edit {
+  background-image: url('../images/edit.png');
+} */
+
+/* .icon-delete {
+  background-image: url('../images/delete.png');
+} */
+
+/* .icon-group {
+  background-image: url('../images/group.png');
+} */
 
 /* Responsividade */
 @media screen and (max-width: 899px) {

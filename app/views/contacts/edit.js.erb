@@ -1,0 +1,10 @@
+<%# app/views/contacts/edit.js.erb %>
+
+// Remove qualquer modal existente para evitar duplicidade
+$('#ajax-modal').remove();
+
+// Adiciona o HTML do formulário ao corpo da página
+$('body').append('<div id="ajax-modal" style="display:none;"><%= j render(partial: "form", locals: { contact: @contact }) %></div>');
+
+// Exibe o modal usando a função global
+showModal('ajax-modal', '600px');

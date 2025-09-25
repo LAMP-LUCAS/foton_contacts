@@ -62,20 +62,20 @@
               <% end %>
             </td>
             <td class="buttons">
-              <%= link_to '', analytics_contact_path(contact),
+              <%= link_to l(:button_analysis), analytics_contact_path(contact),
                         remote: true,
-                        class: 'icon icon-search bi-analysis',
-                        title: 'Análise',
+                        class: 'icon icon-stats',
+                        title: l(:button_analysis),
                         data: { contact_id: contact.id } %>
-              <%= link_to '', edit_contact_path(contact),
+              <%= link_to l(:button_edit), edit_contact_path(contact),
                         remote: true,
-                        class: 'icon icon-edit contact-edit',
+                        class: 'icon icon-edit',
                         title: l(:label_edit_contact),
                         data: { contact_id: contact.id, modal: true } if contact.visible?(User.current) %>
-              <%= link_to '', contact_path(contact),
+              <%= link_to l(:button_delete), contact_path(contact),
                         method: :delete,
                         data: { confirm: l(:text_are_you_sure) },
-                        class: 'icon icon-del',
+                        class: 'icon icon-delete',
                         title: l(:button_delete) if contact.visible?(User.current) %>
             </td>
           </tr>
@@ -113,6 +113,10 @@
 <% end %>
 
 <% content_for :header_tags do %>
-  <%= stylesheet_link_tag 'contacts', plugin: 'foton_contacts' %>
+  <%= stylesheet_link_tag 'contacts.css', plugin: 'foton_contacts' %>
   <%= javascript_include_tag 'contacts', plugin: 'foton_contacts' %>
+  <% if defined?(Chartkick) %>
+    <%= javascript_include_tag 'chartkick' %>
+    <%= javascript_include_tag 'Chart.bundle' %>
+  <% end %>
 <% end %>

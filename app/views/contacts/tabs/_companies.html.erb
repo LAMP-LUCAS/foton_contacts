@@ -18,7 +18,7 @@
             <td><%= l("label_#{role.status_name}") %></td>
             <td class="buttons">
               <%= link_to l(:button_delete), contact_role_path(role),
-                        method: :delete,
+                        method: :delete, 
                         remote: true,
                         class: 'icon icon-del',
                         data: { confirm: l(:text_are_you_sure) } if User.current.allowed_to?(:manage_contacts, @contact.project) %>
