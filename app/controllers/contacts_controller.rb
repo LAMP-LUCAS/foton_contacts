@@ -8,8 +8,11 @@ class ContactsController < ApplicationController
   include SortHelper
   helper :custom_fields
   include CustomFieldsHelper
-  helper :attachments
-  include AttachmentsHelper
+  helper :attachments, :issues
+  include AttachmentsHelper, IssuesHelper
+  
+  # Carrega o helper do Chartkick apenas se a gem estiver definida
+  helper Chartkick::Helper if Redmine::Plugin.installed?(:chartkick)
   
   def index
     sort_init 'name', 'asc'
@@ -73,8 +76,7 @@ class ContactsController < ApplicationController
           redirect_to contact_path(@contact)
         }
         format.js {
-          flash[:notice] = l(:notice_contact_created)
-          render js: "window.location.reload();"
+          # Deixa o Rails renderizar create.js.erb por convenção
         }
         format.api { render action: 'show', status: :created, location: contact_url(@contact) }
       end
@@ -88,9 +90,7 @@ class ContactsController < ApplicationController
   end
   
   def edit
-    if request.xhr?
-      render partial: 'form', locals: { f: ActionView::Helpers::FormBuilder.new(:contact, @contact, self, {}) }, layout: false
-    end
+    # A renderização será feita por 'edit.js.erb'
   end
   
   def update
@@ -99,14 +99,16 @@ class ContactsController < ApplicationController
     if @contact.save
       respond_to do |format|
         format.html {
-          flash[:notice] = l(:notice_contact_updated)
+          flash[:notice] = l(:notice_successful_update)
           redirect_to contact_path(@contact)
         }
+        format.js # Deixa o Rails renderizar update.js.erb por convenção
         format.api { render_api_ok }
       end
     else
       respond_to do |format|
         format.html { render action: 'edit' }
+        format.js { render partial: 'form', status: :unprocessable_entity }
         format.api { render_validation_errors(@contact) }
       end
     end
@@ -141,7 +143,7 @@ class ContactsController < ApplicationController
   
   def analytics
     respond_to do |format|
-      format.html { render partial: 'contacts/analysis/modal', locals: { contact: @contact }, layout: false }
+      format.js # Deixa o Rails renderizar analytics.js.erb por convenção
     end
   end
   

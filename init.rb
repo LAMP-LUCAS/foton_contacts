@@ -1,16 +1,13 @@
 require 'redmine'
-#require_dependency 'foton_contacts/hooks'
-
-# Registrar assets
-Rails.application.config.assets.precompile += %w( jquery.js select2.min.js contacts.js )
+# require_dependency 'foton_contacts/hooks'
 
 Redmine::Plugin.register :foton_contacts do
   name 'Foton Contacts'
   author 'Mundo AEC'
+  author_url 'https://mundoaec.com/'
   description 'Plugin de gestão de contatos para o setor AEC'
   version '0.1.0'
   url 'https://mundoaec.com/'
-  author_url 'https://mundoaec.com/'
 
   settings default: {
     'contact_types' => ['person', 'company'],
@@ -23,23 +20,9 @@ Redmine::Plugin.register :foton_contacts do
     'create_user_contact' => 1
   }, partial: 'settings/contact_settings'
 
-  # Permissões
-  project_module :contacts do
-    permission :view_contacts, { 
-      contacts: [:index, :show],
-      contact_groups: [:index, :show]
-    }
-    permission :manage_contacts, {
-      contacts: [:new, :create, :edit, :update, :destroy],
-      contact_roles: [:create, :update, :destroy],
-      contact_groups: [:new, :create, :edit, :update, :destroy],
-      contact_issue_links: [:create, :destroy]
-    }
-  end
-
   # Menu principal
-  menu :top_menu, 
-       :contacts, 
+  menu :top_menu,
+       :contacts,
        { controller: 'contacts', action: 'index' },
        caption: :label_contacts,
        if: Proc.new { User.current.allowed_to?(:view_contacts, nil, global: true) }
@@ -49,11 +32,24 @@ Redmine::Plugin.register :foton_contacts do
        :contact_settings,
        { controller: 'settings', action: 'plugin', id: 'foton_contacts' },
        caption: :label_contact_settings
+
+  # Permissões
+  project_module :contacts do |map|
+    map.permission :view_contacts, { contacts: [:index, :show, :analytics], contact_groups: [:index, :show] }
+    map.permission :manage_contacts, {
+      contacts: [:new, :create, :edit, :update, :destroy, :import],
+      contact_roles: [:create, :update, :destroy],
+      contact_groups: [:new, :create, :edit, :update, :destroy, :add_member, :remove_member],
+      contact_issue_links: [:create, :destroy]
+    }
+  end
 end
 
-# Patches e hooks são carregados automaticamente pelo Zeitwerk
-# Este bloco garante que os patches sejam aplicados após o Redmine carregar suas classes
+# A partir do Redmine 6.0 (Rails 7.1), a melhor prática é registrar patches e assets no bloco `to_prepare`
 Rails.configuration.to_prepare do
+  # Registra os assets do plugin para pré-compilação
+  Rails.application.config.assets.precompile += %w( contacts.css select2.min.css contacts.js analytics.js )
+
   # Aplica o patch na classe User do Redmine
   unless User.included_modules.include?(Patches::UserPatch)
     User.send(:include, Patches::UserPatch)
