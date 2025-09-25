@@ -41,7 +41,7 @@ class ContactsController < ApplicationController
     respond_to do |format|
       format.html
       format.api
-      format.csv { send_data(contacts_to_csv(@contacts), filename: 'contacts.csv') }
+      format.csv { send_data(Contact.contacts_to_csv(@contacts), filename: 'contacts.csv') }
     end
   end
   
@@ -60,7 +60,6 @@ class ContactsController < ApplicationController
   def new
     @contact = Contact.new(author: User.current)
     @contact.safe_attributes = params[:contact]
-    render layout: false if request.xhr?
   end
 
   def create
@@ -82,13 +81,16 @@ class ContactsController < ApplicationController
     else
       respond_to do |format|
         format.html { render action: 'new' }
-        format.js { render action: 'new', layout: false }
+        format.js { render partial: 'new_form', layout: false }
         format.api { render_validation_errors(@contact) }
       end
     end
   end
   
   def edit
+    if request.xhr?
+      render partial: 'form', locals: { f: ActionView::Helpers::FormBuilder.new(:contact, @contact, self, {}) }, layout: false
+    end
   end
   
   def update
@@ -138,7 +140,9 @@ class ContactsController < ApplicationController
   end
   
   def analytics
-    # Implementação futura de análises e BI
+    respond_to do |format|
+      format.html { render partial: 'contacts/analysis/modal', locals: { contact: @contact }, layout: false }
+    end
   end
   
   def search
