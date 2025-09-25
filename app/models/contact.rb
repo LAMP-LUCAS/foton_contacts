@@ -1,3 +1,5 @@
+require 'csv'
+
 class Contact < ActiveRecord::Base
   include Redmine::SafeAttributes
   include Redmine::Acts::Customizable
@@ -103,5 +105,24 @@ class Contact < ActiveRecord::Base
   
   def css_classes
     [contact_type, status].join(' ')
+  end
+
+  def self.contacts_to_csv(contacts)
+    CSV.generate(col_sep: ',') do |csv|
+      csv << ["ID", "Name", "Email", "Phone", "Address", "Type", "Status", "Project", "Description"] # Header row
+      contacts.each do |contact|
+        csv << [
+          contact.id,
+          contact.name,
+          contact.email,
+          contact.phone,
+          contact.address,
+          contact.contact_type,
+          contact.status,
+          contact.project&.name, # Use & for safe navigation in case project is nil
+          contact.description
+        ]
+      end
+    end
   end
 end
