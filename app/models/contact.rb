@@ -34,8 +34,8 @@ class Contact < ActiveRecord::Base
   has_many :issues, through: :issue_links
   
   validates :name, presence: true
-  enum contact_type: [:person, :company]
-  enum status: [:active, :inactive, :discontinued]
+  enum :contact_type, [:person, :company]
+  enum :status, [:active, :inactive, :discontinued]
   
   validates :contact_type, presence: true
   validates :status, presence: true

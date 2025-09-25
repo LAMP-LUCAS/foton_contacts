@@ -55,7 +55,7 @@ Exemplo: `feature/vinculo-multiplo-contato-empresa`
 
 ## 4. 📝 Mensagens de Commit
 
-Utilize o padrão [Conventional Commits](https://www.conventionalcommits.org/):
+Utilize o padrão [Conventional Commits](https://www.conventionalcommits.org/) com as mensagens preferencialmente em português:
 
 ```
 <tipo>(<escopo>): <descrição>
