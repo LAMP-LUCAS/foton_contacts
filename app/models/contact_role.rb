@@ -1,3 +1,36 @@
+'''
+Modelo que representa o Cargo/Função de um Contato (pessoa) em uma Empresa.
+Gerencia a relação profissional entre pessoas e empresas.
+
+Classe: ContactRole
+  Descrição:
+    Modelo que representa o cargo ou função que uma Pessoa (contato) exerce em uma Empresa (outro contato). Gerencia relações profissionais com status, datas e informações adicionais.
+
+  Relacionamentos:
+
+    belongs_to :contact (pessoa)
+    belongs_to :company (empresa, também um Contact)
+
+  Validações:
+
+    Contact_id, company_id e position obrigatórios
+    Status deve estar entre 0-2 (active/inactive/discontinued)
+    Combinação contact_id + company_id + position única
+    Validações customizadas para garantir tipos corretos
+
+  Validações Customizadas:
+
+    ensure_company_type: Company deve ser do tipo empresa
+    ensure_person_type: Contact deve ser do tipo pessoa
+
+  Scopes:
+    active, inactive, discontinued: Filtros por status
+
+  Métodos Principais:
+      active?, inactive?, discontinued?: Verificadores de status
+      status_name: Nome legível do status
+'''
+
 class ContactRole < ActiveRecord::Base
   include Redmine::SafeAttributes
   

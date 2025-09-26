@@ -1,3 +1,82 @@
+'''
+Modelo principal que representa um Contato no sistema.
+Pode ser uma Pessoa ou uma Empresa, com atributos, relacionamentos e comportamentos específicos.
+
+Classe: Contact
+
+  Descrição:
+    Modelo principal que representa um contato no sistema, que pode ser uma Pessoa ou uma Empresa. Gerencia atributos básicos, relacionamentos com projetos, issues, grupos, cargos, e inclui funcionalidades de customização, anexos, busca e eventos.
+
+  Principais Funcionalidades:
+
+    Atributos seguros (safe_attributes) para massa assignment
+
+    Suporte a campos personalizados (acts_as_customizable)
+
+    Suporte a anexos (acts_as_attachable)
+
+    Sistema de busca (acts_as_searchable)
+
+    Registro de eventos (acts_as_event)
+
+    Relacionamentos:
+
+    belongs_to :author (User que criou o contato)
+
+    belongs_to :project (opcional)
+
+    belongs_to :user (opcional - vinculação com usuário do sistema)
+
+    has_many :contact_roles (cargos/funções)
+
+    has_many :companies (empresas através dos cargos)
+
+    has_many :employees (funcionários através dos cargos inversos)
+
+    has_many :contact_group_memberships (vinculação com grupos)
+
+    has_many :contact_groups (grupos aos quais pertence)
+
+    has_many :contact_issue_links (vinculação com issues)
+
+    has_many :issues (issues associadas)
+
+  Validações:
+
+    Nome obrigatório
+
+    Tipo de contato obrigatório (person/company)
+
+    Status obrigatório (active/inactive/discontinued)
+
+    Formato de email válido (quando preenchido)
+
+  Scopes:
+
+    persons: Filtra apenas contatos do tipo pessoa
+
+    companies: Filtra apenas contatos do tipo empresa
+
+    active: Filtra contatos ativos
+
+    visible: Filtra contatos visíveis para o usuário
+
+    Métodos Principais:
+
+    company?, person?: Verificam o tipo do contato
+
+    active?: Verifica se está ativo
+
+    visible?: Verifica visibilidade para um usuário
+
+    to_s: Representação em string (nome)
+
+    css_classes: Classes CSS para estilização
+
+    contacts_to_csv: Geração de CSV para exportação de contatos
+
+'''
+
 require 'csv'
 
 class Contact < ActiveRecord::Base

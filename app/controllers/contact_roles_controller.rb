@@ -1,3 +1,29 @@
+'''
+Controlador para gerenciar os cargos/funções (roles) associados a contatos do tipo pessoa.
+Permite criar, editar e excluir cargos de um contato.
+
+Classe: ContactRolesController
+
+  Descrição:
+    Este controlador administra os cargos ou funções que um contato (pessoa) pode ocupar em empresas. Ele permite associar, atualizar ou remover cargos de um contato.
+
+  Ações:
+
+    create: Cria um novo cargo para um contato.
+
+    update: Atualiza um cargo existente.
+
+    destroy: Exclui um cargo.
+
+  Filtros:
+
+    require_login: Garante autenticação do usuário.
+
+    find_contact_role: Carrega o cargo com base no params[:id].
+
+    authorize_global: Verifica permissões globais.
+'''
+
 class ContactRolesController < ApplicationController
   before_action :require_login
   before_action :find_contact_role, only: [:update, :destroy]

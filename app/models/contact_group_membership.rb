@@ -1,3 +1,23 @@
+'''
+Modelo de junção que representa a associação entre um Contato e um Grupo.
+Armazena a relação muitos-para-muitos com metadados adicionais.
+
+Classe: ContactGroupMembership
+  Descrição:
+    Modelo de junção que representa a associação entre um Contato e um Grupo de Contatos. Implementa relação muitos-para-muitos com metadados adicionais como função (role) e notas.
+
+  Relacionamentos:
+    belongs_to :contact
+    belongs_to :contact_group
+
+  Validações:
+    Contact_id e contact_group_id obrigatórios
+    Combinação contact_id + contact_group_id única
+
+  Atributos Seguros:
+    contact_id, contact_group_id, role, notes
+'''
+
 class ContactGroupMembership < ActiveRecord::Base
   include Redmine::SafeAttributes
   

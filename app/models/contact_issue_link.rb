@@ -1,3 +1,28 @@
+'''
+Modelo que representa o vínculo entre um Contato e uma Issue.
+Permite associar contatos a tickets/issues com informações contextuais.
+
+Classe: ContactIssueLink
+  Descrição:
+    Modelo que representa a associação entre um Contato e uma Issue (ticket/chamado). Permite vincular contatos a issues com informações adicionais como função e notas.
+
+  Relacionamentos:
+
+    belongs_to :contact
+
+    belongs_to :issue
+
+    Validações:
+
+  Contact_id e issue_id obrigatórios
+
+    Combinação contact_id + issue_id única
+
+    Métodos Principais:
+
+    visible?: Verifica se o vínculo é visível para o usuário (baseado na visibilidade do contato e issue)
+'''
+
 class ContactIssueLink < ActiveRecord::Base
   include Redmine::SafeAttributes
   
