@@ -1,0 +1,30 @@
+<h2><%= l(:label_analysis) %>: <%= @contact.name %></h2>
+
+<div class="tabs">
+  <ul>
+    <li><a href="#tab-relationships" class="selected"><%= l(:label_relationships) %></a></li>
+    <li><a href="#tab-projects"><%= l(:label_projects) %></a></li>
+    <li><a href="#tab-career"><%= l(:label_career) %></a></li>
+    <li><a href="#tab-alerts"><%= l(:label_alerts) %></a></li>
+  </ul>
+</div>
+
+<div id="tab-relationships" class="tab-content">
+  <h3><%= l(:label_active_links) %></h3>
+  <p><%= l(:label_no_data) %></p>
+</div>
+
+<div id="tab-projects" class="tab-content" style="display:none;">
+  <h3><%= l(:label_projects) %></h3>
+  <p><%= l(:label_no_data) %></p>
+</div>
+
+<div id="tab-career" class="tab-content" style="display:none;">
+  <h3><%= l(:label_career) %></h3>
+  <p><%= l(:label_no_data) %></p>
+</div>
+
+<div id="tab-alerts" class="tab-content" style="display:none;">
+  <h3><%= l(:label_alerts) %></h3>
+  <p><%= l(:label_no_data) %></p>
+</div>
