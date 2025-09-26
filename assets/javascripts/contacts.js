@@ -33,8 +33,14 @@ $(document).ready(function() {
 
     // Busca o conteúdo do formulário
     $.get(url, function(data) {
-      // O próprio new.js.erb vai preencher o #ajax-modal e chamar showModal()
-    }).fail(function() {
+      // O Rails UJS vai executar o script retornado (ex: analytics.js.erb)
+      // que preenche o #ajax-modal.
+      // Após o preenchimento, podemos inicializar componentes como as abas.
+      // A inicialização das abas do modal de análise é feita no próprio analytics.js.erb
+      // para garantir que o conteúdo já exista.
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+      console.error('Falha ao carregar conteúdo do modal: ' + textStatus, errorThrown);
+      // Adicione um feedback visual para o usuário aqui, se desejar.
       console.error('Falha ao carregar conteúdo do modal.');
       $('#ajax-modal').remove(); // Limpa em caso de erro
     });
