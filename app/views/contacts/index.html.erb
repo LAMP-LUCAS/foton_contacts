@@ -1,122 +1,60 @@
-<%# app/views/contacts/index.html.erb %>
-
-<% if flash[:notice] %>
-  <div class="flash notice"><span class="icon icon-ok"></span> <%= flash[:notice] %></div>
-<% end %>
-<% if flash[:error] %>
-  <div class="flash error"><span class="icon icon-error"></span> <%= flash[:error] %></div>
-<% end %>
-
-<% html_title(l(:label_contacts)) %>
-
 <div class="contextual">
-  <%= link_to l(:label_new_contact), new_contact_path,
-              remote: true,
-              class: 'icon icon-add contact-new',
-              data: { modal: true } if User.current.allowed_to?(:manage_contacts, nil, global: true) %>
-  <%= link_to l(:button_import), '#',
-              class: 'icon icon-import',
-              onclick: "showModal('import-dialog', '450px'); return false;" if User.current.allowed_to?(:manage_contacts, nil, global: true) %>
-  <%= link_to 'Exportar CSV', contacts_path(request.query_parameters.merge(format: :csv)),
-              class: 'icon icon-export',
-              title: 'Exportar contatos filtrados para CSV',
-              method: :get %>
+  <%= link_to l(:label_new_contact), new_contact_path(type: 'person'), remote: true, class: 'icon icon-add contact-new' %>
+  <%= link_to l(:label_new_contact) + " (#{l(:label_company).downcase})", new_contact_path(type: 'company'), remote: true, class: 'icon icon-add contact-new' %>
 </div>
 
-<h2>
-  <%= l(:label_contacts) %>
-  <span class="count">(<%= @contact_count %>)</span>
-</h2>
+<h2><%= l(:label_contacts) %></h2>
 
-<%= render 'filters' %>
-
-<% if @contacts.any? %>
-  <div class="autoscroll">
-    <table class="list contacts">
-      <thead>
-        <tr>
-          <%= sort_header_tag('name', caption: l(:field_name), class: 'name') %>
-          <%= sort_header_tag('contact_type', caption: l(:field_type), class: 'type') %>
-          <%= sort_header_tag('status', caption: l(:field_status), class: 'status') %>
-          <%= sort_header_tag('project_id', caption: l(:field_project), class: 'project') %>
-          <%= sort_header_tag('companies_count', caption: l(:label_companies), class: 'companies') %>
-          <th class="buttons"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @contacts.each do |contact| %>
-          <tr class="contact <%= contact.css_classes %> <%= cycle('odd', 'even') %>">
-            <td class="name">
-              <span class="contact-type-icon <%= contact.contact_type %>"></span>
-              <%= contact.name %>
-            </td>
-            <td class="type"><%= l("label_#{contact.contact_type}") %></td>
-            <td class="status"><%= l("label_#{contact.status}") %></td>
-            <td class="project"><%= link_to_project(contact.project) if contact.project %></td>
-            <td class="companies">
-              <% if contact.person? %>
-                <%= contact.companies.active.limit(3).map { |c| link_to c.name, contact_path(c) }.join(', ').html_safe %>
-                <% if contact.companies.count > 3 %>
-                  <span class="additional-info">(<%= l(:label_and_more, count: contact.companies.count - 3) %>)</span>
-                <% end %>
-              <% end %>
-            </td>
-            <td class="buttons">
-              <%= link_to l(:button_analysis), analytics_contact_path(contact),
-                        remote: true,
-                        class: 'icon icon-stats',
-                        title: l(:button_analysis),
-                        data: { contact_id: contact.id } %>
-              <%= link_to l(:button_edit), edit_contact_path(contact),
-                        remote: true,
-                        class: 'icon icon-edit',
-                        title: l(:label_edit_contact),
-                        data: { contact_id: contact.id, modal: true } if contact.visible?(User.current) %>
-              <%= link_to l(:button_delete), contact_path(contact),
-                        method: :delete,
-                        data: { confirm: l(:text_are_you_sure) },
-                        class: 'icon icon-delete',
-                        title: l(:button_delete) if contact.visible?(User.current) %>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
-  
-  <span class="pagination"><%= pagination_links_full @contact_pages, @contact_count %></span>
-  
-<% else %>
-  <div class="nodata">
-    <span class="icon icon-info"></span>
-    <strong>Nenhum contato encontrado.</strong><br>
-    Que tal começar cadastrando o primeiro?
-    <% if User.current.allowed_to?(:manage_contacts, nil, global: true) %>
-      <br><%= link_to l(:label_new_contact), new_contact_path, remote: true, class: 'button icon icon-add contact-new', data: { modal: true } %>
-    <% end %>
-  </div>
-<% end %>
-
-<% if User.current.allowed_to?(:manage_contacts, nil, global: true) %>
-<div id="import-dialog" style="display: none;">
-  <h3 class="title"><%= l(:label_import_contacts) %></h3>
-  <%= form_tag import_contacts_path, multipart: true do %>
-    <p>
-      <%= file_field_tag 'file', accept: '.csv,.vcf' %>
-    </p>
+<%= form_tag(contacts_path, method: :get, id: 'query_form') do %>
+  <fieldset id="filters" class="collapsible">
+    <legend onclick="toggleFieldset(this);"><%= l(:label_filter_plural) %></legend>
+    <div style="">
+      <div class="splitcontent">
+        <div class="splitcontentleft">
+          <p>
+            <%= label_tag 'search', l(:field_name) %>
+            <%= text_field_tag 'search', params[:search], size: 30 %>
+          </p>
+          <p>
+            <%= label_tag 'contact_type', l(:field_type) %>
+            <%= select_tag 'contact_type', options_for_select([[l(:label_all), '']] + Contact.contact_types.keys.map { |t| [l("label_#{t}"), t] }, params[:contact_type]) %>
+          </p>
+        </div>
+        <div class="splitcontentright">
+          <p>
+            <%= label_tag 'status', l(:field_status) %>
+            <%= select_tag 'status', options_for_select([[l(:label_all), '']] + Contact.statuses.keys.map { |s| [l("label_#{s}"), s] }, params[:status]) %>
+          </p>
+        </div>
+      </div>
+    </div>
     <p class="buttons">
-      <%= submit_tag l(:button_import) %>
-      <%= link_to_function l(:button_cancel), "hideModal(this);" %>
+      <%= link_to l(:button_apply), '#', onclick: 'submit_query_form("query_form"); return false;', class: 'icon icon-checked' %>
+      <%= link_to l(:button_clear), {controller: 'contacts', action: 'index'}, class: 'icon icon-reload' %>
     </p>
-  <% end %>
-</div>
+  </fieldset>
 <% end %>
 
-<% content_for :header_tags do %>
-  <%= stylesheet_link_tag 'contacts.css', plugin: 'foton_contacts' %>
-  <%= javascript_include_tag 'contacts', plugin: 'foton_contacts' %>
-  <% if defined?(Chartkick) %>
-    <%= javascript_include_tag 'chartkick' %>
-    <%= javascript_include_tag 'Chart.bundle' %>
-  <% end %>
+<div id="contacts_list">
+  <table class="list">
+    <thead>
+      <tr>
+        <th><%= l(:field_name) %></th>
+        <th><%= l(:field_type) %></th>
+        <th><%= l(:field_status) %></th>
+        <th><%= l(:field_project) %></th>
+        <th><%= l(:field_created_on) %></th>
+        <th style="width: 15%"><%= l(:label_actions) %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @contacts.each do |contact| %>
+        <%= render partial: 'contact_row', locals: { contact: contact } %>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<% if @contacts.empty? %>
+<p class="nodata"><%= l(:label_no_data) %></p>
 <% end %>

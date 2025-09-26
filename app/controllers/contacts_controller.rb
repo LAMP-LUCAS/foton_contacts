@@ -48,10 +48,12 @@ class ContactsController < ApplicationController
     end
   end
   
-  def show
-    @roles = @contact.roles.includes(:company)
-    @groups = @contact.groups.visible(User.current)
-    @issues = @contact.issues.visible(User.current)
+  def show    
+    # Inicializa as variáveis de instância esperadas pela view
+    @contact_roles = @contact.contact_roles.includes(:company) if @contact.person?
+    @contact_groups = @contact.contact_groups
+    @issues = @contact.issues.visible
+    @custom_values = @contact.custom_values
     
     respond_to do |format|
       format.html
@@ -61,8 +63,12 @@ class ContactsController < ApplicationController
   end
   
   def new
-    @contact = Contact.new(author: User.current)
-    @contact.safe_attributes = params[:contact]
+    @contact = Contact.new(author: User.current, contact_type: params[:type])
+    
+    respond_to do |format|
+      format.html # Renders new.html.erb for non-JS fallback
+      format.js   # Renders new.js.erb for AJAX requests
+    end
   end
 
   def create
@@ -126,15 +132,15 @@ class ContactsController < ApplicationController
   end
   
   def roles
-    @roles = @contact.roles.includes(:company)
+    @roles = @contact.contact_roles.includes(:company)
   end
   
   def groups
-    @groups = @contact.groups.visible(User.current)
+    @groups = @contact.contact_groups
   end
   
   def tasks
-    @issues = @contact.issues.visible(User.current)
+    @issues = @contact.issues.visible
   end
   
   def history

@@ -1,0 +1,12 @@
+<tr id="contact-<%= contact.id %>" class="<%= cycle('odd', 'even') %>">
+  <td class="name"><%= link_to contact.name, contact_path(contact) %></td>
+  <td><%= l("label_#{contact.contact_type}") %></td>
+  <td><span class="status <%= contact.status %>"><%= l("label_#{contact.status}") %></span></td>
+  <td><%= contact.project ? link_to_project(contact.project) : '---' %></td>
+  <td><%= format_date(contact.created_at) %></td>
+  <td class="buttons">
+    <%= link_to '📊', analytics_contact_path(contact), remote: true, class: 'bi-analysis', title: l(:button_analysis) %>
+    <%= link_to '✏️', edit_contact_path(contact), remote: true, class: 'contact-edit', title: l(:button_edit) %>
+    <%= link_to '🗑️', contact_path(contact), remote: true, method: :delete, data: { confirm: l(:text_are_you_sure) }, class: 'contact-delete', title: l(:button_delete) %>
+  </td>
+</tr>

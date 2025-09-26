@@ -64,3 +64,7 @@ pt-BR:
   label_no_data: "Sem dados para exibir"
   button_import: "Importar"
   label_import_contacts: "Importar Contatos"
+  label_filter_plural: "Filtros"
+  label_all: "Todos"
+  label_actions: "Ações"
+  text_are_you_sure: "Você tem certeza?"
