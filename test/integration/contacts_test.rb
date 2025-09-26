@@ -10,6 +10,11 @@ class ContactsTest < ActionDispatch::IntegrationTest
   def test_full_contact_workflow
     log_user('contact_user', 'contact_user')
     
+    # Acessar a listagem de contatos
+    get '/contacts'
+    assert_response :success
+    assert_select 'h2', text: 'Contatos'
+
     # Criar uma nova pessoa
     get '/contacts/new'
     assert_response :success
@@ -27,7 +32,17 @@ class ContactsTest < ActionDispatch::IntegrationTest
     
     person = Contact.last
     assert_equal 'Integration Test Person', person.name
+
+    # Verificar se o link para o perfil existe na listagem
+    get '/contacts'
+    assert_response :success
+    assert_select "a[href=?]", "/contacts/#{person.id}", text: 'Integration Test Person'
     
+    # Acessar a página de perfil da pessoa
+    get "/contacts/#{person.id}"
+    assert_response :success
+    assert_select 'h2', text: 'Integration Test Person'
+
     # Criar uma nova empresa
     post '/contacts', params: {
       contact: {
@@ -54,9 +69,10 @@ class ContactsTest < ActionDispatch::IntegrationTest
     assert_response :redirect
     
     # Verificar vínculo
-    get "/contacts/#{person.id}/roles"
+    get "/contacts/#{person.id}"
     assert_response :success
-    assert_select 'table.contact-roles td', text: 'Integration Test Company'
+    assert_select 'div#tab-companies td', text: 'Integration Test Company'
+    assert_select 'div#tab-companies td', text: 'Integration Tester'
     
     # Criar um grupo
     post '/contact_groups', params: {
@@ -98,9 +114,9 @@ class ContactsTest < ActionDispatch::IntegrationTest
     assert_response :redirect
     
     # Verificar tarefa vinculada
-    get "/contacts/#{person.id}/tasks"
+    get "/contacts/#{person.id}"
     assert_response :success
-    assert_select 'table.issues td', text: /#{issue.subject}/
+    assert_select 'div#tab-issues td.subject', text: /#{issue.subject}/
     
     # Atualizar contato
     put "/contacts/#{person.id}", params: {

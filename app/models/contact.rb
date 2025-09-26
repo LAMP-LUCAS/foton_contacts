@@ -22,16 +22,16 @@ class Contact < ActiveRecord::Base
   belongs_to :project, optional: true
   belongs_to :user, optional: true
   
-  has_many :roles, class_name: 'ContactRole', dependent: :destroy
-  has_many :companies, through: :roles, source: :company
+  has_many :contact_roles, class_name: 'ContactRole', dependent: :destroy
+  has_many :companies, through: :contact_roles, source: :company
   has_many :inverse_roles, class_name: 'ContactRole', foreign_key: :company_id, dependent: :destroy
   has_many :employees, through: :inverse_roles, source: :contact
   
-  has_many :group_memberships, class_name: 'ContactGroupMembership', dependent: :destroy
-  has_many :groups, through: :group_memberships, source: :contact_group
+  has_many :contact_group_memberships, class_name: 'ContactGroupMembership', dependent: :destroy
+  has_many :contact_groups, through: :contact_group_memberships, source: :contact_group
   
-  has_many :issue_links, class_name: 'ContactIssueLink', dependent: :destroy
-  has_many :issues, through: :issue_links
+  has_many :contact_issue_links, class_name: 'ContactIssueLink', dependent: :destroy
+  has_many :issues, through: :contact_issue_links
   
   validates :name, presence: true
   enum :contact_type, [:person, :company]
