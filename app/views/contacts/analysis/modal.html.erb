@@ -7,14 +7,19 @@
   <%= render partial: 'contacts/analysis/charts', locals: { contact: contact } %>
   <div class="tabs">
     <ul>
-      <li><a href="#bi-links"><%= l(:label_relationships) %></a></li>
+      <%# A aba de vínculos só é relevante para pessoas %>
+      <% if contact.person? %>
+        <li><a href="#bi-links"><%= l(:label_relationships) %></a></li>
+      <% end %>
       <li><a href="#bi-projects"><%= l(:label_projects) %></a></li>
       <li><a href="#bi-career"><%= l(:label_career) %></a></li>
       <li><a href="#bi-alerts"><%= l(:label_alerts) %></a></li>
     </ul>
-    <div id="bi-links">
-      <%= render partial: 'contacts/analysis/links', locals: { contact: contact } %>
-    </div>
+    <% if contact.person? %>
+      <div id="bi-links">
+        <%= render partial: 'contacts/analysis/links', locals: { contact: contact } %>
+      </div>
+    <% end %>
     <div id="bi-projects">
       <%= render partial: 'contacts/analysis/projects', locals: { contact: contact } %>
     </div>
@@ -26,8 +31,3 @@
     </div>
   </div>
 </div>
-<script>
-$(function() {
-  $('.bi-modal-content .tabs').tabs();
-});
-</script>

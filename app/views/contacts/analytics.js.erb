@@ -1,10 +1,9 @@
-<%# app/views/contacts/analytics.js.erb %>
+// 1. Preenche o container do modal com o conteúdo da partial.
+//    Passamos a variável @contact do controller como uma local 'contact' para a partial.
+$('#ajax-modal').html("<%= j render(partial: 'contacts/analysis/modal', locals: { contact: @contact }) %>");
 
-// Remove qualquer modal existente para evitar duplicidade
-$('#ajax-modal').remove();
+// 2. Exibe o modal que agora contém o HTML.
+showModal('ajax-modal');
 
-// Adiciona o HTML do modal ao corpo da página
-$('body').append('<div id="ajax-modal" style="display:none;"><%= j render(partial: "contacts/analysis/modal", locals: { contact: @contact }) %></div>');
-
-// Exibe o modal usando a função global
-showModal('ajax-modal', '80%');
+// 3. Inicializa as abas do jQuery UI dentro do modal recém-exibido.
+$('#ajax-modal .tabs').tabs();

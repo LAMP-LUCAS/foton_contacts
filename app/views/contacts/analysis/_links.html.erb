@@ -1,18 +1,23 @@
 <%# app/views/contacts/analysis/_links.html.erb %>
-<div class="autoscroll">
-  <div class="splitcontentleft">
-    <h4><%= l(:label_active_links) %> (<%= @contact.roles.active.count %>)</h4>
-    <% if defined?(Chartkick) %>
-      <div class="chart">
-        <%= pie_chart @contact.roles.group(:status).count,
-                    colors: ['#4CAF50', '#FFC107', '#F44336'],
-                    donut: true,
-                    legend: 'bottom' %>
-      </div>
-    <% else %>
-      <p class="nodata"><%= l(:label_no_data) %>. (Chartkick gem not installed)</p>
-    <% end %>
+<%# Esta seção só faz sentido para contatos do tipo 'pessoa' %>
+<% if contact.person? %>
+  <div class="autoscroll">
+    <div class="splitcontentleft">
+      <h4><%= l(:label_active_links) %> (<%= contact.contact_roles.active.count %>)</h4>
+      <% if defined?(Chartkick) && contact.contact_roles.any? %>
+        <div class="chart">
+          <%= pie_chart contact.contact_roles.group(:status).count,
+                      colors: ['#4CAF50', '#FFC107', '#F44336'],
+                      donut: true,
+                      legend: 'bottom' %>
+        </div>
+      <% else %>
+        <p class="nodata"><%= l(:label_no_data) %></p>
+      <% end %>
+    </div>
+    <div class="splitcontentright">
+    </div>
   </div>
-  <div class="splitcontentright">
-  </div>
-</div>
+<% else %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% end %>
