@@ -50,8 +50,12 @@ Rails.configuration.to_prepare do
   # Registra os assets do plugin para pré-compilação
   Rails.application.config.assets.precompile += %w( contacts.css select2.min.css contacts.js analytics.js )
 
+  
+  require_relative 'lib/patches/issue_patch'
+
   # Aplica o patch na classe User do Redmine
   unless User.included_modules.include?(Patches::UserPatch)
     User.send(:include, Patches::UserPatch)
   end
+
 end
