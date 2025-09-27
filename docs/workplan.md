@@ -102,3 +102,15 @@ O desenvolvimento do plugin é guiado pelos seguintes princípios, conforme deta
   3.  Restaurar a lógica no `ContactsController#show` para carregar os `@journals`.
   4.  Garantir que a view `show.html.erb` exiba o histórico corretamente usando o helper `render_journals(@journals)`.
 - **Status:** A lógica quebrada foi removida do controller para evitar o erro 500. A funcionalidade está desativada até que o modelo seja corrigido.
+
+---
+
+#### Refatorar Modelos de Vínculo (ContactRole e ContactEmployment)
+
+- **Problema:** O modelo `Contact` define as associações `:companies` e `:employees` duas vezes, utilizando dois modelos diferentes (`ContactRole` e `ContactEmployment`) para representar o vínculo entre uma pessoa e uma empresa. Isso viola o princípio de responsabilidade única (SOLID) e causa confusão e bugs, como a sobrescrita de associações.
+- **Solução Proposta:**
+  1.  Analisar o uso de ambos os modelos no plugin.
+  2.  Decidir por um modelo canônico para representar o vínculo (provavelmente `ContactEmployment`, que é mais completo).
+  3.  Migrar os dados e a lógica de `ContactRole` para `ContactEmployment`.
+  4.  Remover o modelo `ContactRole` e suas associações para eliminar a duplicidade.
+- **Status:** Pendente. Esta é uma refatoração estrutural importante para a manutenibilidade do plugin.

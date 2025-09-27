@@ -83,14 +83,12 @@ O desenvolvimento do Foton Contacts é guiado pelos seguintes princípios:
 │   ├── controllers
 │   │   ├── contact_groups_controller.rb
 │   │   ├── contact_issue_links_controller.rb
-│   │   ├── contact_roles_controller.rb
 │   │   ├── contacts_controller.rb
 │   │   └── update.js.erb
 │   ├── models
 │   │   ├── contact_group_membership.rb
 │   │   ├── contact_group.rb
 │   │   ├── contact_issue_link.rb
-│   │   ├── contact_role.rb
 │   │   └── contact.rb
 │   └── views
 │       ├── contacts
@@ -154,7 +152,7 @@ O desenvolvimento do Foton Contacts é guiado pelos seguintes princípios:
 │   ├── migrate
 │   │   ├── 001_create_contacts.rb
 │   │   ├── 002_create_contact_roles.rb
-│   │   ├── 003_create_contact_groups.rb
+│   │   ├── 003_create_contact_groups.rb 
 │   │   ├── 004_create_contact_group_memberships.rb
 │   │   ├── 005_convert_contact_type_and_status_to_enum.rb
 │   │   └── 006_create_contact_issue_links.rb
