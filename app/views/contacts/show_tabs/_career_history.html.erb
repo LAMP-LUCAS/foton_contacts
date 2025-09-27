@@ -1,0 +1,22 @@
+<% if @contact_employments.present? %>
+  <table class="list">
+    <thead>
+      <tr>
+        <th><%= l(:label_company) %></th>
+        <th><%= l(:field_position) %></th>
+        <th><%= l(:label_period) %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @contact_employments.each do |employment| %>
+        <tr>
+          <td><%= link_to employment.company.name, contact_path(employment.company) %></td>
+          <td><%= employment.position %></td>
+          <td><%= format_date(employment.start_date) %> - <%= employment.end_date ? format_date(employment.end_date) : l(:label_present) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% end %>

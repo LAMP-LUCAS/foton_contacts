@@ -37,82 +37,48 @@
 <%# The "Career History" section now serves as the single source of truth for this information. %>
 
 <%# Career History %>
-<% if @contact.person? && @contact_employments.present? %>
+<% if @contact.person? %>
 <div class="box">
   <h3><%= l(:label_professional_links) %></h3>
-  <table class="list">
-    <thead>
-      <tr>
-        <th><%= l(:label_company) %></th>
-        <th><%= l(:field_position) %></th>
-        <th><%= l(:label_period) %></th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @contact_employments.each do |employment| %>
-        <tr>
-          <td><%= link_to employment.company.name, contact_path(employment.company) %></td>
-          <td><%= employment.position %></td>
-          <td><%= format_date(employment.start_date) %> - <%= employment.end_date ? format_date(employment.end_date) : l(:label_present) %></td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
+  <%= turbo_frame_tag "contact_career_history", src: career_history_contact_path(@contact), loading: "lazy" do %>
+    <p><%= l(:label_loading) %>...</p>
+  <% end %>
 </div>
 <% end %>
 
 <%# Employees List %>
-<% if !@contact.person? && @employees.present? %>
+<% if !@contact.person? %>
 <div class="box">
   <h3><%= l(:label_employees) %></h3>
-  <table class="list">
-    <thead>
-      <tr>
-        <th><%= l(:label_employee) %></th>
-        <th><%= l(:field_position) %></th>
-        <th><%= l(:field_status) %></th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @employees.each do |role| %>
-        <tr class="contact-role">
-          <td><%= link_to role.person.name, contact_path(role.person) %></td>
-          <td><%= role.position %></td>
-          <td><span class="status <%= role.status %>"><%= l("label_#{role.status}") %></span></td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
+  <%= turbo_frame_tag "contact_employees_list", src: employees_list_contact_path(@contact), loading: "lazy" do %>
+    <p><%= l(:label_loading) %>...</p>
+  <% end %>
 </div>
 <% end %>
 
 <%# Groups %>
-<% if @contact_groups.present? %>
 <div class="box">
   <h3><%= l(:label_groups) %></h3>
-  <ul class="contact-groups">
-    <% @contact_groups.each do |group| %>
-      <li><%= link_to group.name, contact_group_path(group) %></li>
-    <% end %>
-  </ul>
+  <%= turbo_frame_tag "contact_groups", src: groups_contact_path(@contact), loading: "lazy" do %>
+    <p><%= l(:label_loading) %>...</p>
+  <% end %>
 </div>
-<% end %>
 
 <%# Associated Issues %>
-<% if @issues.present? %>
 <div class="box">
   <h3><%= l(:label_issues) %></h3>
-  <%= render partial: 'issues/list_simple', locals: { issues: @issues } %>
+  <%= turbo_frame_tag "contact_tasks", src: tasks_contact_path(@contact), loading: "lazy" do %>
+    <p><%= l(:label_loading) %>...</p>
+  <% end %>
 </div>
-<% end %>
 
 <%# History %>
-<% if @journals.present? %>
 <div class="box">
   <h3><%= l(:label_history) %></h3>
-  <%= render_journals(@journals) %>
+  <%= turbo_frame_tag "contact_history", src: history_contact_path(@contact), loading: "lazy" do %>
+    <p><%= l(:label_loading) %>...</p>
+  <% end %>
 </div>
-<% end %>
 
 <%# Analytics %>
 <div id="analytics-container" class="box">

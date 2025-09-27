@@ -3,6 +3,8 @@
 
 resources :contacts do
   member do
+    get 'career_history'
+    get 'employees_list'
     get 'groups'
     get 'tasks'
     get 'history'

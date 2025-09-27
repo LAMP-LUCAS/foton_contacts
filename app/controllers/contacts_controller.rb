@@ -60,7 +60,7 @@ Classe: ContactsController
 
 class ContactsController < ApplicationController
   before_action :require_login
-  before_action :find_contact, only: [:show, :edit, :update, :destroy, :groups, :tasks, :history, :analytics]
+  before_action :find_contact, only: [:show, :edit, :update, :destroy, :career_history, :employees_list, :groups, :tasks, :history, :analytics]
   before_action :authorize_global, only: [:index, :show, :new, :create]
   before_action :authorize_edit, only: [:edit, :update, :destroy]
   
@@ -117,8 +117,6 @@ class ContactsController < ApplicationController
       @employees = @contact.employees.includes(:person) if @contact.respond_to?(:employees)
     end
     
-    @contact_groups = @contact.contact_groups
-    @issues = @contact.issues.visible
     @custom_values = @contact.custom_values
     
     respond_to do |format|
@@ -130,70 +128,37 @@ class ContactsController < ApplicationController
   
   def new
     @contact = Contact.new(author: User.current, contact_type: params[:type])
-    
-    respond_to do |format|
-      format.html # Renders new.html.erb for non-JS fallback
-      format.js   # Renders new.js.erb for AJAX requests
-    end
+    render 'modal'
   end
 
   def create
     @contact = Contact.new(author: User.current)
     @contact.safe_attributes = params[:contact]
     
-    if @contact.save
-      respond_to do |format|
-        format.html {
-          flash[:notice] = l(:notice_contact_created)
-          redirect_to contact_path(@contact)
-        }
-        format.js {
-          # Deixa o Rails renderizar create.js.erb por convenção
-        }
+    respond_to do |format|
+      if @contact.save
+        format.html { redirect_to contacts_path, notice: l(:notice_contact_created) }
         format.api { render action: 'show', status: :created, location: contact_url(@contact) }
-      end
-    else
-      respond_to do |format|
-        format.html { render action: 'new' }
-        format.js { render partial: 'new_form', layout: false }
+      else
+        format.html { render 'modal', status: :unprocessable_entity }
         format.api { render_validation_errors(@contact) }
       end
     end
   end
   
   def edit
-    # A renderização será feita por 'edit.js.erb'
+    render 'modal'
   end
   
   def update
     @contact.safe_attributes = params[:contact]
     
-    if @contact.save
-      # Custom log to confirm saved data
-      logger.info "Contact ##{@contact.id} ('#{@contact.name}') saved successfully."
-      @contact.employments_as_person.reload.each do |emp|
-        logger.info "  -> Employment ##{emp.id}: Company ##{emp.company_id}, Position: '#{emp.position}'"
-      end
-
-      respond_to do |format|
-        format.html {
-          flash[:notice] = l(:notice_successful_update)
-          redirect_to contact_path(@contact)
-        }
-        format.js # Deixa o Rails renderizar update.js.erb por convenção
+    respond_to do |format|
+      if @contact.save
+        format.html { redirect_to contacts_path, notice: l(:notice_successful_update) }
         format.api { render_api_ok }
-      end
-    else
-      logger.error "Contact ##{@contact.id} failed to save. Errors: #{@contact.errors.full_messages.join(', ')}"
-      @contact.employments_as_person.each_with_index do |emp, i|
-        if emp.errors.any?
-          logger.error "  -> Employment ##{i} errors: #{emp.errors.full_messages.join(', ')}"
-        end
-      end
-
-      respond_to do |format|
-        format.html { render action: 'edit' }
-        format.js { render partial: 'form', status: :unprocessable_entity }
+      else
+        format.html { render 'modal', status: :unprocessable_entity }
         format.api { render_validation_errors(@contact) }
       end
     end
@@ -211,21 +176,34 @@ class ContactsController < ApplicationController
   end
   
   def groups
-    @groups = @contact.contact_groups
+    @contact_groups = @contact.contact_groups
+    render partial: 'contacts/show_tabs/groups', layout: false
   end
   
   def tasks
     @issues = @contact.issues.visible
+    render partial: 'contacts/show_tabs/issues', layout: false
   end
   
   def history
     @journals = @contact.journals.includes(:user).reorder('created_on DESC')
+    render partial: 'contacts/show_tabs/history', layout: false
   end
   
   def analytics
     respond_to do |format|
       format.js # Deixa o Rails renderizar analytics.js.erb por convenção
     end
+  end
+
+  def career_history
+    @contact_employments = @contact.employments_as_person.includes(:company)
+    render partial: 'contacts/show_tabs/career_history', layout: false
+  end
+
+  def employees_list
+    @employees = @contact.employees.includes(:person)
+    render partial: 'contacts/show_tabs/employees_list', layout: false
   end
   
   def search
