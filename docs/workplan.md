@@ -90,4 +90,15 @@ O desenvolvimento do plugin é guiado pelos seguintes princípios, conforme deta
 - [ ] **Documentação para Desenvolvedores:**
   - [ ] Detalhar os hooks disponíveis.
   - [ ] Documentar a API REST.
-  
+
+### backlog
+
+#### Implementar Histórico de Alterações no Contato
+
+- **Problema:** A tentativa de exibir o histórico de alterações na página de detalhes do contato falha com um erro `NoMethodError (undefined method 'journals')`. Isso ocorre porque o modelo `Contact` não foi configurado para usar o sistema de histórico (`journals`) do Redmine.
+- **Solução Proposta:**
+  1.  Modificar o modelo `app/models/contact.rb`.
+  2.  Adicionar a declaração `acts_as_journalized` ao modelo, configurando quais campos devem ser monitorados.
+  3.  Restaurar a lógica no `ContactsController#show` para carregar os `@journals`.
+  4.  Garantir que a view `show.html.erb` exiba o histórico corretamente usando o helper `render_journals(@journals)`.
+- **Status:** A lógica quebrada foi removida do controller para evitar o erro 500. A funcionalidade está desativada até que o modelo seja corrigido.
