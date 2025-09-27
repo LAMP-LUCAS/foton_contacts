@@ -1,0 +1,6 @@
+<%= turbo_frame_tag "modal" do %>
+  <div id="ajax-modal" class="modal">
+    <h2><%= @contact.new_record? ? l(:label_new_contact) : l(:label_edit_contact) %></h2>
+    <%= render 'form', contact: @contact %>
+  </div>
+<% end %>

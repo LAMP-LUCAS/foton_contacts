@@ -1,60 +1,64 @@
 <div class="contextual">
-  <%= link_to l(:label_new_contact), new_contact_path(type: 'person'), remote: true, class: 'icon icon-add contact-new' %>
-  <%= link_to l(:label_new_contact) + " (#{l(:label_company).downcase})", new_contact_path(type: 'company'), remote: true, class: 'icon icon-add contact-new' %>
+  <%= link_to l(:label_new_contact), new_contact_path(type: 'person'), data: { turbo_frame: 'modal' }, class: 'icon icon-add' %>
+  <%= link_to l(:label_new_contact) + " (#{l(:label_company).downcase})", new_contact_path(type: 'company'), data: { turbo_frame: 'modal' }, class: 'icon icon-add' %>
 </div>
 
 <h2><%= l(:label_contacts) %></h2>
 
-<%= form_tag(contacts_path, method: :get, id: 'query_form') do %>
-  <fieldset id="filters" class="collapsible">
-    <legend onclick="toggleFieldset(this);"><%= l(:label_filter_plural) %></legend>
-    <div style="">
-      <div class="splitcontent">
-        <div class="splitcontentleft">
-          <p>
-            <%= label_tag 'search', l(:field_name) %>
-            <%= text_field_tag 'search', params[:search], size: 30 %>
-          </p>
-          <p>
-            <%= label_tag 'contact_type', l(:field_type) %>
-            <%= select_tag 'contact_type', options_for_select([[l(:label_all), '']] + Contact.contact_types.keys.map { |t| [l("label_#{t}"), t] }, params[:contact_type]) %>
-          </p>
-        </div>
-        <div class="splitcontentright">
-          <p>
-            <%= label_tag 'status', l(:field_status) %>
-            <%= select_tag 'status', options_for_select([[l(:label_all), '']] + Contact.statuses.keys.map { |s| [l("label_#{s}"), s] }, params[:status]) %>
-          </p>
+<%= turbo_frame_tag "contacts" do %>
+  <%= form_tag(contacts_path, method: :get, id: 'query_form') do %>
+    <fieldset id="filters" class="collapsible">
+      <legend onclick="toggleFieldset(this);"><%= l(:label_filter_plural) %></legend>
+      <div style="">
+        <div class="splitcontent">
+          <div class="splitcontentleft">
+            <p>
+              <%= label_tag 'search', l(:field_name) %>
+              <%= text_field_tag 'search', params[:search], size: 30 %>
+            </p>
+            <p>
+              <%= label_tag 'contact_type', l(:field_type) %>
+              <%= select_tag 'contact_type', options_for_select([[l(:label_all), '']] + Contact.contact_types.keys.map { |t| [l("label_#{t}"), t] }, params[:contact_type]) %>
+            </p>
+          </div>
+          <div class="splitcontentright">
+            <p>
+              <%= label_tag 'status', l(:field_status) %>
+              <%= select_tag 'status', options_for_select([[l(:label_all), '']] + Contact.statuses.keys.map { |s| [l("label_#{s}"), s] }, params[:status]) %>
+            </p>
+          </div>
         </div>
       </div>
-    </div>
-    <p class="buttons">
-      <%= link_to l(:button_apply), '#', onclick: 'submit_query_form("query_form"); return false;', class: 'icon icon-checked' %>
-      <%= link_to l(:button_clear), {controller: 'contacts', action: 'index'}, class: 'icon icon-reload' %>
-    </p>
-  </fieldset>
+      <p class="buttons">
+        <%= link_to l(:button_apply), '#', onclick: 'submit_query_form("query_form"); return false;', class: 'icon icon-checked' %>
+        <%= link_to l(:button_clear), {controller: 'contacts', action: 'index'}, class: 'icon icon-reload' %>
+      </p>
+    </fieldset>
+  <% end %>
+
+  <div id="contacts_list">
+    <table class="list">
+      <thead>
+        <tr>
+          <th><%= l(:field_name) %></th>
+          <th><%= l(:field_type) %></th>
+          <th><%= l(:field_status) %></th>
+          <th><%= l(:field_project) %></th>
+          <th><%= l(:field_created_on) %></th>
+          <th style="width: 15%"><%= l(:label_actions) %></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @contacts.each do |contact| %>
+          <%= render partial: 'contact_row', locals: { contact: contact } %>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <% if @contacts.empty? %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+  <% end %>
 <% end %>
 
-<div id="contacts_list">
-  <table class="list">
-    <thead>
-      <tr>
-        <th><%= l(:field_name) %></th>
-        <th><%= l(:field_type) %></th>
-        <th><%= l(:field_status) %></th>
-        <th><%= l(:field_project) %></th>
-        <th><%= l(:field_created_on) %></th>
-        <th style="width: 15%"><%= l(:label_actions) %></th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @contacts.each do |contact| %>
-        <%= render partial: 'contact_row', locals: { contact: contact } %>
-      <% end %>
-    </tbody>
-  </table>
-</div>
-
-<% if @contacts.empty? %>
-<p class="nodata"><%= l(:label_no_data) %></p>
-<% end %>
+<%= turbo_frame_tag "modal" %>
