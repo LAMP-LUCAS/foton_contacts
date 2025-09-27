@@ -26,5 +26,8 @@ resources :contact_groups do
 end
 resources :contact_issue_links, only: [:create, :destroy]
 
+resources :projects do
+  resources :contacts
+end
 # Configurações do plugin
 get 'settings/plugin/foton_contacts', to: 'settings#plugin', as: 'contact_settings'

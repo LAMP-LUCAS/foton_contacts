@@ -62,6 +62,9 @@
                       placeholder: "Adicione uma descrição detalhada sobre o contato." %>
     </p>
 
+    <%# Seção de vínculos com empresas - SEM container externo %>
+    <%= render 'contact_employments_fields', f: f %>
+
     <p>
       <%= f.label :is_private %>
       <%= f.check_box :is_private %>
@@ -86,9 +89,11 @@
       if (type === 'person') {
         $('.company-only').hide();
         $('.person-only').show();
+        $('#contact-employments-fieldset').show(); // Mostra vínculos
       } else {
         $('.company-only').show();
         $('.person-only').hide();
+        $('#contact-employments-fieldset').hide(); // Esconde vínculos
       }
     }
     

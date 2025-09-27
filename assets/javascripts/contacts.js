@@ -154,3 +154,48 @@ $(document).ready(function() {
     }, 500);
   });
 });
+
+
+// ========= FUNÇÕES PARA VÍNCULOS COM EMPRESAS =========
+function addContactEmployment() {
+  const container = document.getElementById('contact-employments');
+  const template = container.dataset.template;
+  const regexp = new RegExp('NEW_RECORD', 'g');
+  const newId = new Date().getTime();
+  let newContent = template.replace(regexp, newId);
+  
+  // Corrige aspas quebradas (caso use template inline)
+  newContent = newContent.replace(/\\/g, '');
+  
+  container.insertAdjacentHTML('beforeend', newContent);
+  
+  // Inicializa Select2 nos novos campos
+  const newSelects = container.querySelectorAll('.select2:not(.select2-hidden-accessible)');
+  newSelects.forEach(select => {
+    $(select).select2({
+      width: '60%',
+      allowClear: true
+    });
+  });
+}
+
+function removeContactEmployment(element) {
+  const field = element.closest('.contact-employment-fields');
+  const destroyField = field.querySelector('input[name$="[_destroy]"]');
+  if (destroyField) {
+    destroyField.value = '1';
+    field.style.display = 'none';
+  }
+}
+
+function showTab(name) {
+  document.querySelectorAll('.tab-content').forEach(tab => {
+    tab.style.display = 'none';
+  });
+  document.querySelectorAll('.tabs li').forEach(li => {
+    li.classList.remove('selected');
+  });
+  document.getElementById(`tab-content-${name}`).style.display = 'block';
+  document.getElementById(`tab-${name}`).closest('li').classList.add('selected');
+}
+// ======================================================

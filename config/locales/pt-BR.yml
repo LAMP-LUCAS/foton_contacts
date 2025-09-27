@@ -31,6 +31,20 @@ pt-BR:
   label_no_data_to_display: "Sem dados para exibir"
   label_chart_error: "Erro ao gerar gráfico"
   label_issues_by_creation_date: "Tarefas por Data de Criação"
+  label_companies_tab: "Empresas"
+  label_active_employments: "Vínculos Ativos"
+  label_past_employments: "Vínculos Anteriores"
+  label_employees: "Colaboradores"
+  label_no_active_employments: "Nenhum vínculo ativo"
+  label_no_past_employments: "Nenhum vínculo anterior"
+  label_no_employees: "Nenhum colaborador ativo"
+
+
+  label_contact_employments: "Vínculos com Empresas"
+  field_company: "Empresa"
+  field_start_date: "Início"
+  field_end_date: "Fim"
+  label_select_company: "Selecione uma empresa"
 
   # Traduções da página de configuração
   label_contact_create_from_user: "Criar contato para novos usuários"
@@ -43,6 +57,7 @@ pt-BR:
   label_feature_activation: "Ativação de Módulos"
   text_contact_create_from_user_info: "Se marcado, um perfil de contato será criado automaticamente sempre que um novo usuário for criado no Redmine."
   # Traduções da página de visualização (show)
+  field_created_by: "Criado por"
   label_analysis: "Análise"
   label_details_plural: "Detalhes"
   field_author: "Autor"
@@ -68,3 +83,4 @@ pt-BR:
   label_all: "Todos"
   label_actions: "Ações"
   text_are_you_sure: "Você tem certeza?"
+

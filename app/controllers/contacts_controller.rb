@@ -116,7 +116,18 @@ class ContactsController < ApplicationController
   
   def show    
     # Inicializa as variáveis de instância esperadas pela view
-    @contact_roles = @contact.contact_roles.includes(:company) if @contact.person?
+    if @contact.person?
+      @contact_roles = @contact.contact_roles.includes(:company)
+      if @contact_employments.present?
+        @contact_employments = @contact.contact_employments.includes(:company)
+      else
+        @contact_employments = []
+      end
+    else # Company
+      # Assuming an association like `employees` or similar exists on the Contact model for companies
+      @employees = @contact.employees.includes(:person) if @contact.respond_to?(:employees)
+    end
+    
     @contact_groups = @contact.contact_groups
     @issues = @contact.issues.visible
     @custom_values = @contact.custom_values
@@ -259,4 +270,14 @@ class ContactsController < ApplicationController
     end
     true
   end
+
+  def contact_params
+    params.require(:contact).permit(
+      :first_name, :last_name, :email, :phone, :mobile, :notes, :active, :contact_type,
+      employments_as_person_attributes: [
+        :id, :company_id, :position, :start_date, :end_date, :_destroy
+      ]
+    )
+  end
+
 end

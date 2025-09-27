@@ -1,59 +1,68 @@
-<%# app/views/contacts/tabs/_companies.html.erb %>
-<div class="splitcontentleft">
-  <div class="box">
-    <table class="list contact-roles">
-      <thead>
-        <tr>
-          <th><%= l(:label_company) %></th>
-          <th><%= l(:field_position) %></th>
-          <th><%= l(:field_status) %></th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @roles.each do |role| %>
-          <tr class="<%= role.status_name %>">
-            <td><%= link_to role.company.name, contact_path(role.company) %></td>
-            <td><%= role.position %></td>
-            <td><%= l("label_#{role.status_name}") %></td>
-            <td class="buttons">
-              <%= link_to l(:button_delete), contact_role_path(role),
-                        method: :delete, 
-                        remote: true,
-                        class: 'icon icon-del',
-                        data: { confirm: l(:text_are_you_sure) } if User.current.allowed_to?(:manage_contacts, @contact.project) %>
-            </td>
-          </tr>
+<%# Aba: Vínculos com Empresas %>
+<div id="tab-content-companies" class="tab-content" style="display:none;">
+  <% if @contact.person? %>
+    <h3><%= l(:label_active_employments) %></h3>
+    <% active_employments = @contact.employments_as_person.active %>
+    <% if active_employments.any? %>
+      <ul class="contact-employments-list">
+        <% active_employments.each do |emp| %>
+          <li>
+            <strong><%= link_to emp.company.name, contact_path(emp.company) %></strong>
+            <% if emp.position.present? %>
+              - <%= emp.position %>
+            <% end %>
+            <% if emp.start_date %>
+              (<%= l(:field_start_date) %>: <%= format_date(emp.start_date) %>)
+            <% end %>
+            <%= link_to l(:button_edit), 
+                        edit_contact_path(@contact, anchor: 'tab-companies'), 
+                        class: 'icon icon-edit' %>
+          </li>
         <% end %>
-      </tbody>
-    </table>
-  </div>
-</div>
+      </ul>
+    <% else %>
+      <p class="nodata"><%= l(:label_no_active_employments) %></p>
+    <% end %>
 
-<div class="splitcontentright">
-  <% if User.current.allowed_to?(:manage_contacts, @contact.project) %>
-    <div class="box">
-      <h3><%= l(:label_add_company_role) %></h3>
-      <%= form_for ContactRole.new, remote: true do |f| %>
-        <div class="box tabular">
-          <p>
-            <%= f.hidden_field :contact_id, value: @contact.id %>
-            <%= f.select :company_id,
-                      Contact.companies.active.order(:name).map { |c| [c.name, c.id] },
-                      { include_blank: true },
-                      required: true %>
-          </p>
-          <p>
-            <%= f.text_field :position, required: true, size: 30 %>
-          </p>
-          <p>
-            <%= f.select :status,
-                      ContactRole.statuses.map { |k, v| [l("label_#{k}"), v] },
-                      required: true %>
-          </p>
-          <%= submit_tag l(:button_add) %>
-        </div>
-      <% end %>
-    </div>
+    <h3><%= l(:label_past_employments) %></h3>
+    <% past_employments = @contact.employments_as_person.inactive %>
+    <% if past_employments.any? %>
+      <ul class="contact-employments-list">
+        <% past_employments.each do |emp| %>
+          <li>
+            <strong><%= link_to emp.company.name, contact_path(emp.company) %></strong>
+            <% if emp.position.present? %>
+              - <%= emp.position %>
+            <% end %>
+            (<%= l(:field_start_date) %>: <%= format_date(emp.start_date) %>
+            <% if emp.end_date %>
+              | <%= l(:field_end_date) %>: <%= format_date(emp.end_date) %>
+            <% end %>)
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="nodata"><%= l(:label_no_past_employments) %></p>
+    <% end %>
+
+  <% elsif @contact.company? %>
+    <h3><%= l(:label_employees) %></h3>
+    <% employees = @contact.employees.active %>
+    <% if employees.any? %>
+      <ul class="contact-employees-list">
+        <% employees.each do |person| %>
+          <li>
+            <%= link_to person.name, contact_path(person) %>
+            <% employment = @contact.employments_as_company.find_by(contact: person) %>
+            <% if employment&.position.present? %>
+              - <%= employment.position %>
+            <% end %>
+            (<%= l(:field_start_date) %>: <%= format_date(employment.start_date) %>)
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="nodata"><%= l(:label_no_employees) %></p>
+    <% end %>
   <% end %>
 </div>

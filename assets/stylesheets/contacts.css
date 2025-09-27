@@ -60,6 +60,17 @@ tr.discontinued td.status {
   color: #e74c3c;
 }
 
+/* Badge de status */
+.status-label {
+  font-size: 0.8em;
+  padding: 2px 6px;
+  border-radius: 3px;
+  margin-left: 10px;
+}
+.status-active { background-color: #e6f4ea; color: #137333; }
+.status-inactive { background-color: #fce8e6; color: #c5221f; }
+.status-discontinued { background-color: #f1f3f4; color: #5f6368; }
+
 /* Formulários */
 .box.tabular label {
   width: 150px;
@@ -106,7 +117,7 @@ tr.discontinued td.status {
 
 .alerts {
   padding: 10px;
-  border-left: 3px solid <%= Rails.application.config.try(:warning_color) || '#ffeb3b' %>;
+  border-left: 3px solid; /* <%= Rails.application.config.try(:warning_color) || '#ffeb3b' %>; */
   margin: 10px 0;
 }
 
