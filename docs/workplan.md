@@ -1,116 +1,74 @@
-# Foton Contacts
+# Foton Contacts: Plano de Trabalho (Workplan)
 
-## Plano de Trabalho (Workplan)
+## 🧭 Apresentação
 
-*Nota: Este documento foi atualizado para refletir o estado de desenvolvimento atual. As fases concluídas representam o trabalho já realizado, enquanto as fases pendentes estão em planejamento.*
+Este documento detalha o plano de trabalho e as tarefas pendentes para a evolução do plugin **Foton Contacts**. O objetivo do plugin é ser a solução definitiva para gestão de contatos e relacionamentos no Redmine para a indústria AEC.
 
-### 🧭 Apresentação
+Para detalhes sobre funcionalidades já implementadas e como o plugin funciona, consulte o **[Roadmap e Manual de Funcionalidades](ROADMAP.md)**.
 
-Este documento detalha o plano de trabalho para a evolução do plugin **Foton Contacts**, uma solução OpenSource para a gestão de contatos e relacionamentos profissionais no Redmine, com foco especial na indústria de Arquitetura, Engenharia e Construção (AEC).
-
-#### Objetivos do Plugin
-
-O Foton Contacts visa resolver problemas crônicos na gestão de stakeholders em projetos de construção, como:
-
-- **Centralização de Dados:** Unificar contatos (pessoas e empresas) que hoje vivem em planilhas, e-mails e sistemas desconectados.
-- **Gestão de Vínculos:** Permitir o mapeamento de relacionamentos profissionais complexos, como um mesmo profissional atuando em diferentes empresas com cargos distintos ao longo do tempo.
-- **Rastreabilidade e Histórico:** Manter um histórico claro de vínculos, participações em projetos e evolução de carreira dos contatos.
-- **Inteligência de Dados:** Oferecer uma visão analítica sobre a rede de contatos, seus relacionamentos e inconsistências (ex: dados faltantes, duplicidade).
-
-#### Diretrizes de Desenvolvimento
-
-O desenvolvimento do plugin é guiado pelos seguintes princípios, conforme detalhado no `CONTRIBUTING.md`:
-
-- **Integração Nativa:** A interface e as funcionalidades devem ser consistentes com a experiência padrão do Redmine.
-- **Foco em UI/UX:** A usabilidade é prioridade. As interfaces devem ser fluidas, responsivas e acessíveis.
-- **Segurança e Resiliência:** O plugin deve ser seguro, validando todas as entradas e tratando de forma elegante a ausência ou inconsistência de dados.
-- **Qualidade de Código:** O projeto segue o padrão *Conventional Commits* para mensagens de commit e um fluxo de contribuição baseado no Git Flow simplificado.
+Para diretrizes de arquitetura, UI/UX e conceitos de desenvolvimento, consulte o **[Relatório de Arquitetura de Views](views_architecture.md)**.
 
 ---
 
-### ✅ Fase 4 — Frontend e Experiência do Usuário (Concluído)
+## 🚀 Fase 1 — Modernização da Interface com Hotwire (Prioridade)
 
-**Objetivo:** Criar uma interface robusta, responsiva e intuitiva para o gerenciamento de contatos, com foco em:
+**Objetivo:** Migrar a interface do plugin de UJS/jQuery para Hotwire (Turbo e Stimulus) para criar uma experiência de usuário mais rápida, fluida e moderna.
 
-- Visualização analítica (BI) em aba dedicada
-- Operações rápidas (CRUD, importação, vinculação) em modais
-- Melhorar a responsividade para dispositivos móveis
+### Fase 1.0: Preparação do Ambiente
+- [x] **Instalar Hotwire:** Adicionar a gem `hotwire-rails` e executar `rails hotwire:install`.
+- [x] **Análise de Conflitos:** Garantir que a inicialização do Hotwire não entre em conflito com os scripts JavaScript existentes.
 
-#### 🔘 Botões de Ação (topo da aba)
+### Fase 1.1: Migração do CRUD de Contatos
+- [x] **Estruturar com Turbo Frames:** Envolver a lista de contatos e os modais de formulário em `turbo-frame-tag`.
+- [x] **Atualizar Controller:** Modificar as actions `create` e `update` para responder com `Turbo Streams`.
+- [x] **Remover Código Legado:** Excluir os arquivos `*.js.erb` e o código jQuery associado.
 
-- [x] ➕ **Novo Contato** → abrir formulário modal com campos dinâmicos por tipo
-- [x] 📥 **Importar CSV/vCard** → abrir modal com upload e mapeamento de campos
-- [x] 📊 **Análise de Contato** → botão em cada linha da tabela que abre modal BI
+### Fase 1.2: Otimização com Carregamento Sob Demanda (Lazy Loading)
+- [x] **Aplicar em Abas:** Converter o conteúdo das abas para `Turbo Frames` com `loading="lazy"`.
 
-#### 📊 Modal de Análise (BI)
+### Fase 1.3: Refinamento da Experiência com Stimulus
+- [ ] **Adicionar Feedback Visual:** Usar Stimulus para desabilitar botões e exibir spinners durante o envio de formulários.
+- [ ] **Melhorar Formulários Dinâmicos:** Usar Stimulus para animar a adição de novos vínculos e focar automaticamente.
+- [ ] **Implementar "Empty States":** Exibir mensagens e botões de ação quando as listas estiverem vazias.
 
-- [x] **Abertura:**
-  - Acessado via botão 🔍 na tabela
-  - Modal responsivo com abas internas
-- [x] **Conteúdo:**
-  - [x] **Aba 1: Vínculos:** Quantidade de empresas vinculadas, cargos ocupados e status, período de cada vínculo.
-  - [x] **Aba 2: Relações com Projetos:** Projetos associados, tarefas vinculadas (por tipo de issue), última atividade registrada.
-  - [x] **Aba 3: Carreira:** Linha do tempo dos vínculos, evolução de cargos, participação em grupos e tarefas.
-  - [x] **Aba 4: Alertas e Inconsistências:** Dados ausentes (e-mail, telefone, empresa), vínculos sem cargo definido, contatos duplicados (por nome ou e-mail).
-
-### 🧪 Fase 6 — Testes e Validações (Em Andamento)
-
-**Objetivo:**
-
-- Garantir que todas as funcionalidades do plugin funcionem corretamente
-- Validar regras de negócio, permissões e escopos
-- Prevenir falhas em ambientes com dados incompletos ou inconsistentes
-
-#### 🧱 Tipos de Testes
-
-- [x] **Testes de Integração (RSpec/Capybara):**
-  - [x] Verificar fluxo entre controllers, views e banco de dados para as principais funcionalidades.
-- [x] **Testes de Importação/Exportação:**
-  - [x] Validar mapeamento e tratamento de arquivos CSV.
-- [ ] **Testes Unitários (RSpec):**
-  - [ ] Validar modelos, métodos auxiliares e regras de validação.
-- [ ] **Testes de Permissão:**
-  - [ ] Confirmar que cada usuário vê e acessa apenas o que tem direito.
-- [ ] **Testes de Interface:**
-  - [ ] Garantir que a UI responde corretamente em desktop e mobile.
-- [ ] **Testes de Resiliência:**
-  - [ ] Simular dados corrompidos, ausentes ou duplicados.
-
-### 📦 Fase 7 — Empacotamento, Documentação e Publicação (Planejamento)
-
-**Objetivo:**
-
-- Criar documentação técnica e de uso clara, acessível e atualizada.
-
-#### 📘 Documentação Técnica
-
-- [ ] **Uso do Plugin:**
-  - [ ] Detalhar o processo de importação de vCard.
-    - [ ] Detalhar funcionalidades avançadas e configurações.
-- [ ] **Documentação para Desenvolvedores:**
-  - [ ] Detalhar os hooks disponíveis.
-  - [ ] Documentar a API REST.
-
-### backlog
-
-#### Implementar Histórico de Alterações no Contato
-
-- **Problema:** A tentativa de exibir o histórico de alterações na página de detalhes do contato falha com um erro `NoMethodError (undefined method 'journals')`. Isso ocorre porque o modelo `Contact` não foi configurado para usar o sistema de histórico (`journals`) do Redmine.
-- **Solução Proposta:**
-  1.  Modificar o modelo `app/models/contact.rb`.
-  2.  Adicionar a declaração `acts_as_journalized` ao modelo, configurando quais campos devem ser monitorados.
-  3.  Restaurar a lógica no `ContactsController#show` para carregar os `@journals`.
-  4.  Garantir que a view `show.html.erb` exiba o histórico corretamente usando o helper `render_journals(@journals)`.
-- **Status:** A lógica quebrada foi removida do controller para evitar o erro 500. A funcionalidade está desativada até que o modelo seja corrigido.
+### Fase 1.4: Modernização de Componentes
+- [ ] **Substituir Select2:** Planejar a substituição de `select2.js` por `Tom Select` com um wrapper Stimulus.
 
 ---
 
-#### Refatorar Modelos de Vínculo (ContactRole e ContactEmployment)
+## 🧪 Fase 2 — Testes e Validações (Pendentes)
 
-- **Problema:** O modelo `Contact` define as associações `:companies` e `:employees` duas vezes, utilizando dois modelos diferentes (`ContactRole` e `ContactEmployment`) para representar o vínculo entre uma pessoa e uma empresa. Isso viola o princípio de responsabilidade única (SOLID) e causa confusão e bugs, como a sobrescrita de associações.
+**Objetivo:** Aumentar a robustez e a confiabilidade do plugin.
+
+- [ ] **Testes Unitários (RSpec):** Validar modelos, métodos auxiliares e regras de validação.
+- [ ] **Testes de Permissão:** Confirmar que cada usuário vê e acessa apenas o que tem direito.
+- [ ] **Testes de Interface:** Garantir que a UI responde corretamente em desktop e mobile após a migração para Hotwire.
+- [ ] **Testes de Resiliência:** Simular dados corrompidos, ausentes ou duplicados.
+
+---
+
+## 📦 Fase 3 — Empacotamento e Documentação (Pendentes)
+
+**Objetivo:** Facilitar a adoção e contribuição para o plugin.
+
+- [ ] **Importação de vCard:** Detalhar e testar o processo de importação.
+- [ ] **Documentação da API REST:** Documentar todos os endpoints da API.
+- [ ] **Hooks para Desenvolvedores:** Detalhar os hooks disponíveis para extensão do plugin.
+
+---
+
+## 📝 Backlog Pendente
+
+### Implementar Histórico de Alterações no Contato
+
+- **Problema:** A funcionalidade de histórico (`journals`) está desativada pois o modelo `Contact` não foi configurado para tal.
 - **Solução Proposta:**
-  1.  Analisar o uso de ambos os modelos no plugin.
-  2.  Decidir por um modelo canônico para representar o vínculo (provavelmente `ContactEmployment`, que é mais completo).
-  3.  Migrar os dados e a lógica de `ContactRole` para `ContactEmployment`.
-  4.  Remover o modelo `ContactRole` e suas associações para eliminar a duplicidade.
-- **Status:** Pendente. Esta é uma refatoração estrutural importante para a manutenibilidade do plugin.
+  1. Adicionar `acts_as_journalized` ao modelo `contact.rb`.
+  2. Restaurar a lógica no `ContactsController#show` e na view `show.html.erb` para carregar e renderizar os `journals`.
+- **Status:** Pendente.
+
+### Refatorar Grupos de Contatos
+
+- **Problema:** O modelo `ContactGroup` usa flags booleanas (`is_system`, `is_private`) que poderiam ser substituídas por um enum `group_type` mais robusto.
+- **Solução Proposta:** Avaliar a substituição das flags pelo enum `group_type` (`general`, `ephemeral`).
+- **Status:** Pendente.
