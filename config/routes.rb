@@ -3,7 +3,6 @@
 
 resources :contacts do
   member do
-    get 'roles'
     get 'groups'
     get 'tasks'
     get 'history'
@@ -17,7 +16,8 @@ resources :contacts do
   end
 end
 
-resources :contact_roles, except: [:index, :show, :new, :edit]
+resources :contact_roles, only: [] # Rota vazia para desativar
+resources :contact_employments, only: [:create, :update, :destroy]
 resources :contact_groups do
   member do
     post 'add_member'

@@ -4,8 +4,8 @@ class Permissions
         map.project_module :contacts do
           # Permissões básicas
           map.permission :view_contacts,
-                        {
-                          contacts: [:index, :show, :roles, :groups, :tasks, :history, :analytics],
+                        { # Ação 'roles' removida
+                          contacts: [:index, :show, :groups, :tasks, :history, :analytics],
                           contact_groups: [:index, :show]
                         },
                         read: true
@@ -13,7 +13,7 @@ class Permissions
           map.permission :manage_contacts,
                         {
                           contacts: [:new, :create, :edit, :update, :destroy, :import],
-                          contact_roles: [:create, :update, :destroy],
+                          # contact_roles: [:create, :update, :destroy], # Removido
                           contact_groups: [:new, :create, :edit, :update, :destroy, :add_member, :remove_member],
                           contact_issue_links: [:create, :destroy]
                         },

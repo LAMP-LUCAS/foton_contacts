@@ -23,12 +23,6 @@ Classe: ContactsController
 
     destroy: Exclui o contato.
 
-    roles: Exibe os cargos do contato.
-
-    groups: Mostra os grupos aos quais o contato pertence.
-
-    tasks: Lista as issues associadas ao contato.
-
     history: Exibe o histórico de alterações (journals).
 
     analytics: Fornece dados analíticos (se habilitado).
@@ -66,7 +60,7 @@ Classe: ContactsController
 
 class ContactsController < ApplicationController
   before_action :require_login
-  before_action :find_contact, only: [:show, :edit, :update, :destroy, :roles, :groups, :tasks, :history, :analytics]
+  before_action :find_contact, only: [:show, :edit, :update, :destroy, :groups, :tasks, :history, :analytics]
   before_action :authorize_global, only: [:index, :show, :new, :create]
   before_action :authorize_edit, only: [:edit, :update, :destroy]
   
@@ -117,12 +111,7 @@ class ContactsController < ApplicationController
   def show    
     # Inicializa as variáveis de instância esperadas pela view
     if @contact.person?
-      @contact_roles = @contact.contact_roles.includes(:company)
-      if @contact_employments.present?
-        @contact_employments = @contact.contact_employments.includes(:company)
-      else
-        @contact_employments = []
-      end
+      @contact_employments = @contact.employments_as_person.includes(:company)
     else # Company
       # Assuming an association like `employees` or similar exists on the Contact model for companies
       @employees = @contact.employees.includes(:person) if @contact.respond_to?(:employees)
@@ -180,6 +169,12 @@ class ContactsController < ApplicationController
     @contact.safe_attributes = params[:contact]
     
     if @contact.save
+      # Custom log to confirm saved data
+      logger.info "Contact ##{@contact.id} ('#{@contact.name}') saved successfully."
+      @contact.employments_as_person.reload.each do |emp|
+        logger.info "  -> Employment ##{emp.id}: Company ##{emp.company_id}, Position: '#{emp.position}'"
+      end
+
       respond_to do |format|
         format.html {
           flash[:notice] = l(:notice_successful_update)
@@ -189,6 +184,13 @@ class ContactsController < ApplicationController
         format.api { render_api_ok }
       end
     else
+      logger.error "Contact ##{@contact.id} failed to save. Errors: #{@contact.errors.full_messages.join(', ')}"
+      @contact.employments_as_person.each_with_index do |emp, i|
+        if emp.errors.any?
+          logger.error "  -> Employment ##{i} errors: #{emp.errors.full_messages.join(', ')}"
+        end
+      end
+
       respond_to do |format|
         format.html { render action: 'edit' }
         format.js { render partial: 'form', status: :unprocessable_entity }
@@ -206,10 +208,6 @@ class ContactsController < ApplicationController
       }
       format.api { render_api_ok }
     end
-  end
-  
-  def roles
-    @roles = @contact.contact_roles.includes(:company)
   end
   
   def groups

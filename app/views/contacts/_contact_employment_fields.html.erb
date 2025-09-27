@@ -1,0 +1,30 @@
+<%# app/views/contacts/_contact_employment_fields.html.erb %>
+<div class="contact-employment-fields">
+  <div class="splitcontent">
+    <div class="splitcontentleft">
+      <p>
+        <%= f.label :company_id, l(:field_company) %>
+        <%= f.select :company_id,
+                      CompanyContactOptionCollection.new(@project).options,
+                      { include_blank: l(:label_select_company) },
+                      { class: 'select2' } %>
+      </p>
+      <p>
+        <%= f.label :position, l(:field_position) %>
+        <%= f.text_field :position, size: 40 %>
+      </p>
+    </div>
+    <div class="splitcontentright">
+      <p>
+        <%= f.label :start_date, l(:field_start_date) %>
+        <%= f.date_field :start_date %>
+      </p>
+      <p>
+        <%= f.label :end_date, l(:field_end_date) %>
+        <%= f.date_field :end_date %>
+      </p>
+    </div>
+  </div>
+  <%= f.hidden_field :_destroy %>
+  <%= link_to_function l(:button_delete), 'removeContactEmployment(this)', class: 'icon icon-del' %>
+</div>

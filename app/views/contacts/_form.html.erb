@@ -62,8 +62,24 @@
                       placeholder: "Adicione uma descrição detalhada sobre o contato." %>
     </p>
 
-    <%# Seção de vínculos com empresas - SEM container externo %>
-    <%= render 'contact_employments_fields', f: f %>
+    <% if @contact.person? %>
+      <fieldset class="box person-only" id="contact-employments-fieldset">
+        <legend><%= l(:label_contact_employments) %></legend>
+        <div id="contact-employments" data-template="<%= CGI.escapeHTML(render('contact_employment_fields', f: f, employment: ContactEmployment.new).to_str) %>">
+          <%= f.fields_for :employments_as_person do |employment_form| %>
+            <%= render 'contact_employment_fields', f: employment_form %>
+          <% end %>
+        </div>
+        <p>
+          <%= link_to_function l(:label_add_employment), 'addContactEmployment()', class: 'icon icon-add' %>
+        </p>
+      </fieldset>
+    <% end %>
+
+    <fieldset class="box">
+      <legend><%= l(:label_attachment_plural) %></legend>
+      <p><%= render partial: 'attachments/form', locals: { container: @contact } %></p>
+    </fieldset>
 
     <p>
       <%= f.label :is_private %>
@@ -78,25 +94,4 @@
   <%= link_to_function l(:button_cancel), "hideModal(this);" %>
 <% end %>
 
-<%= javascript_tag do %>
-  $(document).ready(function() {
-    $('#contact_contact_type').change(function() {
-      toggleContactTypeFields();
-    });
-    
-    function toggleContactTypeFields() {
-      var type = $('#contact_contact_type').val();
-      if (type === 'person') {
-        $('.company-only').hide();
-        $('.person-only').show();
-        $('#contact-employments-fieldset').show(); // Mostra vínculos
-      } else {
-        $('.company-only').show();
-        $('.person-only').hide();
-        $('#contact-employments-fieldset').hide(); // Esconde vínculos
-      }
-    }
-    
-    toggleContactTypeFields();
-  });
-<% end %>
+<%# A lógica de exibição dinâmica dos campos (person/company) já é tratada em assets/javascripts/contacts.js %>
