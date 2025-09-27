@@ -20,9 +20,6 @@ Classe: Contact
     belongs_to :author (User que criou o contato)
     belongs_to :project (opcional)
     belongs_to :user (opcional - vinculação com usuário do sistema)
-    has_many :contact_roles (cargos/funções)
-    has_many :companies (empresas através dos cargos)
-    has_many :employees (funcionários através dos cargos inversos)
     has_many :contact_group_memberships (vinculação com grupos)
     has_many :contact_groups (grupos aos quais pertence)
     has_many :contact_issue_links (vinculação com issues)
@@ -76,11 +73,6 @@ class Contact < ActiveRecord::Base
   belongs_to :project, optional: true
   belongs_to :user, optional: true
   
-  has_many :contact_roles, class_name: 'ContactRole', dependent: :destroy
-  has_many :companies, through: :contact_roles, source: :company
-  has_many :inverse_roles, class_name: 'ContactRole', foreign_key: :company_id, dependent: :destroy
-  has_many :employees, through: :inverse_roles, source: :contact
-  
   has_many :contact_group_memberships, class_name: 'ContactGroupMembership', dependent: :destroy
   has_many :contact_groups, through: :contact_group_memberships, source: :contact_group
   
@@ -102,7 +94,7 @@ class Contact < ActiveRecord::Base
   has_many :employees, through: :employments_as_company, source: :contact
 
   # Permitir atributos aninhados no formulário
-  accepts_nested_attributes_for :employments_as_person, allow_destroy: true
+  accepts_nested_attributes_for :employments_as_person, allow_destroy: true, reject_if: :all_blank
 
   validates :name, presence: true
   enum :contact_type, [:person, :company]
@@ -131,7 +123,8 @@ class Contact < ActiveRecord::Base
                  'status',
                  'is_private',
                  'project_id',
-                 'description'
+                 'description',
+                 'employments_as_person_attributes'
 
   def allowed_target_projects
     Project.allowed_to(User.current, :manage_contacts)

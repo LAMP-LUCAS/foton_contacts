@@ -88,17 +88,6 @@ class ContactsControllerTest < ActionController::TestCase
     assert_redirected_to contacts_path
   end
   
-  def test_roles
-    contact = create_contact
-    company = create_company
-    role = create_contact_role(person: contact, company: company)
-    
-    get :roles, params: { id: contact.id }
-    assert_response :success
-    assert_template 'roles'
-    assert_not_nil assigns(:roles)
-  end
-  
   def test_unauthorized_access
     User.current = nil
     @request.session[:user_id] = nil

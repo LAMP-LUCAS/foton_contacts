@@ -15,6 +15,9 @@
   <p><strong><%= l(:field_description) %>:</strong> <%= simple_format(@contact.description) %></p>
   <hr/>
   <p><strong><%= l(:field_author) %>:</strong> <%= link_to_user @contact.author %></p>
+  <% if @contact.user.present? %>
+    <p><strong><%= l(:field_user) %>:</strong> <%= link_to_user @contact.user %></p>
+  <% end %>
   <p><strong><%= l(:field_created_on) %>:</strong> <%= format_time(@contact.created_at) %></p>
   <p><strong><%= l(:field_is_private) %>:</strong> <%= @contact.is_private? ? l(:general_text_yes) : l(:general_text_no) %></p>
   <% if @contact.project %>
@@ -30,35 +33,13 @@
   </div>
 <% end %>
 
-<%# Companies a person belongs to %>
-<% if @contact.person? && @contact_roles.present? %>
-<div class="box">
-  <h3><%= l(:label_companies) %></h3>
-  <table class="list">
-    <thead>
-      <tr>
-        <th><%= l(:label_company) %></th>
-        <th><%= l(:field_position) %></th>
-        <th><%= l(:field_status) %></th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @contact_roles.each do |role| %>
-        <tr class="contact-role">
-          <td><%= link_to role.company.name, contact_path(role.company) %></td>
-          <td><%= role.position %></td>
-          <td><span class="status <%= role.status %>"><%= l("label_#{role.status}") %></span></td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-</div>
-<% end %>
+<%# The "Companies a person belongs to" section was removed as it was redundant. %>
+<%# The "Career History" section now serves as the single source of truth for this information. %>
 
 <%# Career History %>
 <% if @contact.person? && @contact_employments.present? %>
 <div class="box">
-  <h3><%= l(:label_career_history) %></h3>
+  <h3><%= l(:label_professional_links) %></h3>
   <table class="list">
     <thead>
       <tr>

@@ -58,21 +58,25 @@ class ContactsTest < ActionDispatch::IntegrationTest
     assert_equal 'Integration Test Company', company.name
     
     # Vincular pessoa à empresa
-    post '/contact_roles', params: {
-      contact_role: {
-        contact_id: person.id,
-        company_id: company.id,
-        position: 'Integration Tester',
-        status: 0
+    put "/contacts/#{person.id}", params: {
+      contact: {
+        employments_as_person_attributes: {
+          '0' => {
+            company_id: company.id,
+            position: 'Integration Tester'
+          }
+        }
       }
     }
-    assert_response :redirect
+    follow_redirect!
+    assert_response :success
     
     # Verificar vínculo
-    get "/contacts/#{person.id}"
-    assert_response :success
-    assert_select 'div#tab-companies td', text: 'Integration Test Company'
-    assert_select 'div#tab-companies td', text: 'Integration Tester'
+    person.reload
+    assert_equal 1, person.employments_as_person.count
+    assert_equal 'Integration Tester', person.employments_as_person.first.position
+    assert_select 'td', text: 'Integration Test Company'
+    assert_select 'td', text: 'Integration Tester'
     
     # Criar um grupo
     post '/contact_groups', params: {
