@@ -30,18 +30,6 @@ module FotonContacts
       }.merge(attributes))
     end
     
-    def create_contact_role(attributes = {})
-      person = attributes.delete(:person) || create_contact
-      company = attributes.delete(:company) || create_company
-      
-      ContactRole.create!({
-        contact: person,
-        company: company,
-        position: 'Test Position',
-        status: 0
-      }.merge(attributes))
-    end
-    
     def create_contact_group(attributes = {})
       ContactGroup.create!({
         name: 'Test Group',
