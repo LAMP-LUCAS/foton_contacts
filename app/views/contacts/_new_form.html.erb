@@ -1,12 +1,13 @@
-<h3 class="title"><%= l(:label_new_contact) %></h3>
+<%# app/views/contacts/_new_form.html.erb %>
+<%= turbo_frame_tag "modal" do %>
+  <h3 class="title"><%= l(:label_new_contact) %></h3>
 
-<%# The form needs to be remote to be handled by AJAX %>
-<%= form_for @contact, url: contacts_path, remote: true do |f| %>
-  <%# Render the fields from the partial %>
-  <%= render partial: 'form', locals: { f: f } %>
-  
-  <div class="buttons">
-    <%= submit_tag l(:button_create) %>
-    <%= link_to_function l(:button_cancel), "hideModal(this);" %>
-  </div>
+  <%= form_for @contact, url: contacts_path, html: { data: { controller: "form", action: "turbo:submit-start->form#disable turbo:submit-end->form#enable" } } do |f| %>
+    <%= render partial: 'form', locals: { f: f } %>
+    
+    <div class="buttons">
+      <%= f.submit l(:button_create), data: { "form-target": "submit" } %>
+      <%= link_to_function l(:button_cancel), "hideModal(this);" %>
+    </div>
+  <% end %>
 <% end %>

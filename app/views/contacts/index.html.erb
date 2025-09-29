@@ -57,7 +57,11 @@
   </div>
 
   <% if @contacts.empty? %>
-  <p class="nodata"><%= l(:label_no_data) %></p>
+    <%= render partial: 'common/empty_state', locals: {
+      message: l(:label_no_contacts_found),
+      button_label: l(:label_new_contact),
+      button_path: new_contact_path(type: 'person')
+    } %>
   <% end %>
 <% end %>
 

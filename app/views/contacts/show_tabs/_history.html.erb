@@ -1,5 +1,5 @@
 <% if @journals.present? %>
   <%= render_journals(@journals) %>
 <% else %>
-  <p class="nodata"><%= l(:label_no_data) %></p>
+  <%= render partial: 'common/empty_state', locals: { message: l(:label_no_history_for_contact) } %>
 <% end %>

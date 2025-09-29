@@ -27,9 +27,9 @@ Para diretrizes de arquitetura, UI/UX e conceitos de desenvolvimento, consulte o
 - [x] **Aplicar em Abas:** Converter o conteúdo das abas para `Turbo Frames` com `loading="lazy"`.
 
 ### Fase 1.3: Refinamento da Experiência com Stimulus
-- [ ] **Adicionar Feedback Visual:** Usar Stimulus para desabilitar botões e exibir spinners durante o envio de formulários.
-- [ ] **Melhorar Formulários Dinâmicos:** Usar Stimulus para animar a adição de novos vínculos e focar automaticamente.
-- [ ] **Implementar "Empty States":** Exibir mensagens e botões de ação quando as listas estiverem vazias.
+- [x] **Adicionar Feedback Visual:** Usar Stimulus para desabilitar botões e exibir spinners durante o envio de formulários.
+- [x] **Melhorar Formulários Dinâmicos:** Usar Stimulus para animar a adição de novos vínculos e focar automaticamente.
+- [x] **Implementar "Empty States":** Exibir mensagens e botões de ação quando as listas estiverem vazias.
 
 ### Fase 1.4: Modernização de Componentes
 - [ ] **Substituir Select2:** Planejar a substituição de `select2.js` por `Tom Select` com um wrapper Stimulus.

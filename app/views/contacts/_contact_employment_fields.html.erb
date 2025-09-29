@@ -1,5 +1,5 @@
 <%# app/views/contacts/_contact_employment_fields.html.erb %>
-<div class="contact-employment-fields">
+<div class="contact-employment-fields" data-nested-form-target="fields" data-new-record="<%= f.object.new_record? %>">
   <div class="splitcontent">
     <div class="splitcontentleft">
       <p>
@@ -26,5 +26,5 @@
     </div>
   </div>
   <%= f.hidden_field :_destroy %>
-  <%= link_to_function l(:button_delete), 'removeContactEmployment(this)', class: 'icon icon-del' %>
+  <%= button_tag l(:button_delete), type: "button", data: { action: "nested-form#remove" }, class: "icon icon-del" %>
 </div>

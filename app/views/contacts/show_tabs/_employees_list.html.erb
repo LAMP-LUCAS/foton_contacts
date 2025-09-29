@@ -18,5 +18,5 @@
     </tbody>
   </table>
 <% else %>
-  <p class="nodata"><%= l(:label_no_data) %></p>
+  <%= render partial: 'common/empty_state', locals: { message: l(:label_no_employees_for_company) } %>
 <% end %>

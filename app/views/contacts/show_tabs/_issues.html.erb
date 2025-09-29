@@ -1,5 +1,5 @@
 <% if @issues.present? %>
   <%= render partial: 'issues/list_simple', locals: { issues: @issues } %>
 <% else %>
-  <p class="nodata"><%= l(:label_no_data) %></p>
+  <%= render partial: 'common/empty_state', locals: { message: l(:label_no_issues_for_contact) } %>
 <% end %>

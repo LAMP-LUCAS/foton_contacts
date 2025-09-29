@@ -84,3 +84,11 @@ pt-BR:
   label_actions: "Ações"
   text_are_you_sure: "Você tem certeza?"
 
+  # Empty States
+  label_no_contacts_found: "Nenhum contato encontrado. Que tal criar o primeiro?"
+  label_contact_not_in_groups: "Este contato não pertence a nenhum grupo."
+  label_no_history_for_contact: "Nenhuma alteração registrada para este contato."
+  label_no_issues_for_contact: "Nenhuma tarefa associada a este contato."
+  label_no_career_history_for_contact: "Nenhum histórico de carreira para este contato."
+  label_no_employees_for_company: "Nenhum funcionário registrado para esta empresa."
+

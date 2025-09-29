@@ -1,0 +1,6 @@
+<div class="empty-state">
+  <p class="empty-state__message"><%= message %></p>
+  <% if defined?(button_path) && defined?(button_label) %>
+    <%= link_to button_label, button_path, class: 'button-positive empty-state__button', data: { turbo_frame: 'modal' } %>
+  <% end %>
+</div>
