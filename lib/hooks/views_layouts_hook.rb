@@ -1,26 +1,24 @@
 module Hooks
   class ViewsLayoutsHook < Redmine::Hook::ViewListener
     def view_layouts_base_html_head(context = {})
-      # 1. Inclui o JavaScript Global do Redmine (agora com Hotwire)
-      tags = context[:controller].view_context.javascript_include_tag(
-        'application', 
-        type: 'module' # Força o carregamento como módulo JavaScript
-      )
+      tags = []
       
-      # '<script src="https://cdn.jsdelivr.net/npm/@hotwired/turbo@8.0.4/dist/turbo.es2017-umd.js" type="module"></script>',
-      # '<script src="https://cdn.jsdelivr.net/npm/@hotwired/stimulus@3.2.2/dist/stimulus.min.js" type="module"></script>',
-      
+      # 1. Load Turbo from CDN (with version bypass)
+      tags << '<script src="https://cdn.jsdelivr.net/npm/@hotwired/turbo@8.0.4/dist/turbo.es2017-umd.js?v=1" defer></script>'
 
-      # 2. Inclui o CSS do seu plugin
+      # 2. Load Stimulus from CDN (with version bypass)
+      tags << '<script src="https://cdn.jsdelivr.net/npm/@hotwired/stimulus@3.2.2/dist/stimulus.min.js?v=1" defer></script>'
+
+      # 3. Load the plugin's JS bundle (classic script, depends on Stimulus)
+      tags << context[:controller].view_context.javascript_include_tag(
+        'foton_contacts_bundle',
+        plugin: 'foton_contacts',
+        defer: true
+      )
+
+      # 4. Include the plugin's CSS
       tags << context[:controller].view_context.stylesheet_link_tag(
         'contacts', 
-        plugin: 'foton_contacts'
-      )
-
-      # 3. Inclui o JavaScript do seu plugin (se necessário)
-      # Use um arquivo diferente para evitar confusão. Ex: 'foton_contacts'
-      tags << context[:controller].view_context.javascript_include_tag(
-        'foton_contacts', 
         plugin: 'foton_contacts'
       )
 
@@ -28,4 +26,3 @@ module Hooks
     end
   end
 end
-  

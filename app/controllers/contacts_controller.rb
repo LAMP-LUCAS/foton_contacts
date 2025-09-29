@@ -161,7 +161,7 @@ class ContactsController < ApplicationController
   
   def new
     @contact = Contact.new(author: User.current, contact_type: params[:type])
-    render 'modal'
+    render layout: false
   end
 
   def create
@@ -171,16 +171,17 @@ class ContactsController < ApplicationController
     respond_to do |format|
       if @contact.save
         format.html { redirect_to contacts_path, notice: l(:notice_contact_created) }
+        format.turbo_stream
         format.api { render action: 'show', status: :created, location: contact_url(@contact) }
       else
-        format.html { render 'modal', status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_entity, layout: false }
         format.api { render_validation_errors(@contact) }
       end
     end
   end
   
   def edit
-    render 'modal'
+    render layout: false
   end
   
   def update
@@ -189,9 +190,10 @@ class ContactsController < ApplicationController
     respond_to do |format|
       if @contact.save
         format.html { redirect_to contacts_path, notice: l(:notice_successful_update) }
+        format.turbo_stream
         format.api { render_api_ok }
       else
-        format.html { render 'modal', status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_entity, layout: false }
         format.api { render_validation_errors(@contact) }
       end
     end
@@ -262,6 +264,10 @@ class ContactsController < ApplicationController
       flash[:notice] = l(:notice_contacts_imported, count: count)
       redirect_to contacts_path
     end
+  end
+
+  def close_modal
+    # By convention, this will render close_modal.turbo_stream.erb
   end
   
   private

@@ -15,6 +15,7 @@ resources :contacts do
     get 'autocomplete'
     post 'import'
     get 'export'
+    get 'close_modal'
   end
 end
 

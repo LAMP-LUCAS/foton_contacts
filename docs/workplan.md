@@ -18,12 +18,12 @@ Para diretrizes de arquitetura, UI/UX e conceitos de desenvolvimento, consulte o
 - [x] **Reverter Alterações Anteriores:** Garantir que todos os arquivos, exceto este workplan, estejam no estado `HEAD` do commit anterior.
 - [x] **Instalar Hotwire:** Adicionar a gem `hotwire-rails` e executar `rails hotwire:install`.
 - [x] **Análise de Conflitos:** Garantir que a inicialização do Hotwire não entre em conflito com os scripts JavaScript existentes.
-- [ ] **Limpeza de Artefatos UJS:** Excluir **todos** os arquivos `.js.erb` relacionados ao CRUD de contatos (`create.js.erb`, `update.js.erb`, `new.js.erb`, `edit.js.erb`, `destroy.js.erb`).
+- [x] **Limpeza de Artefatos UJS:** Excluir **todos** os arquivos `.js.erb` relacionados ao CRUD de contatos (`create.js.erb`, `update.js.erb`, `new.js.erb`, `edit.js.erb`, `destroy.js.erb`).
 
 ### Fase 1.1: Implementação Idiomática do Modal com Turbo Frames
 
-- [ ] **Estruturar o Contêiner do Modal:** Adicionar um `<turbo-frame-tag id="modal" class="modal-container">` vazio e oculto na view `index.html.erb`.
-- [ ] **Adaptar Links de Ação:** Modificar os links "Novo Contato" e "Editar" para que apontem para este frame (`data: { turbo_frame: "modal" }`).
+- [x] **Estruturar o Contêiner do Modal:** Adicionar um `<turbo-frame-tag id="modal" class="modal-container">` vazio e oculto na view `index.html.erb`.
+- [x] **Adaptar Links de Ação:** Modificar os links "Novo Contato" e "Editar" para que apontem para este frame (`data: { turbo_frame: "modal" }`).
 - [ ] **Refatorar Actions `new` e `edit`:**
     - As actions devem renderizar uma view (ex: `new.html.erb`) que contém o `<turbo-frame-tag id="modal">` preenchido com o HTML do modal e o formulário **completo**.
     - O formulário deve ser renderizado a partir do partial `_form.html.erb` restaurado com **todos** os seus campos originais.
