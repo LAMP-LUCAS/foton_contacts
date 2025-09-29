@@ -1,119 +1,13 @@
 <div class="contextual">
   <%= link_to l(:button_edit), edit_contact_path(@contact), class: 'icon icon-edit' if User.current.allowed_to?(:manage_contacts, @project, global: true) %>
+  <%= link_to l(:label_analytics), analytics_contact_path(@contact), remote: true, class: 'icon icon-stats' if User.current.allowed_to?(:view_contacts_analytics, @project, global: true) %>
   <%= delete_link contact_path(@contact) if User.current.allowed_to?(:manage_contacts, @project, global: true) %>
 </div>
 
 <h2><%= @contact.name %></h2>
 
-<%# Principal Details %>
-<div class="box">
-  <p><strong><%= l(:field_type) %>:</strong> <%= l("label_#{@contact.contact_type}") %></p>
-  <p><strong><%= l(:field_status) %>:</strong> <%= l("label_#{@contact.status}") %></p>
-  <p><strong><%= l(:field_email) %>:</strong> <%= @contact.email %></p>
-  <p><strong><%= l(:field_phone) %>:</strong> <%= @contact.phone %></p>
-  <p><strong><%= l(:field_address) %>:</strong> <%= simple_format(@contact.address) %></p>
-  <p><strong><%= l(:field_description) %>:</strong> <%= simple_format(@contact.description) %></p>
-  <hr/>
-  <p><strong><%= l(:field_author) %>:</strong> <%= link_to_user @contact.author %></p>
-  <% if @contact.user.present? %>
-    <p><strong><%= l(:field_user) %>:</strong> <%= link_to_user @contact.user %></p>
-  <% end %>
-  <p><strong><%= l(:field_created_on) %>:</strong> <%= format_time(@contact.created_at) %></p>
-  <p><strong><%= l(:field_is_private) %>:</strong> <%= @contact.is_private? ? l(:general_text_yes) : l(:general_text_no) %></p>
-  <% if @contact.project %>
-    <p><strong><%= l(:field_project) %>:</strong> <%= link_to_project @contact.project %></p>
-  <% end %>
-</div>
-
-<%# Custom Fields %>
-<% if @custom_values.any? %>
-  <div class="box">
-    <h3><%= l(:label_custom_fields) %></h3>
-    <%= render_custom_fields_rows(@contact) %>
-  </div>
-<% end %>
-
-<%# The "Companies a person belongs to" section was removed as it was redundant. %>
-<%# The "Career History" section now serves as the single source of truth for this information. %>
-
-<%# Career History %>
-<% if @contact.person? %>
-<div class="box">
-  <h3><%= l(:label_professional_links) %></h3>
-  <%= turbo_frame_tag "contact_career_history", src: career_history_contact_path(@contact), loading: "lazy" do %>
-    <p><%= l(:label_loading) %>...</p>
-  <% end %>
-</div>
-<% end %>
-
-<%# Employees List %>
-<% if !@contact.person? %>
-<div class="box">
-  <h3><%= l(:label_employees) %></h3>
-  <%= turbo_frame_tag "contact_employees_list", src: employees_list_contact_path(@contact), loading: "lazy" do %>
-    <p><%= l(:label_loading) %>...</p>
-  <% end %>
-</div>
-<% end %>
-
-<%# Groups %>
-<div class="box">
-  <h3><%= l(:label_groups) %></h3>
-  <%= turbo_frame_tag "contact_groups", src: groups_contact_path(@contact), loading: "lazy" do %>
-    <p><%= l(:label_loading) %>...</p>
-  <% end %>
-</div>
-
-<%# Associated Issues %>
-<div class="box">
-  <h3><%= l(:label_issues) %></h3>
-  <%= turbo_frame_tag "contact_tasks", src: tasks_contact_path(@contact), loading: "lazy" do %>
-    <p><%= l(:label_loading) %>...</p>
-  <% end %>
-</div>
-
-<%# History %>
-<div class="box">
-  <h3><%= l(:label_history) %></h3>
-  <%= turbo_frame_tag "contact_history", src: history_contact_path(@contact), loading: "lazy" do %>
-    <p><%= l(:label_loading) %>...</p>
-  <% end %>
-</div>
-
-<%# Analytics %>
-<div id="analytics-container" class="box">
-  <%= render partial: 'analytics_modal' %>
-</div>
-
+<%= render_tabs @tabs %>
 
 <% content_for :header_tags do %>
   <%= stylesheet_link_tag 'contacts', plugin: 'foton_contacts' %>
 <% end %>
-
-<%# JavaScript to fix the analytics tabs %>
-<script type="text/javascript">
-$(document).ready(function(){
-  // Use the new ID for the container
-  var analyticsContainer = $('#analytics-container'); 
-
-  // The default Redmine tab handler is too broad.
-  // We stop it from acting on our analytics tabs and provide our own logic.
-  analyticsContainer.find('.tabs a').off('click').on('click', function(e){
-    e.preventDefault();
-    e.stopPropagation(); // Prevent Redmine's global handler from running
-
-    var clickedLink = $(this);
-    var tabContainer = clickedLink.closest('.tabs');
-    var analyticsBox = clickedLink.closest('#analytics-container'); // The scope of our tabs
-    var tabId = clickedLink.attr('href');
-
-    // Update 'selected' class on tabs
-    tabContainer.find('a').removeClass('selected');
-    clickedLink.addClass('selected');
-
-    // Show/hide the correct tab content *within the analytics box*
-    analyticsBox.find('.tab-content').hide();
-    analyticsBox.find(tabId).show();
-  });
-});
-</script>

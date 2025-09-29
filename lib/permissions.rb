@@ -20,6 +20,12 @@ class Permissions
                         require: :loggedin
           
           # Permissões avançadas
+          map.permission :view_contacts_analytics,
+                        {
+                          contacts: [:analytics]
+                        },
+                        require: :loggedin
+
           map.permission :manage_contact_settings,
                         {
                           settings: [:plugin]

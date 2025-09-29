@@ -108,17 +108,50 @@ class ContactsController < ApplicationController
     end
   end
   
-  def show    
-    # Inicializa as variáveis de instância esperadas pela view
-    if @contact.person?
-      @contact_employments = @contact.employments_as_person.includes(:company)
-    else # Company
-      # Assuming an association like `employees` or similar exists on the Contact model for companies
-      @employees = @contact.employees.includes(:person) if @contact.respond_to?(:employees)
-    end
-    
+  def show
     @custom_values = @contact.custom_values
-    
+
+    # Define tabs for the view
+    @tabs = [
+      {
+        name: 'details',
+        partial: 'contacts/show_tabs/details',
+        label: :label_details
+      }
+    ]
+
+    if @contact.person?
+      @tabs << {
+        name: 'career_history',
+        partial: 'contacts/show_tabs/career_history_frame',
+        label: :label_professional_links
+      }
+    else # Company
+      @tabs << {
+        name: 'employees_list',
+        partial: 'contacts/show_tabs/employees_list_frame',
+        label: :label_employees
+      }
+    end
+
+    @tabs += [
+      {
+        name: 'groups',
+        partial: 'contacts/show_tabs/groups_frame',
+        label: :label_groups
+      },
+      {
+        name: 'tasks',
+        partial: 'contacts/show_tabs/issues_frame',
+        label: :label_issues
+      },
+      {
+        name: 'history',
+        partial: 'contacts/show_tabs/history_frame',
+        label: :label_history
+      }
+    ]
+
     respond_to do |format|
       format.html
       format.api
