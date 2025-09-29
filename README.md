@@ -34,6 +34,56 @@ Para aprofundar em nossos conceitos de UI/UX, diretrizes de desenvolvimento e ar
 
 ---
 
+### ⚡ Integração Hotwire (Turbo + Stimulus)
+
+Para que as funcionalidades modernas de interface (como os modais de cadastro e relatórios instantâneos) funcionem, é necessário que o Hotwire esteja configurado como o *framework* JavaScript principal no Redmine.
+
+Se o seu Redmine ainda não usa o Hotwire, siga estas etapas de configuração manual:
+
+#### 1\. Instalação e Configuração de Arquivos
+
+Execute este comando para adicionar as bibliotecas Hotwire e criar os diretórios de controladores no seu Redmine:
+
+```bash
+# Na raiz do seu Redmine
+rails hotwire:install
+```
+
+#### 2\. Criar o Entrypoint Global
+
+O instalador do Rails pode não encontrar o arquivo principal do JavaScript do Redmine. Você precisa garantir que o **arquivo `app/javascript/application.js`** exista e contenha os `import`s de inicialização:
+
+```bash
+# Crie o arquivo, se não existir
+touch app/javascript/application.js
+
+# Edite e adicione o conteúdo:
+cat <<EOT > app/javascript/application.js
+// app/javascript/application.js
+import "@hotwired/turbo-rails"
+import "./controllers"
+EOT
+```
+
+#### 3\. Configurar o Hook do Plugin
+
+O Plugin de Contatos injeta o *entrypoint* Hotwire no cabeçalho (seção `<head>`) do Redmine via um *hook* de visualização.
+
+Verifique se a classe `ViewsLayoutsHook` está usando o `javascript_include_tag('application', type: 'module')` para garantir que o arquivo `application.js` configurado acima seja carregado corretamente como um módulo JavaScript moderno.
+
+#### 4\. Corrigir o Gemfile (Importante\!)
+
+Durante a instalação, o Ruby pode alertar sobre dependências duplicadas. **É crucial corrigir o `Gemfile`** para evitar erros de estabilidade:
+
+1.  Edite o arquivo **`Gemfile`** na raiz do Redmine.
+2.  Procure e **remova as entradas duplicadas** da *gem* `puma`.
+3.  Execute `bundle install` novamente para finalizar:
+    ```bash
+    bundle install
+    ```
+
+---
+
 ### ⚙️ Requisitos e Instalação
 
 Este plugin gerencia suas próprias dependências. O processo de instalação é simples:

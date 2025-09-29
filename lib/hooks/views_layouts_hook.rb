@@ -1,42 +1,31 @@
 module Hooks
   class ViewsLayoutsHook < Redmine::Hook::ViewListener
-      def view_layouts_base_html_head(context = {})
-        javascript_include_tag('application', plugin: 'foton_contacts') +
-        stylesheet_link_tag('select2.min', plugin: 'foton_contacts') +
-        stylesheet_link_tag('contacts', plugin: 'foton_contacts') +        
-        javascript_include_tag('analytics', plugin: 'foton_contacts') +
-        javascript_include_tag('select2.full.min', plugin: 'foton_contacts') +
-        javascript_include_tag('contacts', plugin: 'foton_contacts')
-      end
+    def view_layouts_base_html_head(context = {})
+      # 1. Inclui o JavaScript Global do Redmine (agora com Hotwire)
+      tags = context[:controller].view_context.javascript_include_tag(
+        'application', 
+        type: 'module' # Força o carregamento como módulo JavaScript
+      )
       
-      def view_issues_show_description_bottom(context = {})
-        return unless ActiveRecord::Base.connection.table_exists? 'contacts'
-        issue = context[:issue]
-        controller = context[:controller]
-        return unless issue && controller
-        
-        links = issue.contact_issue_links.includes(:contact).where(contacts: { status: 'active' })
-        return if links.empty?
-        
-        controller.render_to_string(
-          partial: 'contact_issue_links/list',
-          locals: { issue: issue, links: links }
-        )
-      end
+      # '<script src="https://cdn.jsdelivr.net/npm/@hotwired/turbo@8.0.4/dist/turbo.es2017-umd.js" type="module"></script>',
+      # '<script src="https://cdn.jsdelivr.net/npm/@hotwired/stimulus@3.2.2/dist/stimulus.min.js" type="module"></script>',
       
-      def view_projects_show_sidebar_bottom(context = {})
-        return unless ActiveRecord::Base.connection.table_exists? 'contacts'
-        project = context[:project]
-        controller = context[:controller]
-        return unless project && controller
-        
-        contacts = Contact.active.where(project_id: project.id).limit(5)
-        return if contacts.empty?
-        
-        controller.render_to_string(
-          partial: 'contacts/project_sidebar',
-          locals: { project: project, contacts: contacts }
-        )
-      end
+
+      # 2. Inclui o CSS do seu plugin
+      tags << context[:controller].view_context.stylesheet_link_tag(
+        'contacts', 
+        plugin: 'foton_contacts'
+      )
+
+      # 3. Inclui o JavaScript do seu plugin (se necessário)
+      # Use um arquivo diferente para evitar confusão. Ex: 'foton_contacts'
+      tags << context[:controller].view_context.javascript_include_tag(
+        'foton_contacts', 
+        plugin: 'foton_contacts'
+      )
+
+      tags.join("\n").html_safe
+    end
   end
 end
+  

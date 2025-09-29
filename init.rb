@@ -1,4 +1,6 @@
 require 'redmine'
+require_relative 'lib/hooks/views_layouts_hook' 
+
 # require_dependency 'foton_contacts/hooks'
 
 Redmine::Plugin.register :foton_contacts do
