@@ -1,4 +1,3 @@
+<%# app/views/contacts/create.turbo_stream.erb %>
+<%= turbo_stream.prepend "contacts_tbody", partial: "contacts/contact_row", locals: { contact: @contact } %>
 <%= turbo_stream.remove "modal" %>
-<%= turbo_stream.prepend "contacts_tbody" do %>
-  <%= render partial: "contact_row", locals: { contact: @contact } %>
-<% end %>

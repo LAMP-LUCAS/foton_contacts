@@ -159,14 +159,23 @@ class ContactsController < ApplicationController
     end
   end
   
+  def edit
+    respond_to do |format|
+      format.html
+      format.turbo_stream
+    end
+  end
+  
   def new
     @contact = Contact.new(author: User.current, contact_type: params[:type])
-    render layout: false
+    respond_to do |format|
+      format.html
+      format.turbo_stream
+    end
   end
 
   def create
-    @contact = Contact.new(author: User.current)
-    @contact.safe_attributes = params[:contact]
+    @contact = Contact.new(contact_params.merge(author: User.current))
     
     respond_to do |format|
       if @contact.save
@@ -174,22 +183,24 @@ class ContactsController < ApplicationController
         format.turbo_stream
         format.api { render action: 'show', status: :created, location: contact_url(@contact) }
       else
-        format.html { render :new, status: :unprocessable_entity, layout: false }
+        format.html { render :new, status: :unprocessable_entity }
+        format.turbo_stream { render :new, status: :unprocessable_entity }
         format.api { render_validation_errors(@contact) }
       end
     end
   end
   
   def update
-    @contact.safe_attributes = params[:contact]
-    
-    respond_to do |format|
-      if @contact.save
+    if @contact.update(contact_params)
+      respond_to do |format|
         format.html { redirect_to contacts_path, notice: l(:notice_successful_update) }
         format.turbo_stream
         format.api { render_api_ok }
-      else
-        format.html { render :edit, status: :unprocessable_entity, layout: false }
+      end
+    else
+      respond_to do |format|
+        format.html { render :edit, status: :unprocessable_entity }
+        format.turbo_stream { render :edit, status: :unprocessable_entity }
         format.api { render_validation_errors(@contact) }
       end
     end
@@ -265,8 +276,8 @@ class ContactsController < ApplicationController
 
   def close_modal
     respond_to do |format|
-      format.turbo_stream { render turbo_stream: turbo_stream.remove("modal") }
-      format.html { redirect_to contacts_path }
+      format.turbo_stream { render turbo_stream: turbo_stream.replace("modal", "") }
+      format.html { redirect_back fallback_location: contacts_path }
     end
   end
   
@@ -286,6 +297,18 @@ class ContactsController < ApplicationController
     true
   end
 
-
-
+  def contact_params
+    params.require(:contact).permit(
+      :name,
+      :email,
+      :phone,
+      :address,
+      :contact_type,
+      :status,
+      :is_private,
+      :project_id,
+      :description,
+      employments_as_person_attributes: [:id, :company_id, :role, :status, :start_date, :end_date, :_destroy]
+    )
+  end
 end

@@ -7,6 +7,6 @@
   <td class="buttons">
     <%= link_to '📊', analytics_contact_path(contact), remote: true, class: 'bi-analysis', title: l(:button_analysis) %>
     <%= link_to '✏️', edit_contact_path(contact), data: { turbo_frame: 'modal' }, class: 'contact-edit', title: l(:button_edit) %>
-    <%= link_to '🗑️', contact_path(contact), data: { turbo_method: :delete, turbo_confirm: l(:text_are_you_sure) }, class: 'contact-delete', title: l(:button_delete) %>
+    <%= button_to '🗑️', contact_path(contact), method: :delete, data: { turbo_confirm: l(:text_are_you_sure) }, class: 'contact-delete', title: l(:button_delete) %>
   </td>
 </tr>

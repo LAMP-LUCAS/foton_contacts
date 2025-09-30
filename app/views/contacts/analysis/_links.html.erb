@@ -3,14 +3,13 @@
 <% if contact.person? %>
   <div class="autoscroll">
     <div class="splitcontentleft">
-      <h4><%= l(:label_active_links) %> (<%= contact.contact_roles.active.count %>)</h4>
-      <% if defined?(Chartkick) && contact.contact_roles.any? %>
-        <div class="chart">
-          <%= pie_chart contact.contact_roles.group(:status).count,
-                      colors: ['#4CAF50', '#FFC107', '#F44336'],
-                      donut: true,
-                      legend: 'bottom' %>
-        </div>
+      <h4><%= l(:label_active_links) %> (<%= contact.employments_as_person.active.count %>)</h4>
+      <% if contact.employments_as_person.any? %>
+        <ul>
+          <% contact.employments_as_person.each do |employment| %>
+            <li><%= employment.company.name %> (<%= employment.position %>)</li>
+          <% end %>
+        </ul>
       <% else %>
         <p class="nodata"><%= l(:label_no_data) %></p>
       <% end %>
