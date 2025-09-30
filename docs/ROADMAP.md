@@ -82,3 +82,33 @@ A interface foi projetada para ser robusta, responsiva e intuitiva, com foco em 
     ├── integration
     └── unit
 ```
+
+---
+
+## 🏛️ Arquitetura de Modais
+
+O plugin utiliza duas abordagens distintas para a implementação de modais, cada uma com suas próprias características, prós e contras.
+
+### 1. Modais de CRUD (Criar/Editar)
+
+- **Tecnologia:** **Hotwire (Turbo Frames + Turbo Streams)**.
+- **Descrição:** Estes modais são integrados diretamente no fluxo da página usando Turbo Frames. As ações (como salvar ou cancelar) são tratadas via Turbo Streams, que atualizam o DOM de forma eficiente sem a necessidade de um recarregamento completo da página. O conteúdo do modal é renderizado no servidor e inserido em um frame `<turbo-frame id="modal">`.
+- **Prós:**
+  - **Leveza e Performance:** Extremamente rápido, pois apenas o HTML necessário é transportado pela rede.
+  - **Integração com Rails:** Solução nativa do Rails 7, exigindo pouquíssimo JavaScript customizado.
+  - **Desenvolvimento Ágil:** Mantém a lógica no servidor, simplificando o desenvolvimento.
+- **Contras:**
+  - **Menos Flexibilidade de UI:** Funcionalidades complexas de UI, como arrastar e redimensionar, não são suportadas nativamente e exigem a integração com bibliotecas de JavaScript (como StimulusJS).
+  - **Fluxo de Página:** Por ser parte do DOM da página, o modal não se comporta como uma "janela" flutuante independente, o que pode ser menos intuitivo para certas experiências de usuário.
+
+### 2. Modal de Análise (BI)
+
+- **Tecnologia:** **AJAX + Biblioteca de UI JavaScript (provavelmente jQuery UI Dialog)**.
+- **Descrição:** Este modal opera de forma mais tradicional. Um link dispara uma requisição AJAX para o servidor, que retorna um HTML parcial. Esse HTML é então injetado em um contêiner de modal genérico, gerenciado por uma biblioteca JavaScript (o Redmine utiliza jQuery UI, que oferece o componente "Dialog").
+- **Prós:**
+  - **Experiência de Usuário Rica:** Suporta nativamente funcionalidades avançadas como arrastar, redimensionar e manter estado no lado do cliente. Proporciona a sensação de uma janela de aplicativo desktop.
+  - **Isolamento:** O estado e o comportamento do modal são completamente gerenciados no lado do cliente, isolando-o do resto da página.
+- **Contras:**
+  - **Mais Complexidade:** Exige mais código JavaScript para gerenciar os eventos, o estado e as interações do modal.
+  - **Performance:** Pode ser ligeiramente mais lento, pois envolve mais overhead no lado do cliente e, tradicionalmente, um gerenciamento de estado mais manual.
+  - **Estilo de Código:** Representa uma abordagem mais antiga e imperativa em comparação com a reatividade declarativa do Hotwire.
