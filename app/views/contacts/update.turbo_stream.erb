@@ -1,0 +1,4 @@
+<%= turbo_stream.remove "modal" %>
+<%= turbo_stream.replace @contact do %>
+  <%= render partial: "contact_row", locals: { contact: @contact } %>
+<% end %>

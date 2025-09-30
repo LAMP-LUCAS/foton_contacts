@@ -180,10 +180,6 @@ class ContactsController < ApplicationController
     end
   end
   
-  def edit
-    render layout: false
-  end
-  
   def update
     @contact.safe_attributes = params[:contact]
     
@@ -202,10 +198,11 @@ class ContactsController < ApplicationController
   def destroy
     @contact.destroy
     respond_to do |format|
-      format.html {
+      format.html do
         flash[:notice] = l(:notice_contact_deleted)
         redirect_to contacts_path
-      }
+      end
+      format.turbo_stream # Will render destroy.turbo_stream.erb
       format.api { render_api_ok }
     end
   end
@@ -267,7 +264,10 @@ class ContactsController < ApplicationController
   end
 
   def close_modal
-    # By convention, this will render close_modal.turbo_stream.erb
+    respond_to do |format|
+      format.turbo_stream { render turbo_stream: turbo_stream.remove("modal") }
+      format.html { redirect_to contacts_path }
+    end
   end
   
   private
@@ -286,13 +286,6 @@ class ContactsController < ApplicationController
     true
   end
 
-  def contact_params
-    params.require(:contact).permit(
-      :first_name, :last_name, :email, :phone, :mobile, :notes, :active, :contact_type,
-      employments_as_person_attributes: [
-        :id, :company_id, :position, :start_date, :end_date, :_destroy
-      ]
-    )
-  end
+
 
 end

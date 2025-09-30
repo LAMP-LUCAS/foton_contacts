@@ -48,7 +48,7 @@
           <th style="width: 15%"><%= l(:label_actions) %></th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="contacts_tbody">
         <% @contacts.each do |contact| %>
           <%= render partial: 'contact_row', locals: { contact: contact } %>
         <% end %>

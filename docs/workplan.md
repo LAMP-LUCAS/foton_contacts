@@ -24,10 +24,10 @@ Para diretrizes de arquitetura, UI/UX e conceitos de desenvolvimento, consulte o
 
 - [x] **Estruturar o Contêiner do Modal:** Adicionar um `<turbo-frame-tag id="modal" class="modal-container">` vazio e oculto na view `index.html.erb`.
 - [x] **Adaptar Links de Ação:** Modificar os links "Novo Contato" e "Editar" para que apontem para este frame (`data: { turbo_frame: "modal" }`).
-- [ ] **Refatorar Actions `new` e `edit`:**
+- [x] **Refatorar Actions `new` e `edit`:**
     - As actions devem renderizar uma view (ex: `new.html.erb`) que contém o `<turbo-frame-tag id="modal">` preenchido com o HTML do modal e o formulário **completo**.
     - O formulário deve ser renderizado a partir do partial `_form.html.erb` restaurado com **todos** os seus campos originais.
-- [ ] **Controlar Visibilidade com CSS:** Usar CSS para que, quando o `turbo-frame` for preenchido, o modal se torne visível.
+- [x] **Controlar Visibilidade com CSS:** Usar CSS para que, quando o `turbo-frame` for preenchido, o modal se torne visível.
 
 ### Fase 1.2: Refatoração do CRUD com Turbo Streams
 

@@ -1,4 +1,4 @@
-<tr id="contact-<%= contact.id %>" class="<%= cycle('odd', 'even') %>">
+<tr id="<%= dom_id(contact) %>" class="<%= cycle('odd', 'even') %>">
   <td class="name"><%= link_to contact.name, contact_path(contact) %></td>
   <td><%= l("label_#{contact.contact_type}") %></td>
   <td><span class="status <%= contact.status %>"><%= l("label_#{contact.status}") %></span></td>
