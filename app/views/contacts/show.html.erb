@@ -1,6 +1,6 @@
 <div class="contextual">
   <%= link_to l(:button_edit), edit_contact_path(@contact), class: 'icon icon-edit' if User.current.allowed_to?(:manage_contacts, @project, global: true) %>
-  <%= link_to l(:label_analytics), analytics_contact_path(@contact), remote: true, class: 'icon icon-stats' if User.current.allowed_to?(:view_contacts_analytics, @project, global: true) %>
+  <%= link_to l(:label_analysis), analytics_contact_path(@contact), remote: true, class: 'icon icon-stats' if User.current.allowed_to?(:view_contacts_analytics, @project, global: true) %>
   <%= delete_link contact_path(@contact) if User.current.allowed_to?(:manage_contacts, @project, global: true) %>
 </div>
 
