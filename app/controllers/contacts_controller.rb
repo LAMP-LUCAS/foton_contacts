@@ -213,7 +213,7 @@ class ContactsController < ApplicationController
         flash[:notice] = l(:notice_contact_deleted)
         redirect_to contacts_path
       end
-      format.turbo_stream # Will render destroy.turbo_stream.erb
+      format.turbo_stream 
       format.api { render_api_ok }
     end
   end
@@ -275,9 +275,10 @@ class ContactsController < ApplicationController
   end
 
   def close_modal
+    
     respond_to do |format|
-      format.turbo_stream { render turbo_stream: turbo_stream.replace("modal", "") }
-      format.html { redirect_back fallback_location: contacts_path }
+      format.turbo_stream { render turbo_stream: turbo_stream.remove("modal") }
+      format.html { redirect_to contacts_path }
     end
   end
   
