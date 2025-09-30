@@ -1,41 +1,31 @@
+## `./app/models/contact_group.rb`
 '''
-Modelo que representa um Grupo de Contatos.
-Permite agrupar contatos para organização e gestão conjunta.
+### ContactGroup
 
-Classe: ContactGroup
+  **Descrição:**  
+  Modelo que representa um Grupo de Contatos. Permite agrupar contatos para organização e gestão conjunta.
 
-  Descrição:
-    Modelo que representa um grupo de contatos, permitindo agrupar múltiplos contatos para facilitar a organização e gestão. Pode ser público ou privado, e system ou user-created.
+  **Relacionamentos:**
+  - `belongs_to :author` (User criador)
+  - `belongs_to :project` (opcional)
+  - `has_many :memberships` (vinculações com contatos)
+  - `has_many :contacts` (contatos membros do grupo)
 
-  Relacionamentos:
+  **Validações:**
+  - Nome obrigatório e único por projeto
 
-    belongs_to :author (User criador)
+  **Scopes:**
+  - `system_groups`: Grupos do sistema
+  - `user_groups`: Grupos criados por usuários
+  - `visible`: Grupos visíveis para o usuário
 
-    belongs_to :project (opcional)
+  **Métodos Principais:**
+  - `visible?`: Verifica visibilidade
+  - `deletable?`: Verifica se o grupo pode ser excluído (não é sistema)
+  - `css_classes`: Classes CSS para estilização
+  - `to_s`: Representação em string (nome)
 
-    has_many :memberships (vinculaçõees com contatos)
-
-    has_many :contacts (contatos membros do grupo)
-
-  Validações:
-
-    Nome obrigatório e único por projeto
-
-  Scopes:
-
-    system_groups: Grupos do sistema
-
-    user_groups: Grupos criados por usuários
-
-    visible: Grupos visíveis para o usuário
-
-    Métodos Principais:
-
-    visible?: Verifica visibilidade
-
-    deletable?: Verifica se o grupo pode ser excluído (não é sistema)
-
-    css_classes: Classes CSS para estilização
+---
 
 '''
 

@@ -1,9 +1,10 @@
+## `./app/models/company_contact_option_collection.rb`
+
 '''
-Classe de serviço responsável por fornecer uma coleção de opções de empresas (contatos do tipo empresa)
-para uso em selects/dropdowns. Filtra empresas ativas e opcionalmente por projeto.
+### CompanyContactOptionCollection
 
   **Descrição:**  
-  Classe de serviço que encapsula a lógica para gerar uma coleção de opções de empresas (contatos do tipo empresa) formatadas para uso em elementos de interface como selects, dropdowns ou comboboxes.
+  Classe de serviço responsável por fornecer uma coleção de opções de empresas (contatos do tipo empresa) para uso em selects/dropdowns. Filtra empresas ativas e opcionalmente por projeto.
 
   **Propósito:**
   - Centralizar a lógica de busca de empresas ativas
@@ -11,26 +12,29 @@ para uso em selects/dropdowns. Filtra empresas ativas e opcionalmente por projet
   - Permitir filtragem opcional por projeto
 
   **Método Principal:**
-    - `options`: Retorna um array de arrays no formato `[nome_da_empresa, id_da_empresa]`
+  - `options`: Retorna um array de arrays no formato `[nome_da_empresa, id_da_empresa]`
 
   **Funcionamento:**
-    1. Busca todos os contatos do tipo empresa com status ativo
-    2. Aplica filtro por projeto se especificado
-    3. Mapeia os resultados para o formato esperado por helpers como `options_for_select`
+  1. Busca todos os contatos do tipo empresa com status ativo
+  2. Aplica filtro por projeto se especificado
+  3. Mapeia os resultados para o formato esperado por helpers como `options_for_select`
 
   **Exemplo de Uso:**
+  ```ruby
+  # Todas as empresas ativas
+  options = CompanyContactOptionCollection.new.options
+  # => [["Empresa A", 1], ["Empresa B", 2], ...]
 
-    # Todas as empresas ativas
-    options = CompanyContactOptionCollection.new.options
-    # => [["Empresa A", 1], ["Empresa B", 2], ...]
-
-    # Empresas ativas de um projeto específico
-    options = CompanyContactOptionCollection.new(project).options
-    # => [["Empresa do Projeto", 3], ...]
+  # Empresas ativas de um projeto específico
+  options = CompanyContactOptionCollection.new(project).options
+  # => [["Empresa do Projeto", 3], ...]
+  ```
 
   **Dependências:**
-    - Assume que o modelo `Contact` possui os scopes `company` e `active`
-    - Utiliza a estrutura de projetos do Redmine
+  - Assume que o modelo `Contact` possui os scopes `company` e `active`
+  - Utiliza a estrutura de projetos do Redmine
+
+---
 
 '''
 

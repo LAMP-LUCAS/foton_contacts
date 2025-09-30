@@ -1,39 +1,28 @@
+## `./app/controllers/contact_groups_controller.rb`
+
 '''
-Controlador responsável por gerenciar grupos de contatos (ContactGroups).
-Inclui operações de CRUD, adição e remoção de membros.
+### ContactGroupsController
 
-Classe: ContactGroupsController
+  **Descrição:**  
+  Controlador responsável por gerenciar grupos de contatos (ContactGroups). Inclui operações de CRUD, adição e remoção de membros.
 
-  Descrição:
-    Este controlador gerencia os grupos de contatos no sistema. Ele permite criar, visualizar, editar e excluir grupos, além de adicionar ou remover contatos como membros de um grupo.
+  **Ações:**
+  - `index`: Lista todos os grupos de contatos visíveis ao usuário atual, com suporte a paginação e formato API
+  - `show`: Exibe os detalhes de um grupo, incluindo a lista de membros (contatos)
+  - `new`: Inicializa um novo grupo de contatos
+  - `create`: Cria um novo grupo de contatos
+  - `edit`: Prepara a edição de um grupo existente
+  - `update`: Atualiza os dados de um grupo
+  - `destroy`: Exclui um grupo, se permitido
+  - `add_member`: Adiciona um contato como membro do grupo
+  - `remove_member`: Remove um contato do grupo
 
-  Ações:
+  **Filtros:**
+  - `require_login`: Garante que o usuário está autenticado
+  - `find_contact_group`: Carrega o grupo de contatos com base no `params[:id]`
+  - `authorize_global`: Verifica permissões globais do usuário
 
-    index: Lista todos os grupos de contatos visíveis ao usuário atual, com suporte a paginação e formato API.
-
-    show: Exibe os detalhes de um grupo, incluindo a lista de membros (contatos).
-
-    new: Inicializa um novo grupo de contatos.
-
-    create: Cria um novo grupo de contatos.
-
-    edit: Prepara a edição de um grupo existente.
-
-    update: Atualiza os dados de um grupo.
-
-    destroy: Exclui um grupo, se permitido.
-
-    add_member: Adiciona um contato como membro do grupo.
-
-    remove_member: Remove um contato do grupo.
-
-  Filtros:
-
-    require_login: Garante que o usuário está autenticado.
-
-    find_contact_group: Carrega o grupo de contatos com base no params[:id].
-
-    authorize_global: Verifica permissões globais do usuário.
+---
 '''
 
 class ContactGroupsController < ApplicationController

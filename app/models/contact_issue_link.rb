@@ -1,26 +1,28 @@
+## `./app/models/contact_issue_link.rb`
+
 '''
-Modelo que representa o vínculo entre um Contato e uma Issue.
-Permite associar contatos a tickets/issues com informações contextuais.
+### ContactIssueLink
 
-Classe: ContactIssueLink
-  Descrição:
-    Modelo que representa a associação entre um Contato e uma Issue (ticket/chamado). Permite vincular contatos a issues com informações adicionais como função e notas.
+  **Descrição:**  
+  Modelo que representa o vínculo entre um Contato e uma Issue. Permite associar contatos a tickets/issues com informações contextuais.
 
-  Relacionamentos:
+  **Relacionamentos:**
+  - `belongs_to :contact`
+  - `belongs_to :issue`
 
-    belongs_to :contact
+  **Validações:**
+  - `contact_id` e `issue_id` obrigatórios
+  - Combinação `contact_id` + `issue_id` única
 
-    belongs_to :issue
+  **Atributos Seguros:**
+  - `contact_id`, `issue_id`, `role`, `notes`
 
-    Validações:
+  **Métodos Principais:**
+  - `visible?`: Verifica se o vínculo é visível para o usuário (baseado na visibilidade do contato e issue)
+  - `to_s`: Representação em string formatada
 
-  Contact_id e issue_id obrigatórios
+---
 
-    Combinação contact_id + issue_id única
-
-    Métodos Principais:
-
-    visible?: Verifica se o vínculo é visível para o usuário (baseado na visibilidade do contato e issue)
 '''
 
 class ContactIssueLink < ActiveRecord::Base

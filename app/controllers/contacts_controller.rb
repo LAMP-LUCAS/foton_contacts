@@ -1,62 +1,39 @@
+## `./app/controllers/contacts_controller.rb`
 '''
-Controlador principal para gerenciar contatos (pessoas e empresas).
-Oferece operações completas de CRUD, importação, exportação e visualizações secundárias.
+### ContactsController
 
-Classe: ContactsController
+  **Descrição:**  
+  Controlador principal para gerenciar contatos (pessoas e empresas). Oferece operações completas de CRUD, importação, exportação e visualizações secundárias.
 
-  Descrição:
-    Controlador principal responsável pela gestão de contatos no sistema, incluindo pessoas e empresas. Oferece funcionalidades completas de listagem, criação, edição, exclusão, importação, exportação e visualizações detalhadas.
+  **Ações:**
+  - `index`: Lista contatos com filtros, ordenação e paginação; suporta HTML, API e CSV
+  - `show`: Exibe detalhes do contato, incluindo cargos, grupos e issues relacionadas; suporta vCard
+  - `new`: Inicializa um novo contato
+  - `create`: Cria um novo contato
+  - `edit`: Prepara a edição de um contato
+  - `update`: Atualiza os dados do contato
+  - `destroy`: Exclui o contato
+  - `history`: Exibe o histórico de alterações (journals)
+  - `analytics`: Fornece dados analíticos (se habilitado)
+  - `search`: Busca contatos para sugestão em campos de busca
+  - `autocomplete`: Retorna sugestões para autocompletar
+  - `import`: Processa importação de contatos via arquivo CSV
 
-  Ações:
+  **Filtros:**
+  - `require_login`: Exige autenticação
+  - `find_contact`: Carrega o contato a partir de `params[:id]`
+  - `authorize_global`: Para ações globais como listar e criar
+  - `authorize_edit`: Para ações de edição e exclusão
 
-    index: Lista contatos com filtros, ordenação e paginação; suporta HTML, API e CSV.
+  **Helpers incluídos:**
+  - `sort_helper`: Para ordenação de listas
+  - `custom_fields_helper`: Para campos personalizados
+  - `attachments_helper` e `issues_helper`: Para anexos e issues
+  - `chartkick_helper`: Para gráficos (se a gem estiver instalada)
 
-    show: Exibe detalhes do contato, incluindo cargos, grupos e issues relacionadas; suporta vCard.
-
-    new: Inicializa um novo contato.
-
-    create: Cria um novo contato.
-
-    edit: Prepara a edição de um contato.
-
-    update: Atualiza os dados do contato.
-
-    destroy: Exclui o contato.
-
-    history: Exibe o histórico de alterações (journals).
-
-    analytics: Fornece dados analíticos (se habilitado).
-
-    search: Busca contatos para sugestão em campos de busca.
-
-    autocomplete: Retorna sugestões para autocompletar.
-
-    import: Processa importação de contatos via arquivo CSV.
-
-  Filtros:
-
-    require_login: Exige autenticação.
-
-    find_contact: Carrega o contato a partir de params[:id].
-
-    authorize_global: Para ações globais como listar e criar.
-
-    authorize_edit: Para ações de edição e exclusão.
-
-    Helpers incluídos:
-
-    sort_helper: Para ordenação de listas.
-
-    custom_fields_helper: Para campos personalizados.
-
-    attachments_helper e issues_helper: Para anexos e issues.
-
-    chartkick_helper: Para gráficos (se a gem estiver instalada).
-
-
+---
 
 '''
-
 
 class ContactsController < ApplicationController
   before_action :require_login
