@@ -251,6 +251,12 @@ class ContactsController < ApplicationController
     end
   end
 
+  def new_employment_field
+    respond_to do |format|
+      format.turbo_stream
+    end
+  end
+
   def close_modal
     
     respond_to do |format|

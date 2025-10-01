@@ -1,3 +1,3 @@
 <%# app/views/contacts/update.turbo_stream.erb %>
-<%= turbo_stream.replace @contact %>
+<%= turbo_stream.replace @contact, partial: "contacts/contact_row", locals: { contact: @contact } %>
 <%= turbo_stream.remove "modal" %>

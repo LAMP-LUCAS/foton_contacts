@@ -11,6 +11,7 @@ resources :contacts do
     get 'analytics'
   end
   collection do
+    get :new_employment_field
     get 'search'
     get 'autocomplete'
     post 'import'

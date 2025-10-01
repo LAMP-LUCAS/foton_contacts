@@ -10,7 +10,7 @@
     
     <div class="buttons">
       <%= f.submit l(:button_save), data: { "form-target": "submit" } %>
-      <%= button_to l(:button_cancel), close_modal_contacts_path, method: :post, class: "button" %>
+      <%= link_to l(:button_cancel), close_modal_contacts_path, class: "button", data: { turbo_stream: true } %>
     </div>
   <% end %>
 <% end %>
