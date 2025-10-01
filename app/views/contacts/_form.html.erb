@@ -62,23 +62,17 @@
   </p>
 
   <% if @contact.person? %>
-    <fieldset class="box person-only" id="contact-employments-fieldset" data-controller="nested-form">
+    <fieldset class="box person-only" id="contact-employments-fieldset" data-controller="nested-form" data-nested-form-url-value="<%= new_employment_field_contacts_path %>">
       <legend><%= l(:label_contact_employments) %></legend>
 
-      <template data-nested-form-target="template">
-        <%= f.fields_for :employments_as_person, ContactEmployment.new, child_index: "NEW_RECORD" do |employment_form| %>
-          <%= render 'contact_employment_fields', f: employment_form %>
-        <% end %>
-      </template>
-
-      <div data-nested-form-target="target">
+      <div id="contact_employments_target" data-nested-form-target="target">
         <%= f.fields_for :employments_as_person do |employment_form| %>
           <%= render 'contact_employment_fields', f: employment_form %>
         <% end %>
       </div>
 
       <p>
-        <%= button_tag l(:label_add_employment), type: "button", data: { action: "nested-form#add" }, class: "icon icon-add" %>
+        <a href="#" class="icon icon-add" data-action="nested-form#add"><%= l(:label_add_employment) %></a>
       </p>
     </fieldset>
   <% end %>
@@ -96,5 +90,3 @@
 
   <%= call_hook(:view_contacts_form_details, contact: @contact, form: f) %>
 </div>
-
-<%# A lógica de exibição dinâmica dos campos (person/company) já é tratada em assets/javascripts/contacts.js %>

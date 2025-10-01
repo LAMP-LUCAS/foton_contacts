@@ -1,23 +1,23 @@
 import { Controller } from "@hotwired/stimulus"
+import { get } from "@rails/request.js"
 
 // Connects to data-controller="nested-form"
 export default class extends Controller {
-  static targets = [ "template", "target", "fields" ]
+  static targets = [ "target" ]
+  static values = { url: String }
 
   add(event) {
     event.preventDefault()
 
-    const content = this.templateTarget.innerHTML.replace(/NEW_RECORD/g, new Date().getTime())
-    this.targetTarget.insertAdjacentHTML("beforeend", content)
-    const newFields = this.targetTarget.lastElementChild
-    newFields.scrollIntoView({ behavior: "smooth", block: "center" })
-    newFields.querySelector("input, select, textarea").focus()
+    get(this.urlValue, {
+      responseKind: "turbo-stream"
+    })
   }
 
   remove(event) {
     event.preventDefault()
 
-    const wrapper = event.target.closest("[data-nested-form-target='fields']")
+    const wrapper = event.target.closest(".contact-employment-fields")
     if (wrapper.dataset.newRecord === "true") {
       wrapper.remove()
     } else {

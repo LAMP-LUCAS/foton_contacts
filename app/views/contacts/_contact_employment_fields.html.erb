@@ -1,16 +1,16 @@
 <%# app/views/contacts/_contact_employment_fields.html.erb %>
-<div class="contact-employment-fields" data-nested-form-target="fields" data-new-record="<%= f.object.new_record? %>">
+<div class="contact-employment-fields" data-new-record="<%= f.object.new_record? %>">
   <div class="splitcontent">
     <div class="splitcontentleft">
       <p>
         <%= f.label :company_id, l(:field_company) %>
         <%= f.select :company_id,
-                      CompanyContactOptionCollection.new(@project).options,
-                      { include_blank: l(:label_select_company) },
-                      { class: 'select2' } %>
+                     options_for_company_contact(selected: f.object.company_id),
+                     { include_blank: l(:label_select_company) },
+                     { class: 'select2' } %>
       </p>
       <p>
-        <%= f.label :position, l(:field_position) %>
+        <%= f.label :position %>
         <%= f.text_field :position, size: 40 %>
       </p>
     </div>
@@ -26,5 +26,5 @@
     </div>
   </div>
   <%= f.hidden_field :_destroy %>
-  <%= button_tag l(:button_delete), type: "button", data: { action: "nested-form#remove" }, class: "icon icon-del" %>
+  <button type="button" data-action="nested-form#remove" class="icon icon-del"><%= l(:button_delete) %></button>
 </div>

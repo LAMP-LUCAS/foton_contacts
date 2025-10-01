@@ -1,0 +1,14 @@
+<%# app/views/contacts/new_employment_field.turbo_stream.erb %>
+
+<%# 
+  Este Turbo Stream anexa um novo conjunto de campos de vínculo empregatício ao formulário.
+  - `turbo_stream.append`: Define o alvo onde o conteúdo será inserido.
+  - `fields_for`: Cria os campos para um novo objeto `ContactEmployment`.
+    - O primeiro argumento constrói o nome base para os campos, ex: `contact[employments_as_person_attributes][1678886400]`
+    - `child_index`: Usa o timestamp atual para garantir um índice único para os novos campos, essencial para o Rails processar corretamente os atributos aninhados.
+%>
+<%= turbo_stream.append "contact_employments_target" do %>
+  <%= fields_for "contact[employments_as_person_attributes][#{Time.now.to_f.to_s.gsub('.','')}]", ContactEmployment.new do |employment_form| %>
+    <%= render partial: 'contact_employment_fields', locals: { f: employment_form } %>
+  <% end %>
+<% end %>
