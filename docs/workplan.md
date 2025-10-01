@@ -31,27 +31,27 @@ Para diretrizes de arquitetura, UI/UX e conceitos de desenvolvimento, consulte o
 
 ### Fase 1.2: Refatoração do CRUD com Turbo Streams
 
-- [ ] **Restaurar `contact_params`:** Garantir que o `ContactsController` aceite todos os atributos do modelo novamente, incluindo campos aninhados.
-- [ ] **Adaptar Actions `create`, `update`, `destroy`:**
+- [x] **Restaurar `contact_params`:** Garantir que o `ContactsController` aceite todos os atributos do modelo novamente, incluindo campos aninhados.
+- [x] **Adaptar Actions `create`, `update`, `destroy`:**
     - Devem responder **apenas** a `format.turbo_stream`.
     - Em caso de sucesso (`create`, `update`), o response deve conter dois streams: um para remover o modal (`<%= turbo_stream.remove "modal" %>`) e outro para atualizar/adicionar o registro na lista (`<%= turbo_stream.replace @contact, ... %>` ou `prepend`).
     - Em caso de falha de validação, a action deve re-renderizar a view do formulário (ex: `render :new, status: :unprocessable_entity`) para que o Turbo exiba os erros no modal.
 
 ### Fase 1.3: Migração do CRUD de Contatos
 
-- [ ] **Estruturar com Turbo Frames:** Envolver a lista de contatos e os modais de formulário em `turbo-frame-tag`.
-- [ ] **Atualizar Controller:** Modificar as actions `create` e `update` para responder com `Turbo Streams`.
-- [ ] **Remover Código Legado:** Excluir os arquivos `*.js.erb` e o código jQuery associado.
+- [x] **Estruturar com Turbo Frames:** Envolver a lista de contatos e os modais de formulário em `turbo-frame-tag`.
+- [x] **Atualizar Controller:** Modificar as actions `create` e `update` para responder com `Turbo Streams`.
+- [x] **Remover Código Legado:** Excluir os arquivos `*.js.erb` e o código jQuery associado.
 
 ### Fase 1.4: Otimização com Carregamento Sob Demanda (Lazy Loading)
 
-- [ ] **Aplicar em Abas:** Converter o conteúdo das abas para `Turbo Frames` com `loading="lazy"`.
+- [x] **Aplicar em Abas:** Converter o conteúdo das abas para `Turbo Frames` com `loading="lazy"`.
 
 ### Fase 1.5: Refinamento da Experiência com Stimulus
 
-- [ ] **Adicionar Feedback Visual:** Usar Stimulus para desabilitar botões e exibir spinners durante o envio de formulários.
-- [ ] **Melhorar Formulários Dinâmicos:** Usar Stimulus para animar a adição de novos vínculos e focar automaticamente.
-- [ ] **Implementar "Empty States":** Exibir mensagens e botões de ação quando as listas estiverem vazias.
+- [x] **Adicionar Feedback Visual:** Usar Stimulus para desabilitar botões e exibir spinners durante o envio de formulários.
+- [x] **Melhorar Formulários Dinâmicos:** Usar Stimulus para animar a adição de novos vínculos e focar automaticamente.
+- [x] **Implementar "Empty States":** Exibir mensagens e botões de ação quando as listas estiverem vazias.
 
 ### Fase 1.6: Modernização de Componentes
 
