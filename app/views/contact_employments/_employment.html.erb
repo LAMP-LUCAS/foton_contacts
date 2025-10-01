@@ -1,0 +1,12 @@
+<tr id="<%= dom_id(employment) %>">
+  <td><%= link_to employment.company.name, contact_path(employment.company) %></td>
+  <td><%= employment.role %></td>
+  <td><%= format_date(employment.start_date) %></td>
+  <td><%= format_date(employment.end_date) %></td>
+  <td class="buttons">
+    <%= link_to l(:button_delete),
+                contact_employment_path(employment),
+                data: { turbo_method: :delete, turbo_confirm: l(:text_are_you_sure) },
+                class: 'icon icon-del' %>
+  </td>
+</tr>

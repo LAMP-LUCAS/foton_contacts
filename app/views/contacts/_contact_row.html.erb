@@ -1,5 +1,5 @@
 <tr id="<%= dom_id(contact) %>" class="<%= cycle('odd', 'even') %>">
-  <td class="name"><%= link_to contact.name, contact_path(contact) %></td>
+  <td class="name"><%= link_to contact.name, contact_path(contact), data: { turbo_frame: '_top' } %></td>
   <td><%= l("label_#{contact.contact_type}") %></td>
   <td><span class="status <%= contact.status %>"><%= l("label_#{contact.status}") %></span></td>
   <td><%= contact.project ? link_to_project(contact.project) : '---' %></td>

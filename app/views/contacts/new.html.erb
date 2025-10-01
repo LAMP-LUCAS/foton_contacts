@@ -2,7 +2,7 @@
 <%= turbo_frame_tag "modal" do %>
   <div class="modal-header">
     <h3 class="title"><%= l(:label_new_contact) %></h3>
-    <%= link_to "&#10006;".html_safe, close_modal_contacts_path, class: "close", data: { turbo_method: :post, turbo_frame: "_top" } %>
+    <%= link_to "&#10006;".html_safe, close_modal_contacts_path, class: "close", data: { turbo_method: :post } %>
   </div>
 
   <%= form_for @contact, url: contacts_path, html: { data: { controller: "form", action: "turbo:submit-start->form#disable turbo:submit-end->form#enable" } } do |f| %>
@@ -10,7 +10,7 @@
     
     <div class="buttons">
       <%= f.submit l(:button_create), data: { "form-target": "submit" } %>
-      <%= link_to l(:button_cancel), close_modal_contacts_path, class: "button", data: { turbo_stream: true } %>
+      <%= link_to l(:button_cancel), close_modal_contacts_path, class: "button", data: { turbo_method: :post } %>
     </div>
   <% end %>
 <% end %>

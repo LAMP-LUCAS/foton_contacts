@@ -6,7 +6,25 @@
 
 <h2><%= @contact.name %></h2>
 
-<%= render_tabs @tabs %>
+<div class="tabs">
+  <ul>
+    <% @tabs.each_with_index do |tab, i| %>
+      <li>
+        <%= link_to l(tab[:label]), { controller: 'contacts', action: 'show', id: @contact.id, tab: tab[:name] },
+                    onclick: "selectTab('#{tab[:name]}', this); return false;",
+                    id: "tab-link-#{tab[:name]}",
+                    class: (params[:tab].to_s == tab[:name].to_s || (params[:tab].blank? && i == 0)) ? 'selected' : nil %>
+      </li>
+    <% end %>
+  </ul>
+</div>
+
+<% @tabs.each_with_index do |tab, i| %>
+  <div class="tab-content" id="tab-<%= tab[:name] %>" style="<%= (params[:tab].to_s == tab[:name].to_s || (params[:tab].blank? && i == 0)) ? '' : 'display: none;' %>">
+    <%# The partial is a 'frame' that contains the actual lazy-loaded turbo_frame_tag %>
+    <%= render partial: tab[:partial], locals: { contact: @contact } %>
+  </div>
+<% end %>
 
 <% content_for :header_tags do %>
   <%= stylesheet_link_tag 'contacts', plugin: 'foton_contacts' %>

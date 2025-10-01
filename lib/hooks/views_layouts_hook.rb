@@ -1,15 +1,17 @@
 module Hooks
   class ViewsLayoutsHook < Redmine::Hook::ViewListener
     def view_layouts_base_html_head(context = {})
-      tags = []
+      # Use unpkg CDN to load Hotwire libraries
+      turbo_tag = '<script src="https://unpkg.com/@hotwired/turbo@7.3.0/dist/turbo.es2017-umd.js"></script>'
+      stimulus_tag = '<script src="https://unpkg.com/@hotwired/stimulus@3.2.2/dist/stimulus.umd.js"></script>'
 
       # Load the plugin's CSS
-      tags << context[:controller].view_context.stylesheet_link_tag('contacts', plugin: 'foton_contacts')
+      css_tag = context[:controller].view_context.stylesheet_link_tag('contacts', plugin: 'foton_contacts')
       
-      # Load the Hotwire javascript
-      tags << context[:controller].view_context.javascript_include_tag('application', plugin: 'foton_contacts', 'data-turbo-track': 'reload', defer: true, type: 'module')
+      # Load the plugin's JS as a standard script (NOT a module)
+      plugin_js_tag = context[:controller].view_context.javascript_include_tag('application', plugin: 'foton_contacts', 'data-turbo-track': 'reload', defer: true)
 
-      tags.join("\n").html_safe
+      [turbo_tag, stimulus_tag, css_tag, plugin_js_tag].join("\n").html_safe
     end
   end
 end

@@ -61,6 +61,7 @@ class Contact < ActiveRecord::Base
   # include Redmine::I18n
   acts_as_customizable
   acts_as_attachable
+  #acts_as_journalized watch: %w(name email phone address contact_type status is_private project_id description)
   acts_as_searchable columns: %w(name email address description),
                      preload: [:author],
                      date_column: :created_at

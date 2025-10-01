@@ -1,0 +1,33 @@
+<%= turbo_frame_tag "modal" do %>
+  <div class="modal-header">
+    <h3 class="title"><%= l(:label_employment_new) %></h3>
+    <%= link_to "&#10006;".html_safe, close_modal_contacts_path, class: "close", data: { turbo_method: :post } %>
+  </div>
+
+  <%= form_with model: @employment, url: contact_employments_path, html: { data: { controller: "form", action: "turbo:submit-start->form#disable turbo:submit-end->form#enable" } } do |f| %>
+    <%= f.hidden_field :contact_id, value: @contact.id %>
+    <div class="box tabular">
+      <p>
+        <%= f.label :company_id %>
+        <%= f.select :company_id, options_from_collection_for_select(Contact.companies.active, :id, :name, @employment.company_id), { include_blank: true }, { required: true } %>
+      </p>
+      <p>
+        <%= f.label :role %>
+        <%= f.text_field :role, required: true %>
+      </p>
+      <p>
+        <%= f.label :start_date %>
+        <%= f.date_field :start_date %>
+      </p>
+      <p>
+        <%= f.label :end_date %>
+        <%= f.date_field :end_date %>
+      </p>
+    </div>
+
+    <div class="buttons">
+      <%= f.submit l(:button_create), data: { "form-target": "submit" } %>
+      <%= link_to l(:button_cancel), close_modal_contacts_path, class: "button", data: { turbo_method: :post } %>
+    </div>
+  <% end %>
+<% end %>

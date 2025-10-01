@@ -101,7 +101,7 @@ class ContactsController < ApplicationController
       @tabs << {
         name: 'career_history',
         partial: 'contacts/show_tabs/career_history_frame',
-        label: :label_professional_links
+        label: :label_contact_employments
       }
     else # Company
       @tabs << {

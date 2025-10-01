@@ -1,22 +1,35 @@
-<% if @contact_employments.present? %>
-  <table class="list">
-    <thead>
-      <tr>
-        <th><%= l(:label_company) %></th>
-        <th><%= l(:field_position) %></th>
-        <th><%= l(:label_period) %></th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @contact_employments.each do |employment| %>
+<%= turbo_frame_tag "contact_career_history" do %>
+  <% if @contact_employments.any? %>
+    <div class="contextual">
+      <%= link_to l(:label_employment_new),
+                  new_contact_employment_path(contact_id: @contact.id),
+                  class: 'icon icon-add',
+                  data: { turbo_frame: 'modal' } %>
+    </div>
+  <% end %>
+
+  <h3><%= l(:label_contact_employments) %></h3>
+
+  <% if @contact_employments.any? %>
+    <table class="list">
+      <thead>
         <tr>
-          <td><%= link_to employment.company.name, contact_path(employment.company) %></td>
-          <td><%= employment.position %></td>
-          <td><%= format_date(employment.start_date) %> - <%= employment.end_date ? format_date(employment.end_date) : l(:label_present) %></td>
+          <th><%= l(:field_company) %></th>
+          <th><%= l(:field_role) %></th>
+          <th><%= l(:field_start_date) %></th>
+          <th><%= l(:field_end_date) %></th>
+          <th></th>
         </tr>
-      <% end %>
-    </tbody>
-  </table>
-<% else %>
-  <%= render partial: 'common/empty_state', locals: { message: l(:label_no_career_history_for_contact) } %>
+      </thead>
+      <tbody id="contact_employments">
+        <%= render partial: 'contact_employments/employment', collection: @contact_employments, as: :employment %>
+      </tbody>
+    </table>
+  <% else %>
+    <%= render partial: 'common/empty_state', locals: {
+      message: l(:label_no_employments_found),
+      button_label: l(:label_employment_new),
+      button_path: new_contact_employment_path(contact_id: @contact.id)
+    } %>
+  <% end %>
 <% end %>
