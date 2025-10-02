@@ -1,5 +1,29 @@
-<% if @journals.present? %>
-  <%= render_journals(@journals) %>
-<% else %>
-  <%= render partial: 'common/empty_state', locals: { message: l(:label_no_history_for_contact) } %>
+<%= turbo_frame_tag "contact_history" do %>
+<div class="wiki">
+  <div id="history">
+    <% if @journals.present? %>
+      <h3><%= l(:label_history) %></h3>
+      <% @journals.each do |journal| %>
+        <div id="change-<%= journal.id %>" class="<%= journal.css_classes %>">
+          <h4>
+            <%= avatar(journal.user, size: 24) %>
+            <%= authoring(journal.created_on, journal.user, format: :long) %>
+          </h4>
+          <% if journal.notes.present? %>
+            <div class="wiki-note">
+              <%= textilizable(journal, :notes) %>
+            </div>
+          <% end %>
+          <ul class="details">
+            <% journal.details.each do |detail| %>
+              <li><%= show_detail(detail) %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+    <% else %>
+      <%= render partial: 'common/empty_state', locals: { message: l(:label_no_history_for_contact) } %>
+    <% end %>
+  </div>
+</div>
 <% end %>
