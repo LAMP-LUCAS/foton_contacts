@@ -5,7 +5,7 @@
   <td><%= contact.project ? link_to_project(contact.project) : '---' %></td>
   <td><%= format_date(contact.created_at) %></td>
   <td class="buttons">
-    <%= link_to '📊', analytics_contact_path(contact), remote: true, class: 'bi-analysis', title: l(:button_analysis) %>
+    <%= link_to '📊', analytics_contact_path(contact), data: { turbo_frame: 'modal' }, title: l(:button_analysis) %>
     <%= link_to '✏️', edit_contact_path(contact), data: { turbo_frame: 'modal' }, class: 'contact-edit', title: l(:button_edit) %>
     <%= delete_link contact_path(contact) if User.current.allowed_to?(:manage_contacts, @project, global: true) %>
 

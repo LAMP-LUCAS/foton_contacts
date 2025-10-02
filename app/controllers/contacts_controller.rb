@@ -1,46 +1,10 @@
-## `./app/controllers/contacts_controller.rb`
-'''
-### ContactsController
-
-  **Descrição:**  
-  Controlador principal para gerenciar contatos (pessoas e empresas). Oferece operações completas de CRUD, importação, exportação e visualizações secundárias.
-
-  **Ações:**
-  - `index`: Lista contatos com filtros, ordenação e paginação; suporta HTML, API e CSV
-  - `show`: Exibe detalhes do contato, incluindo cargos, grupos e issues relacionadas; suporta vCard
-  - `new`: Inicializa um novo contato
-  - `create`: Cria um novo contato
-  - `edit`: Prepara a edição de um contato
-  - `update`: Atualiza os dados do contato
-  - `destroy`: Exclui o contato
-  - `history`: Exibe o histórico de alterações (journals)
-  - `analytics`: Fornece dados analíticos (se habilitado)
-  - `search`: Busca contatos para sugestão em campos de busca
-  - `autocomplete`: Retorna sugestões para autocompletar
-  - `import`: Processa importação de contatos via arquivo CSV
-
-  **Filtros:**
-  - `require_login`: Exige autenticação
-  - `find_contact`: Carrega o contato a partir de `params[:id]`
-  - `authorize_global`: Para ações globais como listar e criar
-  - `authorize_edit`: Para ações de edição e exclusão
-
-  **Helpers incluídos:**
-  - `sort_helper`: Para ordenação de listas
-  - `custom_fields_helper`: Para campos personalizados
-  - `attachments_helper` e `issues_helper`: Para anexos e issues
-  - `chartkick_helper`: Para gráficos (se a gem estiver instalada)
-
----
-
-'''
-
 class ContactsController < ApplicationController
   before_action :require_login
-  before_action :find_contact, only: [:show, :edit, :update, :destroy, :career_history, :employees_list, :groups, :tasks, :history, :analytics]
+  before_action :find_contact, only: [:show, :edit, :update, :destroy, :career_history, :employees_list, :groups, :tasks, :history, :analytics, :show_edit]
   before_action :authorize_global, only: [:index, :show, :new, :create]
-  before_action :authorize_edit, only: [:edit, :update, :destroy]
+  before_action :authorize_edit, only: [:edit, :update, :destroy, :show_edit]
   
+  helper :journals
   helper :sort
   include SortHelper
   helper :custom_fields
@@ -142,6 +106,13 @@ class ContactsController < ApplicationController
       format.turbo_stream
     end
   end
+
+  def show_edit
+    respond_to do |format|
+      format.html
+      format.turbo_stream
+    end
+  end
   
   def new
     @contact = Contact.new(author: User.current, contact_type: params[:type])
@@ -211,8 +182,23 @@ class ContactsController < ApplicationController
   end
   
   def analytics
+    # Data for person contact
+    if @contact.person?
+      @tasks_count = @contact.issues.count
+      @groups_count = @contact.contact_groups.count
+      @companies_count = @contact.employments_as_person.count
+    end
+
+    # Data for company contact
+    if @contact.company?
+      @linked_contacts_count = @contact.employees.count
+      # Simple interpretation of turnover: count of employments with an end_date
+      @turnover_count = @contact.employments_as_company.where.not(end_date: nil).count
+    end
+
     respond_to do |format|
-      format.js # Deixa o Rails renderizar analytics.js.erb por convenção
+      format.html { render partial: 'contacts/analytics_modal', locals: { contact: @contact } }
+      format.turbo_stream { render turbo_stream: turbo_stream.update("modal", partial: "contacts/analytics_modal", locals: { contact: @contact }) }
     end
   end
 

@@ -1,0 +1,8 @@
+<p><strong><%= l(:field_name) %>:</strong> <%= contact.name %></p>
+<p><strong><%= l(:field_email) %>:</strong> <%= contact.email %></p>
+<p><strong><%= l(:field_phone) %>:</strong> <%= contact.phone %></p>
+<p><strong><%= l(:field_address) %>:</strong> <%= contact.address %></p>
+<p><strong><%= l(:field_contact_type) %>:</strong> <%= l("label_contact_type_#{contact.contact_type}") %></p>
+<p><strong><%= l(:field_status) %>:</strong> <%= contact.status %></p>
+<p><strong><%= l(:field_project) %>:</strong> <%= contact.project.name if contact.project %></p>
+<p><strong><%= l(:field_description) %>:</strong> <%= contact.description %></p>
