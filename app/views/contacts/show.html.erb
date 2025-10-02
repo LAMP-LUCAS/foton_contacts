@@ -1,26 +1,28 @@
 <div class="contextual">
-  <%= link_to l(:button_edit), edit_contact_path(@contact), class: 'icon icon-edit' if User.current.allowed_to?(:manage_contacts, @project, global: true) %>
-  <%= link_to l(:label_analysis), analytics_contact_path(@contact), remote: true, class: 'icon icon-stats' if User.current.allowed_to?(:view_contacts_analytics, @project, global: true) %>
+
+  <%= link_to l(:button_edit), show_edit_contact_path(@contact), data: { turbo_frame: 'modal' }, class: 'icon icon-edit' if User.current.allowed_to?(:manage_contacts, @project, global: true) %>
+  
+  <%= link_to l(:label_analysis), analytics_contact_path(@contact), data: { turbo_frame: 'modal' }, class: 'icon icon-stats' if User.current.allowed_to?(:view_contacts_analytics, @project, global: true) %>
+  
   <%= delete_link contact_path(@contact) if User.current.allowed_to?(:manage_contacts, @project, global: true) %>
 </div>
 
 <h2><%= @contact.name %></h2>
 
-<div class="tabs">
+<div class="tabs" data-controller="show-tabs" data-show-tabs-initial-tab-value="<%= params[:tab].presence || @tabs.first[:name] %>">
   <ul>
     <% @tabs.each_with_index do |tab, i| %>
       <li>
         <%= link_to l(tab[:label]), { controller: 'contacts', action: 'show', id: @contact.id, tab: tab[:name] },
-                    onclick: "selectTab('#{tab[:name]}', this); return false;",
-                    id: "tab-link-#{tab[:name]}",
-                    class: (params[:tab].to_s == tab[:name].to_s || (params[:tab].blank? && i == 0)) ? 'selected' : nil %>
+                    data: { action: "click->show-tabs#showTab", "show-tabs-target": "tab", tab_name: tab[:name] },
+                    id: "tab-link-#{tab[:name]}" %>
       </li>
     <% end %>
   </ul>
 </div>
 
 <% @tabs.each_with_index do |tab, i| %>
-  <div class="tab-content" id="tab-<%= tab[:name] %>" style="<%= (params[:tab].to_s == tab[:name].to_s || (params[:tab].blank? && i == 0)) ? '' : 'display: none;' %>">
+  <div class="tab-content <%= (params[:tab].to_s == tab[:name].to_s || (params[:tab].blank? && i == 0)) ? 'selected' : nil %>" id="tab-<%= tab[:name] %>" data-show-tabs-target="content" data-tab-name="<%= tab[:name] %>">
     <%# The partial is a 'frame' that contains the actual lazy-loaded turbo_frame_tag %>
     <%= render partial: tab[:partial], locals: { contact: @contact } %>
   </div>

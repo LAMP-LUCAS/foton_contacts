@@ -26,10 +26,12 @@
       </tbody>
     </table>
   <% else %>
-    <%= render partial: 'common/empty_state', locals: {
-      message: l(:label_no_employments_found),
-      button_label: l(:label_employment_new),
-      button_path: new_contact_employment_path(contact_id: @contact.id)
-    } %>
+    <div id="contact_career_history_empty_state">
+      <%= render partial: 'common/empty_state', locals: {
+        message: l(:label_no_employments_found),
+        button_label: l(:label_employment_new),
+        button_path: new_contact_employment_path(contact_id: @contact.id)
+      } %>
+    </div>
   <% end %>
 <% end %>

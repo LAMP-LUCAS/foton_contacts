@@ -1,9 +1,7 @@
 <%= turbo_stream.remove "modal" %>
 
-<%= turbo_stream.replace "contact_career_history" do %>
-  <% 
-  # We need to reload the association to get the new record
-  @contact_employments = @contact.employments_as_person.reload.includes(:company)
-  %>
-  <%= render partial: "contacts/show_tabs/career_history", locals: { contact: @contact, contact_employments: @contact_employments } %>
-<% end %>
+<%# Remove the empty state if it exists %>
+<%= turbo_stream.remove "contact_career_history_empty_state" %>
+
+<%# Prepend the new employment to the list %>
+<%= turbo_stream.prepend "contact_employments", partial: "contact_employments/employment", locals: { employment: @employment } %>

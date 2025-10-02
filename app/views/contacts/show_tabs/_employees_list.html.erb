@@ -1,3 +1,5 @@
+<%= turbo_frame_tag "contact_employees_list" do %>
+<h3>l(:label_contact_employments)</h3>
 <% if @employees.present? %>
   <table class="list">
     <thead>
@@ -19,4 +21,5 @@
   </table>
 <% else %>
   <%= render partial: 'common/empty_state', locals: { message: l(:label_no_employees_for_company) } %>
+<% end %>
 <% end %>

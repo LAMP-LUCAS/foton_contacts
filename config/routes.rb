@@ -9,6 +9,7 @@ resources :contacts do
     get 'tasks'
     get 'history'
     get 'analytics'
+    get 'show_edit'
   end
   collection do
     get :new_employment_field
@@ -21,7 +22,7 @@ resources :contacts do
 end
 
 resources :contact_roles, only: [] # Rota vazia para desativar
-resources :contact_employments, only: [:create, :update, :destroy]
+resources :contact_employments, only: [:new, :create, :update, :destroy]
 resources :contact_groups do
   member do
     post 'add_member'

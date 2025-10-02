@@ -1,5 +1,5 @@
 <tr id="<%= dom_id(employment) %>">
-  <td><%= link_to employment.company.name, contact_path(employment.company) %></td>
+  <td><%= employment.company ? link_to(employment.company.name, contact_path(employment.company)) : l(:label_none) %></td>
   <td><%= employment.role %></td>
   <td><%= format_date(employment.start_date) %></td>
   <td><%= format_date(employment.end_date) %></td>

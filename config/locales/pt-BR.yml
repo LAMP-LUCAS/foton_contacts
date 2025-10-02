@@ -9,6 +9,7 @@ pt-BR:
   label_active: "Ativo"
   label_inactive: "Inativo"
   label_discontinued: "Descontinuado"
+
   field_name: "Nome"
   field_email: "E-mail"
   field_phone: "Telefone"
@@ -42,13 +43,14 @@ pt-BR:
   label_add_employment: "Adicionar Vínculo"
   label_remove_employment: "Remover Vínculo"
 
-
-
   label_contact_employments: "Vínculos com Empresas"
   field_company: "Empresa"
   field_start_date: "Início"
   field_end_date: "Fim"
   label_select_company: "Selecione uma empresa"
+
+  label_groups_title: "Grupos"
+  label_issues_title: "Tarefas"
 
   # Traduções da página de configuração
   label_contact_create_from_user: "Criar contato para novos usuários"
