@@ -7,7 +7,7 @@
         <%= f.select :company_id,
                      options_for_company_contact(selected: f.object.company_id),
                      { include_blank: l(:label_select_company) },
-                     { class: 'select2' } %>
+                     { data: { controller: 'tom-select', 'tom-select-create-value': true } } %>
       </p>
       <p>
         <%= f.label :position %>

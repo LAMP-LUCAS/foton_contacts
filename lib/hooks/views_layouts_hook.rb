@@ -8,10 +8,13 @@ module Hooks
       # Load the plugin's CSS
       css_tag = context[:controller].view_context.stylesheet_link_tag('contacts', plugin: 'foton_contacts')
       
+      # Load Tom Select JS
+      tom_select_js_tag = context[:controller].view_context.javascript_include_tag('tom-select.complete.min', plugin: 'foton_contacts', 'data-turbo-track': 'reload', defer: true)
+
       # Load the plugin's JS as a standard script (NOT a module)
       plugin_js_tag = context[:controller].view_context.javascript_include_tag('application', plugin: 'foton_contacts', 'data-turbo-track': 'reload', defer: true)
 
-      [turbo_tag, stimulus_tag, css_tag, plugin_js_tag].join("\n").html_safe
+      [turbo_tag, stimulus_tag, css_tag, tom_select_js_tag, plugin_js_tag].join("\n").html_safe
     end
   end
 end

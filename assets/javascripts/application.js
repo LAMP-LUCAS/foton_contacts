@@ -1,10 +1,13 @@
+//= require controllers/tom_select_controller
+//= require controllers/analytics_tabs_controller
+
 document.addEventListener("turbo:load", function() {
   if (!window.Stimulus) {
     console.error("Foton Contacts plugin: Stimulus not found on window object.");
     return;
   }
 
-  const application = window.Stimulus.Application.getApplications()[0] || window.Stimulus.Application.start();
+  const application = window.Stimulus.Application.start();
   const Controller = window.Stimulus.Controller;
 
   // To avoid re-registering controllers on every turbo:load, check if already registered.

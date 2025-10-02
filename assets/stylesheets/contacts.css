@@ -1,3 +1,16 @@
+/* Tab Content */
+.tab-content {
+  display: none;
+}
+
+.tab-content.selected {
+  display: block;
+}
+
+/*
+ *= require tom-select.bootstrap5
+ */
+
 .empty-state {
   text-align: center;
   padding: 40px 20px;

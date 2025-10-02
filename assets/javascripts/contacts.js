@@ -17,70 +17,8 @@ $(document).ready(function() {
     $(element).closest('.ui-dialog-content').dialog('close');
   };
 
-  // Handler para links que devem abrir em modal (lógica do antigo contacts.js.erb)
-  $('body').on('click', 'a.contact-new, a.contact-edit, a.bi-analysis', function(e) {
-    e.preventDefault();
-    var url = $(this).attr('href');
-    var isBI = $(this).hasClass('bi-analysis');
-    
-    // Se o modal já existe, não faz nada (previne duplo clique)
-    if ($('#ajax-modal').length > 0) {
-      return;
-    }
 
-    // Cria um placeholder para o modal
-    $('body').append('<div id="ajax-modal" style="display:none;"></div>');
 
-    // Busca o conteúdo do formulário
-    $.get(url, function(data) {
-      // O Rails UJS vai executar o script retornado (ex: analytics.js.erb)
-      // que preenche o #ajax-modal.
-      // Após o preenchimento, podemos inicializar componentes como as abas.
-      // A inicialização das abas do modal de análise é feita no próprio analytics.js.erb
-      // para garantir que o conteúdo já exista.
-    }).fail(function(jqXHR, textStatus, errorThrown) {
-      console.error('Falha ao carregar conteúdo do modal: ' + textStatus, errorThrown);
-      // Adicione um feedback visual para o usuário aqui, se desejar.
-      console.error('Falha ao carregar conteúdo do modal.');
-      $('#ajax-modal').remove(); // Limpa em caso de erro
-    });
-  });
-
-  // Inicialização do Select2 para campos de seleção
-  if ($.fn.select2) {
-    $('.select2').select2({
-      width: '60%',
-      allowClear: true
-    });
-  } else {
-    console.error('Select2 não está disponível. Verifique a ordem de carregamento dos scripts.');
-  }
-  
-  // Autocompletar para campos de contato
-  $('.contact-autocomplete').each(function() {
-    var field = $(this);
-    var url = field.data('url');
-    
-    field.select2({
-      minimumInputLength: 1,
-      ajax: {
-        url: url,
-        dataType: 'json',
-        data: function(term) {
-          return { q: term };
-        },
-        results: function(data) {
-          return { results: data };
-        }
-      },
-      formatResult: function(item) {
-        return item.text;
-      },
-      formatSelection: function(item) {
-        return item.text;
-      }
-    });
-  });
   
   // Confirmações de exclusão
   $('form.button_to[data-confirm]').submit(function(){
@@ -169,14 +107,7 @@ function addContactEmployment() {
   
   container.insertAdjacentHTML('beforeend', newContent);
   
-  // Inicializa Select2 nos novos campos
-  const newSelects = container.querySelectorAll('.select2:not(.select2-hidden-accessible)');
-  newSelects.forEach(select => {
-    $(select).select2({
-      width: '60%',
-      allowClear: true
-    });
-  });
+
 }
 
 function removeContactEmployment(element) {
