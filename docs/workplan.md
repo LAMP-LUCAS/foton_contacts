@@ -50,12 +50,13 @@ Para diretrizes de arquitetura, UI/UX e conceitos de desenvolvimento, consulte o
 ### Fase 1.5: Refinamento da Experiência com Stimulus
 
 - [x] **Adicionar Feedback Visual:** Usar Stimulus para desabilitar botões e exibir spinners durante o envio de formulários.
-- [x] **Melhorar Formulários Dinâmicos:** Usar Stimulus para animar a adição de novos vínculos e focar automaticamente.
+- [ ] **Melhorar Formulários Dinâmicos:** Usar Stimulus para animar a adição de novos vínculos e focar automaticamente.
+  *   **Diretriz:** A interface de vínculo (empregos) deve ser totalmente integrada ao Redmine 6 com Rails 7+ e adotar ao máximo as facilidades e evoluções do HotWire, respeitando as implementações do Redmine 6. Essa interface deve ser primeiramente implantada na página do contato (`app/views/contacts/show.html.erb`) em uma aba relacionada a isso, onde o usuário com permissão poderá realizar CRUD das informações. A implementação nos modais de edição e criação será realizada posteriormente.
 - [x] **Implementar "Empty States":** Exibir mensagens e botões de ação quando as listas estiverem vazias.
 
 ### Fase 1.6: Modernização de Componentes
 
-- [ ] **Substituir Select2:** Planejar a substituição de `select2.js` por `Tom Select` com um wrapper Stimulus.
+- [x] **Substituir Select2:** Planejar a substituição de `select2.js` por `Tom Select` com um wrapper Stimulus.
 
 ### Fase 1.7 REVISÃO E REATORAÇÃO: FOTON CONTACTS UI/UX
 
