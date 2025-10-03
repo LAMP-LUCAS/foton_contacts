@@ -116,6 +116,7 @@ class ContactsController < ApplicationController
   
   def new
     @contact = Contact.new(author: User.current, contact_type: params[:type])
+    @contact.employments_as_person.build if @contact.person?
     respond_to do |format|
       format.html
       format.turbo_stream
@@ -204,6 +205,7 @@ class ContactsController < ApplicationController
 
   def career_history
     @contact_employments = @contact.employments_as_person.includes(:company)
+    @employment = @contact.employments_as_person.new
     render partial: 'contacts/show_tabs/career_history', layout: false
   end
 
@@ -274,11 +276,11 @@ class ContactsController < ApplicationController
       :phone,
       :address,
       :contact_type,
-      :status,
+      #:status,
       :is_private,
       :project_id,
       :description,
-      employments_as_person_attributes: [:id, :company_id, :role, :status, :start_date, :end_date, :_destroy]
+      employments_as_person_attributes: [:id, :company_id, :position, :status, :start_date, :end_date, :_destroy]
     )
   end
 end

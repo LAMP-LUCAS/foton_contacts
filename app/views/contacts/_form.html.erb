@@ -63,6 +63,20 @@
 
 
 
+  <fieldset id="contact-employments-form" class="box" data-controller="nested-form" style="<%= 'display: none;' unless @contact.person? %>">
+    <legend><%= l(:label_contact_employments) %></legend>
+    
+    <div id="employments" data-nested-form-target="target">
+      <%= f.fields_for :employments_as_person do |employment_form| %>
+        <%= render 'contacts/contact_employment_fields', f: employment_form %>
+      <% end %>
+    </div>
+
+    <div data-nested-form-target="template">
+      <%= link_to l(:label_employment_add), new_employment_field_contacts_path, class: 'icon icon-add', data: { turbo_stream: true } %>
+    </div>
+  </fieldset>
+
   <fieldset class="box">
     <legend><%= l(:label_attachment_plural) %></legend>
     <p><%= render partial: 'attachments/form', locals: { container: @contact } %></p>

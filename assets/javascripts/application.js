@@ -1,5 +1,6 @@
 //= require controllers/tom_select_controller
 //= require controllers/analytics_tabs_controller
+//= require controllers/nested_form_controller
 
 document.addEventListener("turbo:load", function() {
   if (!window.Stimulus) {
