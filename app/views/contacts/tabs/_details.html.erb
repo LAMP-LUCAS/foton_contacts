@@ -1,7 +1,0 @@
-<%# app/views/contacts/tabs/_details.html.erb %>
-<p><strong><%= l(:field_type) %>:</strong> <%= l("label_#{@contact.contact_type}") %></p>
-<p><strong><%= l(:field_status) %>:</strong> <%= l("label_#{@contact.status}") %></p>
-<p><strong><%= l(:field_email) %>:</strong> <%= @contact.email %></p>
-<p><strong><%= l(:field_phone) %>:</strong> <%= @contact.phone %></p>
-<p><strong><%= l(:field_address) %>:</strong> <%= simple_format(@contact.address) %></p>
-<p><strong><%= l(:field_description) %>:</strong> <%= simple_format(@contact.description) %></p>
