@@ -50,7 +50,7 @@ Para diretrizes de arquitetura, UI/UX e conceitos de desenvolvimento, consulte o
 ### Fase 1.5: Refinamento da Experiência com Stimulus
 
 - [x] **Adicionar Feedback Visual:** Usar Stimulus para desabilitar botões e exibir spinners durante o envio de formulários.
-- [ ] **Melhorar Formulários Dinâmicos:** Usar Stimulus para animar a adição de novos vínculos e focar automaticamente.
+- [x] **Melhorar Formulários Dinâmicos:** Usar Stimulus para animar a adição de novos vínculos e focar automaticamente.
   *   **Diretriz:** A interface de vínculo (empregos) deve ser totalmente integrada ao Redmine 6 com Rails 7+ e adotar ao máximo as facilidades e evoluções do HotWire, respeitando as implementações do Redmine 6. Essa interface deve ser primeiramente implantada na página do contato (`app/views/contacts/show.html.erb`) em uma aba relacionada a isso, onde o usuário com permissão poderá realizar CRUD das informações. A implementação nos modais de edição e criação será realizada posteriormente.
 - [x] **Implementar "Empty States":** Exibir mensagens e botões de ação quando as listas estiverem vazias.
 
@@ -121,18 +121,18 @@ Para diretrizes de arquitetura, UI/UX e conceitos de desenvolvimento, consulte o
 
 4. **Checklist de Correção e Verificação Use esta lista para validar a implementação:**
 
-  - [ ] **Navegação:** Clicar no nome de um contato na lista atualiza a URL para /contacts/:id?
-  - [ ] **Modal de Contato:** O modal de new/edit de contato abre corretamente?
-  - [ ] **Validação de Contato:** Erros de validação no formulário do contato são exibidos dentro do modal, sem fechá-lo?
-  - [ ] **Sucesso no CRUD de Contato:** Salvar um contato fecha o modal e atualiza a lista atrás?
-  - [ ] **Carregamento de Abas:** Todas as abas na página de perfil carregam seu conteúdo (ou um "empty state") sem erros no console?
-  - [ ] **Aba Histórico:** A aba de histórico exibe as alterações do contato ou uma mensagem de "sem histórico"? (Verificar se o erro NoMethodError foi resolvido).
-  - [ ] **Aba Vínculos:** A aba de vínculos exibe a lista de vínculos ou um "empty state" com o botão para adicionar?
-  - [ ] **Modal de Vínculo:** Clicar em "Adicionar Vínculo" abre um formulário em um modal?
-  - [ ] **Validação de Vínculo:** O formulário de vínculo lida corretamente com erros de validação dentro do modal?
-  - [ ] **Sucesso no CRUD de Vínculo:** Salvar um vínculo fecha o modal e atualiza a lista na aba?
-  - [ ] **Feedback Visual:** Os botões "Salvar" em todos os formulários são desabilitados durante a submissão?
-  - [ ] **Consistência:** A experiência de uso dos modais de Contato e de Vínculo é idêntica?
+  - [x] **Navegação:** Clicar no nome de um contato na lista atualiza a URL para /contacts/:id?
+  - [x] **Modal de Contato:** O modal de new/edit de contato abre corretamente?
+  - [x] **Validação de Contato:** Erros de validação no formulário do contato são exibidos dentro do modal, sem fechá-lo?
+  - [x] **Sucesso no CRUD de Contato:** Salvar um contato fecha o modal e atualiza a lista atrás?
+  - [x] **Carregamento de Abas:** Todas as abas na página de perfil carregam seu conteúdo (ou um "empty state") sem erros no console?
+  - [x] **Aba Histórico:** A aba de histórico exibe as alterações do contato ou uma mensagem de "sem histórico"? (Verificar se o erro NoMethodError foi resolvido).
+  - [x] **Aba Vínculos:** A aba de vínculos exibe a lista de vínculos ou um "empty state" com o botão para adicionar?
+  - [x] **Modal de Vínculo:** Clicar em "Adicionar Vínculo" abre um formulário em um modal?
+  - [x] **Validação de Vínculo:** O formulário de vínculo lida corretamente com erros de validação dentro do modal?
+  - [x] **Sucesso no CRUD de Vínculo:** Salvar um vínculo fecha o modal e atualiza a lista na aba?
+  - [x] **Feedback Visual:** Os botões "Salvar" em todos os formulários são desabilitados durante a submissão?
+  - [x] **Consistência:** A experiência de uso dos modais de Contato e de Vínculo é idêntica?
 
 ---
 
@@ -165,7 +165,7 @@ Para diretrizes de arquitetura, UI/UX e conceitos de desenvolvimento, consulte o
 - **Solução Proposta:**
   1. Adicionar `acts_as_journalized` ao modelo `contact.rb`.
   2. Restaurar a lógica no `ContactsController#show` e na view `show.html.erb` para carregar e renderizar os `journals`.
-- **Status:** Pendente.
+- **Status:** Concluído.
 
 ### Refatorar Grupos de Contatos
 

@@ -51,7 +51,7 @@ end
 # A partir do Redmine 6.0 (Rails 7.1), a melhor prática é registrar patches e assets no bloco `to_prepare`
 Rails.configuration.to_prepare do
   # Registra os assets do plugin para pré-compilação
-  Rails.application.config.assets.precompile += %w( application.js contacts.css select2.min.css contacts.js analytics.js )
+  Rails.application.config.assets.precompile += %w( application.js contacts.css contacts.js analytics.js )
 
   
   require_relative 'lib/patches/issue_patch'
