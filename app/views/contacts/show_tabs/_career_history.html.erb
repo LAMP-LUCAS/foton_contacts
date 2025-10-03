@@ -1,15 +1,10 @@
 <%= turbo_frame_tag "contact_career_history" do %>
-  <% if @contact_employments.any? %>
-    <div class="contextual">
-      <%= link_to l(:label_employment_new),
-                  new_contact_employment_path(contact_id: @contact.id),
-                  class: 'icon icon-add',
-                  data: { turbo_frame: 'modal' } %>
-    </div>
-  <% end %>
+  <h3><%= l(:label_employment_new) %></h3>
+  <%= render partial: 'contact_employments/form', locals: { contact: @contact, employment: @employment } %>
+
+  <hr class="splitcontent" />
 
   <h3><%= l(:label_contact_employments) %></h3>
-
   <% if @contact_employments.any? %>
     <table class="list">
       <thead>
@@ -26,12 +21,6 @@
       </tbody>
     </table>
   <% else %>
-    <div id="contact_career_history_empty_state">
-      <%= render partial: 'common/empty_state', locals: {
-        message: l(:label_no_employments_found),
-        button_label: l(:label_employment_new),
-        button_path: new_contact_employment_path(contact_id: @contact.id)
-      } %>
-    </div>
+    <p class="nodata"><%= l(:label_no_employments_found) %></p>
   <% end %>
 <% end %>

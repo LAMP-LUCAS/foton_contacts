@@ -1,0 +1,4 @@
+<%= turbo_stream.replace "contact_career_history" do %>
+  <% @contact_employments = @contact.employments_as_person.includes(:company) %>
+  <%= render partial: "contacts/show_tabs/career_history", locals: { contact: @contact, contact_employments: @contact_employments } %>
+<% end %>

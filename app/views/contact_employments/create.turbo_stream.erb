@@ -1,7 +1,1 @@
-<%= turbo_stream.remove "modal" %>
-
-<%# Remove the empty state if it exists %>
-<%= turbo_stream.remove "contact_career_history_empty_state" %>
-
-<%# Prepend the new employment to the list %>
-<%= turbo_stream.prepend "contact_employments", partial: "contact_employments/employment", locals: { employment: @employment } %>
+<%= render 'update_list' %>

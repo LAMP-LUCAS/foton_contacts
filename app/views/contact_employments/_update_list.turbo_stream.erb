@@ -1,0 +1,5 @@
+<%# Removes the modal and updates the entire career history frame %>
+<%= turbo_stream.remove "modal" %>
+<%= turbo_stream.update "contact_career_history" do %>
+  <%= render partial: 'contacts/show_tabs/career_history', locals: { contact: @contact, contact_employments: @contact_employments } %>
+<% end %>

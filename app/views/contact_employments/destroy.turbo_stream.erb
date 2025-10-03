@@ -1,11 +1,1 @@
-<%= turbo_stream.remove dom_id(@employment) %>
-
-<% if @contact.employments_as_person.reload.empty? %>
-  <%= turbo_stream.replace "contact_career_history_empty_state" do %>
-    <%= render partial: 'common/empty_state', locals: {
-      message: l(:label_no_employments_found),
-      button_label: l(:label_employment_new),
-      button_path: new_contact_employment_path(contact_id: @contact.id)
-    } %>
-  <% end %>
-<% end %>
+<%= render 'update_list' %>

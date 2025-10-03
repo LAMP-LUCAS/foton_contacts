@@ -1,0 +1,12 @@
+<%# Renders the modal container and the form for a ContactEmployment %>
+<%= turbo_frame_tag "modal" do %>
+  <div data-controller="modal" class="modal">
+    <div class="modal-content box">
+      <div class="modal-header">
+        <h3><%= title %></h3>
+        <%= link_to "x", close_modal_contacts_path, class: "close", data: { turbo_frame: "modal" } %>
+      </div>
+      <%= render 'form', contact: contact, employment: employment %>
+    </div>
+  </div>
+<% end %>

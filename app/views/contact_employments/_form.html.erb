@@ -1,0 +1,37 @@
+<%= form_with model: employment, local: false, html: { 'data-controller': 'form' } do |f| %>
+  <%= f.hidden_field :contact_id, value: @contact.id %>
+  <div class="box">
+    <%= render 'common/errors', object: f.object %>
+
+    <div class="splitcontent">
+      <div class="splitcontentleft">
+        <p>
+          <%= f.label :company_id, l(:field_company) %><br />
+          <%= f.select :company_id,
+                       options_for_company_contact(selected: f.object.company_id),
+                       { include_blank: l(:label_select_company) },
+                       { required: true, data: { controller: 'tom-select' } } %>
+        </p>
+        <p>
+          <%= f.label :position %><br />
+          <%= f.text_field :position, size: 100 %>
+        </p>
+      </div>
+      <div class="splitcontentright">
+        <p>
+          <%= f.label :start_date, l(:field_start_date) %><br />
+          <%= f.date_field :start_date %>
+        </p>
+        <p>
+          <%= f.label :end_date, l(:field_end_date) %><br />
+          <%= f.date_field :end_date %>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="buttons">
+    <%= f.submit l(f.object.new_record? ? :button_create : :button_save), data: { 'form-target': 'submit' } %>
+    <%= link_to l(:button_cancel), close_modal_contacts_path, data: { turbo_frame: 'modal' } %>
+  </div>
+<% end %>

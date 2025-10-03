@@ -1,0 +1,5 @@
+<%= turbo_frame_tag "contact_career_history" do %>
+  <h2><%= l(:label_employment_edit) %></h2>
+
+  <%= render 'form', contact: @contact, employment: @employment %>
+<% end %>

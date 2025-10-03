@@ -22,7 +22,7 @@ resources :contacts do
 end
 
 resources :contact_roles, only: [] # Rota vazia para desativar
-resources :contact_employments, only: [:new, :create, :update, :destroy]
+resources :contact_employments, only: [:new, :create, :edit, :update, :destroy]
 resources :contact_groups do
   member do
     post 'add_member'
