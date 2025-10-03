@@ -1,11 +1,15 @@
 <tr id="<%= dom_id(employment) %>">
   <td><%= employment.company ? link_to(employment.company.name, contact_path(employment.company)) : l(:label_none) %></td>
-  <td><%= employment.role %></td>
+  <td><%= employment.position %></td>
   <td><%= format_date(employment.start_date) %></td>
   <td><%= format_date(employment.end_date) %></td>
   <td class="buttons">
+    <%= link_to l(:button_edit),
+                edit_contact_employment_path(employment),
+                class: 'icon icon-edit',
+                data: { turbo_frame: "modal" } %>
     <%= link_to l(:button_delete),
-                contact_employment_path(employment),
+                url_for(controller: 'contact_employments', action: 'destroy', id: employment.id),
                 data: { turbo_method: :delete, turbo_confirm: l(:text_are_you_sure) },
                 class: 'icon icon-del' %>
   </td>

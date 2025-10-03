@@ -48,6 +48,7 @@ class InitFotonContactsSchema < ActiveRecord::Migration[6.1]
       t.references :contact, null: false, foreign_key: { to_table: :contacts }
       t.references :company, null: false, foreign_key: { to_table: :contacts }
       t.string :position
+      #t.string :status, default: 'active', null: false
       t.date :start_date, default: -> { "CURRENT_DATE" }
       t.date :end_date
       t.timestamps
