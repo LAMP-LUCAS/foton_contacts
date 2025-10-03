@@ -11,14 +11,14 @@ Este documento é o registro histórico e o manual de funcionalidades do plugin 
 ### Core
 
 - **Gestão de Contatos:** CRUD completo para contatos (pessoas e empresas).
-- **Tipos e Status:** Diferenciação entre contatos do tipo "pessoa" e "empresa", e controle de status (ativo, inativo, descontinuado) com tipos enumerados.
+- **Tipos e Status:** Diferenciação entre contatos do tipo "pessoa" e "empresa", e controle de status (ativo, inativo, descontinuado).
 - **Campos Personalizados:** Suporte a campos personalizados para contatos.
-- **Anexos:** Suporte a anexos para contatos.
+- **Anexos e Histórico:** Suporte a anexos e registro de histórico de alterações (`journals`) para contatos.
 - **Busca e Filtro:** Funcionalidade de busca e filtros na lista de contatos.
 
 ### Relacionamentos
 
-- **Cargos e Empresas:** Associação de contatos (pessoas) a empresas com cargos específicos.
+- **Vínculos Empregatícios:** Associação de contatos (pessoas) a empresas com cargos específicos, incluindo histórico de carreira.
 - **Grupos de Contatos:** Criação de grupos de contatos para organização.
 - **Vínculo com Tarefas:** Associação de contatos a tarefas do Redmine.
 
@@ -28,20 +28,19 @@ Este documento é o registro histórico e o manual de funcionalidades do plugin 
 - **Visibilidade:** Controle de visibilidade de contatos (público, privado, por projeto).
 - **Perfil de Usuário:** Vínculo de um contato a um usuário do Redmine.
 
-### UI/UX e Fluxo de Trabalho
+### UI/UX e Arquitetura Front-End (Hotwire)
 
-A interface foi projetada para ser robusta, responsiva e intuitiva, com foco em operações rápidas através de modais.
+A interface foi completamente modernizada com **Hotwire (Turbo + Stimulus)** para oferecer uma experiência de usuário de página única (SPA-like), rápida e reativa, eliminando a necessidade de recarregamentos de página completos para operações comuns.
 
-- **Botões de Ação Rápida:**
-  - **➕ Novo Contato:** Abre um formulário modal para criação rápida.
-  - **📥 Importar CSV/vCard:** Abre um modal para upload e mapeamento de campos.
-  - **📊 Análise de Contato:** Um botão em cada linha da tabela abre um modal de Business Intelligence (BI) com dados analíticos.
-
-- **Modal de Análise (BI):**
-  - **Aba 1: Vínculos:** Mostra a quantidade de empresas vinculadas, cargos ocupados, status e o período de cada vínculo.
-  - **Aba 2: Relações com Projetos:** Exibe projetos associados, tarefas vinculadas e a última atividade registrada.
-  - **Aba 3: Carreira:** Apresenta uma linha do tempo dos vínculos, evolução de cargos e participação em grupos.
-  - **Aba 4: Alertas e Inconsistências:** Aponta dados ausentes (e-mail, telefone), vínculos sem cargo definido e possíveis contatos duplicados.
+- **Navegação com Turbo Drive:** A navegação geral no plugin é acelerada, proporcionando uma sensação de fluidez.
+- **Modais com Turbo Frames:** Todas as operações de CRUD (Criar/Editar Contatos, Adicionar/Editar Vínculos) ocorrem em modais que são carregados dinamicamente com Turbo Frames. Isso mantém o contexto do usuário na página de fundo (seja a lista de contatos ou o perfil de um contato).
+- **Atualizações em Tempo Real com Turbo Streams:** Após salvar ou excluir um item em um modal, a lista de fundo é atualizada automaticamente via Turbo Streams, sem a necessidade de recarregar a página. Erros de validação também são tratados de forma inteligente dentro do modal.
+- **Carregamento Sob Demanda (Lazy Loading):** Na página de perfil de um contato, o conteúdo das abas (Detalhes, Carreira, Histórico, etc.) é carregado sob demanda usando Turbo Frames, otimizando o tempo de carregamento inicial da página.
+- **Componentes Interativos com Stimulus:**
+  - **Feedback Visual:** Formulários fornecem feedback claro, desabilitando botões e exibindo spinners durante o envio para evitar cliques duplos.
+  - **Formulários Dinâmicos:** A adição e remoção de campos aninhados (como vínculos empregatícios) é gerenciada de forma suave.
+  - **Componentes Modernos:** A biblioteca `Select2` foi substituída por `Tom Select` para campos de seleção avançados, encapsulado em um controller Stimulus para uma integração perfeita.
+- **"Empty States" Inteligentes:** Listas vazias (como um contato sem histórico ou vínculos) exibem mensagens amigáveis com botões de ação claros, guiando o usuário no próximo passo.
 
 ### Importação e Exportação
 
@@ -51,10 +50,6 @@ A interface foi projetada para ser robusta, responsiva e intuitiva, com foco em 
 ### Testes
 
 - **Testes de Integração:** Cobertura de testes de integração para o `ContactsController`, validando as principais ações de CRUD e filtros.
-
-### Backend e Estrutura
-
-- **Refatoração Estrutural:** Unificação dos modelos de vínculo (`ContactRole` e `ContactEmployment`) para garantir consistência, manutenibilidade e corrigir bugs estruturais.
 
 ---
 
@@ -68,6 +63,7 @@ A interface foi projetada para ser robusta, responsiva e intuitiva, com foco em 
 │   └── views
 ├── assets
 │   ├── javascripts
+│   │   └── controllers (Stimulus)
 │   └── stylesheets
 ├── config
 │   ├── locales
@@ -82,33 +78,3 @@ A interface foi projetada para ser robusta, responsiva e intuitiva, com foco em 
     ├── integration
     └── unit
 ```
-
----
-
-## 🏛️ Arquitetura de Modais
-
-O plugin utiliza duas abordagens distintas para a implementação de modais, cada uma com suas próprias características, prós e contras.
-
-### 1. Modais de CRUD (Criar/Editar)
-
-- **Tecnologia:** **Hotwire (Turbo Frames + Turbo Streams)**.
-- **Descrição:** Estes modais são integrados diretamente no fluxo da página usando Turbo Frames. As ações (como salvar ou cancelar) são tratadas via Turbo Streams, que atualizam o DOM de forma eficiente sem a necessidade de um recarregamento completo da página. O conteúdo do modal é renderizado no servidor e inserido em um frame `<turbo-frame id="modal">`.
-- **Prós:**
-  - **Leveza e Performance:** Extremamente rápido, pois apenas o HTML necessário é transportado pela rede.
-  - **Integração com Rails:** Solução nativa do Rails 7, exigindo pouquíssimo JavaScript customizado.
-  - **Desenvolvimento Ágil:** Mantém a lógica no servidor, simplificando o desenvolvimento.
-- **Contras:**
-  - **Menos Flexibilidade de UI:** Funcionalidades complexas de UI, como arrastar e redimensionar, não são suportadas nativamente e exigem a integração com bibliotecas de JavaScript (como StimulusJS).
-  - **Fluxo de Página:** Por ser parte do DOM da página, o modal não se comporta como uma "janela" flutuante independente, o que pode ser menos intuitivo para certas experiências de usuário.
-
-### 2. Modal de Análise (BI)
-
-- **Tecnologia:** **AJAX + Biblioteca de UI JavaScript (provavelmente jQuery UI Dialog)**.
-- **Descrição:** Este modal opera de forma mais tradicional. Um link dispara uma requisição AJAX para o servidor, que retorna um HTML parcial. Esse HTML é então injetado em um contêiner de modal genérico, gerenciado por uma biblioteca JavaScript (o Redmine utiliza jQuery UI, que oferece o componente "Dialog").
-- **Prós:**
-  - **Experiência de Usuário Rica:** Suporta nativamente funcionalidades avançadas como arrastar, redimensionar e manter estado no lado do cliente. Proporciona a sensação de uma janela de aplicativo desktop.
-  - **Isolamento:** O estado e o comportamento do modal são completamente gerenciados no lado do cliente, isolando-o do resto da página.
-- **Contras:**
-  - **Mais Complexidade:** Exige mais código JavaScript para gerenciar os eventos, o estado e as interações do modal.
-  - **Performance:** Pode ser ligeiramente mais lento, pois envolve mais overhead no lado do cliente e, tradicionalmente, um gerenciamento de estado mais manual.
-  - **Estilo de Código:** Representa uma abordagem mais antiga e imperativa em comparação com a reatividade declarativa do Hotwire.
