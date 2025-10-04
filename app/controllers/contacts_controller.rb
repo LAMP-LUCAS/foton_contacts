@@ -215,12 +215,38 @@ class ContactsController < ApplicationController
   end
   
   def search
-    @contacts = Contact.visible(User.current)
-                      .where('LOWER(name) LIKE LOWER(?)', "%#{params[:q]}%")
-                      .limit(10)
-    
+    query = params[:q].to_s.strip
+    results = []
+
+    if query.present?
+      # Search for Contacts (Pessoas)
+      persons = Contact.visible(User.current)
+                       .where(contact_type: Contact.contact_types[:person])
+                       .where('LOWER(name) LIKE LOWER(?)', "%#{query.downcase}%")
+                       .limit(5)
+
+      if persons.any?
+        results << {
+          label: l(:label_foton_contacts_persons),
+          options: persons.map { |p| { value: "contact-#{p.id}", text: p.name, type: 'person' } }
+        }
+      end
+
+      # Search for ContactGroups (Grupos)
+      groups = ContactGroup.visible(User.current)
+                           .where('LOWER(name) LIKE LOWER(?)', "%#{query.downcase}%")
+                           .limit(5)
+
+      if groups.any?
+        results << {
+          label: l(:label_foton_contacts_groups),
+          options: groups.map { |g| { value: "group-#{g.id}", text: g.name, type: 'group' } }
+        }
+      end
+    end
+
     respond_to do |format|
-      format.json { render json: @contacts.map { |c| { id: c.id, text: c.name } } }
+      format.json { render json: results }
     end
   end
   

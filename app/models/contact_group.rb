@@ -37,6 +37,9 @@ class ContactGroup < ActiveRecord::Base
   
   has_many :memberships, class_name: 'ContactGroupMembership', dependent: :destroy
   has_many :contacts, through: :memberships
+
+  has_many :contact_issue_links, class_name: 'ContactIssueLink', dependent: :destroy
+  has_many :issues, through: :contact_issue_links
   
   validates :name, presence: true, uniqueness: { scope: :project_id }
   

@@ -29,7 +29,10 @@ resources :contact_groups do
     delete 'remove_member'
   end
 end
-resources :contact_issue_links, only: [:create, :destroy]
+
+resources :issues do
+  resources :contact_issue_links, only: [:create, :destroy]
+end
 
 resources :projects do
   resources :contacts

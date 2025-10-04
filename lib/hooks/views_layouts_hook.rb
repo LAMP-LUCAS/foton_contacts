@@ -16,5 +16,12 @@ module Hooks
 
       [turbo_tag, stimulus_tag, css_tag, tom_select_js_tag, plugin_js_tag].join("\n").html_safe
     end
+
+    def view_issues_show_details_bottom(context = {})
+      context[:controller].send(:render_to_string, {
+        partial: 'issues/foton_contacts_section',
+        locals: context
+      })
+    end
   end
 end
