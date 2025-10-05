@@ -1,31 +1,31 @@
-<div class="box issue-foton-contacts">
+<div class="box">
   <h3><%= l(:label_foton_contacts_linked_contacts) %></h3>
 
-  <%= turbo_frame_tag "foton_contacts_section" do %>
-    <div id="issue_contact_links">
-      <% if issue.contact_issue_links.any? %>
-        <%= render partial: 'issues/contact_issue_link', collection: issue.contact_issue_links, as: :contact_issue_link %>
-      <% else %>
-        <p class="no-results"><%= l(:label_foton_contacts_no_linked_contacts) %></p>
+  <div class="splitcontent">
+    <div class="splitcontentleft">
+      <h5><%= l(:label_foton_contacts_search_contact_or_group) %></h5>
+      <%= form_with url: search_links_contacts_path, method: :get, data: { turbo_frame: "contact_search_results" } do |f| %>
+        <%= f.hidden_field :issue_id, value: issue.id %>
+        <p><%= f.text_field :q, 
+                             placeholder: l(:label_foton_contacts_search_contact_or_group), 
+                             data: { controller: 'contact-search', action: 'input->contact-search#search' },
+                             class: 'full-width' %></p>
+      <% end %>
+
+      <%= turbo_frame_tag "contact_search_results", class: "list" do %>
+        <%# Search results will be loaded here %>
       <% end %>
     </div>
 
-    <%# This is where the form for adding new links will go (Step 3.3) %>
-    <%= turbo_frame_tag "issue_contact_links_form" do %>
-      <%= form_with model: ContactIssueLink.new(issue: issue), url: issue_contact_issue_links_path(issue), data: { turbo_frame: "issue_contact_links_form" } do |f| %>
-        <p>
-          <%= f.text_field :search_term, # This field will be used by Tom Select
-                           data: { controller: "tom-select",
-                                   tom_select_url_value: search_contacts_path(format: :json),
-                                   tom_select_target_id_value: "contact_issue_link_contact_id",
-                                   tom_select_target_group_id_value: "contact_issue_link_contact_group_id",
-                                   tom_select_submit_on_change_value: true },
-                           placeholder: l(:label_foton_contacts_search_contact_or_group),
-                           class: "full-width" %>
-          <%= f.hidden_field :contact_id %>
-          <%= f.hidden_field :contact_group_id %>
-        </p>
-      <% end %>
-    <% end %>
-  <% end %>
+    <div class="splitcontentright">
+      <h5><%= l(:label_foton_contacts_selected_contacts) %></h5>
+      <div id="issue_contact_links" class="list-container">
+        <% if issue.contact_issue_links.any? %>
+          <%= render partial: 'issues/contact_issue_link', collection: issue.contact_issue_links, as: :contact_issue_link %>
+        <% else %>
+          <p id="no-contacts-message" class="no-data"><%= l(:label_foton_contacts_no_linked_contacts) %></p>
+        <% end %>
+      </div>
+    </div>
+  </div>
 </div>

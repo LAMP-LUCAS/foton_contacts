@@ -1,0 +1,33 @@
+<%# Renders the search results for contacts and groups %>
+
+<% if contacts.blank? && groups.blank? %>
+  <p class="no-data"><%= l(:label_no_data) %></p>
+<% else %>
+  <ul class="list">
+    <%# Render contacts %>
+    <% contacts.each do |contact| %>
+      <li id="search-result-contact-<%= contact.id %>">
+        <div class="contact-result">
+          <span class="name"><%= contact.name %></span>
+          <%= button_to l(:button_add), 
+                        issue_contact_issue_links_path(issue, contact_issue_link: { contact_id: contact.id }),
+                        method: :post,
+                        class: 'button-small' %>
+        </div>
+      </li>
+    <% end %>
+
+    <%# Render groups %>
+    <% groups.each do |group| %>
+      <li id="search-result-group-<%= group.id %>">
+        <div class="contact-result">
+          <span class="name"><%= group.name %></span>
+          <%= button_to l(:button_add), 
+                        issue_contact_issue_links_path(issue, contact_issue_link: { contact_group_id: group.id }),
+                        method: :post,
+                        class: 'button-small' %>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+<% end %>

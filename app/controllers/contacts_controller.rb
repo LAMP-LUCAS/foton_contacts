@@ -249,6 +249,38 @@ class ContactsController < ApplicationController
       format.json { render json: results }
     end
   end
+
+  def search_links
+    query = params[:q].to_s.strip
+    @issue = Issue.find(params[:issue_id])
+
+    @contacts = Contact.visible(User.current)
+                       .where(contact_type: :person)
+                       .where('LOWER(name) LIKE LOWER(?)', "%#{query}%")
+                       .limit(10)
+
+    @groups = ContactGroup.visible(User.current)
+                          .where('LOWER(name) LIKE LOWER(?)', "%#{query}%")
+                          .limit(5)
+    
+    # Exclude already linked contacts and groups
+    if @issue.present?
+      existing_contact_ids = @issue.contact_issue_links.where.not(contact_id: nil).pluck(:contact_id)
+      existing_group_ids = @issue.contact_issue_links.where.not(contact_group_id: nil).pluck(:contact_group_id)
+      @contacts = @contacts.where.not(id: existing_contact_ids)
+      @groups = @groups.where.not(id: existing_group_ids)
+    end
+
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.update(
+          'contact_search_results',
+          partial: 'issues/search_results',
+          locals: { contacts: @contacts, groups: @groups, issue: @issue }
+        )
+      end
+    end
+  end
   
   def autocomplete
     @contacts = Contact.visible(User.current)

@@ -8,11 +8,25 @@ class ContactIssueLinksController < ApplicationController
     if @contact_issue_link.save
       respond_to do |format|
         format.turbo_stream do
-          render turbo_stream: turbo_stream.append(
-            "issue_contact_links",
-            partial: "issues/contact_issue_link",
-            locals: { contact_issue_link: @contact_issue_link }
-          )
+          target_id = if @contact_issue_link.contact_id
+                        "search-result-contact-#{@contact_issue_link.contact_id}"
+                      else
+                        "search-result-group-#{@contact_issue_link.contact_group_id}"
+                      end
+
+          render turbo_stream: [
+            turbo_stream.remove("no-contacts-message"),
+            turbo_stream.append(
+              "issue_contact_links",
+              partial: "issues/contact_issue_link",
+              locals: { contact_issue_link: @contact_issue_link }
+            ),
+            turbo_stream.replace(
+              target_id,
+              partial: "issues/search_result_added",
+              locals: { object: @contact_issue_link.linked_object }
+            )
+          ]
         end
         format.html { redirect_to @issue }
       end
@@ -64,13 +78,7 @@ class ContactIssueLinksController < ApplicationController
     params.require(:contact_issue_link).permit(:contact_id, :contact_group_id)
   end
 
-  # Placeholder for authorization. Redmine's authorize method should handle this.
-  # Ensure the user has permission to manage contact issue links on the issue's project.
   def authorize
-    # Example: require a specific permission on the project
-    # User.current.allowed_to?(:manage_contact_issue_links, @issue.project)
-    # For now, relying on Redmine's default authorize which checks :view_issue
-    # More specific permission will be added in a later step (e.g., 2.2.1)
-    true # Temporarily allow all, will be refined with Redmine permissions
+    deny_access unless User.current.allowed_to?(:manage_contacts, @issue.project)
   end
 end

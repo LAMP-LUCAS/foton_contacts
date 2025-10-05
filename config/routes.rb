@@ -14,6 +14,7 @@ resources :contacts do
   collection do
     get :new_employment_field
     get 'search'
+    get 'search_links'
     get 'autocomplete'
     post 'import'
     get 'export'

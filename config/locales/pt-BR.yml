@@ -98,3 +98,11 @@ pt-BR:
   label_no_career_history_for_contact: "Nenhum histórico de carreira para este contato."
   label_no_employees_for_company: "Nenhum funcionário registrado para esta empresa."
 
+  # Foton Contacts - Issue Linking UI
+  label_foton_contacts_linked_contacts: "Contatos Vinculados"
+  label_foton_contacts_search_contact_or_group: "Buscar contato ou grupo..."
+  label_foton_contacts_selected_contacts: "Contatos Selecionados"
+  label_foton_contacts_no_linked_contacts: "Nenhum contato vinculado."
+  label_foton_contacts_added: "Adicionado"
+
+
