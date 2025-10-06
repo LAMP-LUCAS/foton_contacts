@@ -279,11 +279,7 @@ class ContactsController < ApplicationController
     end
 
     respond_to do |format|
-      format.html do
-        render partial: 'issues/search_results',
-               locals: { contacts: @contacts, groups: @groups, issue: @issue },
-               layout: false
-      end
+      format.html { render :search_links }
       format.turbo_stream do
         render turbo_stream: turbo_stream.update('contact_search_results',
                                                  partial: 'issues/search_results',
