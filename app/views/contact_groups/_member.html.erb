@@ -1,0 +1,7 @@
+<div id="<%= dom_id(member) %>" class="contact-group-member">
+  <%= link_to member.name, contact_path(member) %>
+  <%= link_to l(:button_delete), 
+              remove_member_contact_group_path(group, contact_id: member.id), 
+              data: { turbo_method: :delete },
+              class: 'icon icon-del' %>
+</div>

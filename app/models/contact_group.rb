@@ -69,12 +69,11 @@ class ContactGroup < ActiveRecord::Base
   
   def css_classes
     classes = ['contact-group']
-    classes << 'system' if is_system?
     classes << 'private' if is_private?
     classes.join(' ')
   end
   
   def deletable?
-    !is_system?
+    true
   end
 end

@@ -24,14 +24,27 @@
       <% end %>
 
       <div class="<%= User.current.allowed_to?(:manage_contacts, @issue.project) ? 'splitcontentright' : '' %>">
-        <h5><%= l(:label_foton_contacts_selected_contacts) %></h5>
+        <h5>
+          <%= l(:label_foton_contacts_selected_contacts) %>
+          <span id="issue_contacts_counter" class="count"><%= issue.contact_issue_links.count %></span>
+        </h5>
         <div id="issue_contact_links" class="list-container">
-          <% if issue.contact_issue_links.any? %>
-            <%= render partial: 'issues/contact_issue_link', collection: issue.contact_issue_links, as: :contact_issue_link %>
+          <% 
+            all_links = issue.contact_issue_links.includes(contact: :groups, contact_group: :contacts)
+            linked_groups = all_links.map(&:contact_group).compact
+            contact_ids_in_groups = linked_groups.flat_map(&:contact_ids).uniq
+
+            links_to_render = all_links.select do |link|
+              link.contact_group_id.present? || (link.contact_id.present? && !contact_ids_in_groups.include?(link.contact_id))
+            end
+          %>
+          <% if links_to_render.any? %>
+            <%= render partial: 'issues/contact_issue_link', collection: links_to_render, as: :contact_issue_link %>
           <% else %>
             <p id="no-contacts-message" class="no-data"><%= l(:label_foton_contacts_no_linked_contacts) %></p>
           <% end %>
         </div>
+        <%= turbo_frame_tag "save_group_form_wrapper" %>
       </div>
     </div>
   </div>

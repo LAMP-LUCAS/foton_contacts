@@ -168,12 +168,27 @@ class ContactsController < ApplicationController
   end
   
   def groups
-    @contact_groups = @contact.contact_groups
-    render partial: 'contacts/show_tabs/groups', layout: false
+    @contact_groups = @contact.contact_groups.visible(User.current)
+    
+    respond_to do |format|
+      format.html { render partial: 'contacts/show_tabs/groups', locals: { contact_groups: @contact_groups } }
+      format.api
+    end
   end
   
   def tasks
-    @issues = @contact.issues.visible
+    # Find issue IDs linked directly to the contact
+    direct_issue_ids = @contact.issue_ids
+
+    # Find issue IDs linked to the groups the contact is a member of
+    group_issue_ids = Issue.joins(:contact_issue_links)
+                           .where(contact_issue_links: { contact_group_id: @contact.contact_group_ids })
+                           .pluck(:id)
+
+    # Combine, uniq and fetch visible issues
+    all_issue_ids = (direct_issue_ids + group_issue_ids).uniq
+    @issues = Issue.where(id: all_issue_ids).visible
+
     render partial: 'contacts/show_tabs/issues', layout: false
   end
   

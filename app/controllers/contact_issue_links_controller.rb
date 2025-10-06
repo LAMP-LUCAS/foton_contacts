@@ -14,7 +14,7 @@ class ContactIssueLinksController < ApplicationController
                         "search-result-group-#{@contact_issue_link.contact_group_id}"
                       end
 
-          render turbo_stream: [
+          streams = [
             turbo_stream.remove("no-contacts-message"),
             turbo_stream.append(
               "issue_contact_links",
@@ -25,8 +25,17 @@ class ContactIssueLinksController < ApplicationController
               target_id,
               partial: "issues/search_result_added",
               locals: { object: @contact_issue_link.linked_object }
-            )
+            ),
+            turbo_stream.update("issue_contacts_counter", html: @issue.contact_issue_links.count)
           ]
+
+          if @issue.contact_issue_links.count > 1
+            streams << turbo_stream.replace("save_group_form_wrapper") do
+              render_to_string partial: "issues/save_group_form", locals: { issue: @issue }
+            end
+          end
+
+          render turbo_stream: streams
         end
         format.html { redirect_to @issue }
       end
@@ -51,7 +60,22 @@ class ContactIssueLinksController < ApplicationController
 
     if @contact_issue_link.destroy
       respond_to do |format|
-        format.turbo_stream
+        format.turbo_stream do
+          streams = [
+            turbo_stream.remove(@contact_issue_link),
+            turbo_stream.update("issue_contacts_counter", html: @issue.contact_issue_links.count)
+          ]
+
+          if @issue.contact_issue_links.count <= 1
+            streams << turbo_stream.replace("save_group_form_wrapper", "")
+          end
+
+          if @issue.contact_issue_links.count == 0
+            streams << turbo_stream.append("issue_contact_links", "<p id=\"no-contacts-message\" class=\"no-data\">#{l(:label_foton_contacts_no_linked_contacts)}</p>")
+          end
+
+          render turbo_stream: streams
+        end
         format.html { redirect_to @issue }
       end
     else

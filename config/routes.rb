@@ -26,6 +26,7 @@ resources :contact_roles, only: [] # Rota vazia para desativar
 resources :contact_employments, only: [:new, :create, :edit, :update, :destroy]
 resources :contact_groups do
   member do
+    get 'search_members'
     post 'add_member'
     delete 'remove_member'
   end

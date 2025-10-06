@@ -1,0 +1,69 @@
+<div class="contextual">
+  <%= link_to l(:button_edit), edit_contact_group_path(@contact_group), class: 'icon icon-edit' %>
+  <%= delete_link contact_group_path(@contact_group) %>
+</div>
+
+<h2><%= @contact_group.name %></h2>
+<p><em><%= @contact_group.description %></em></p>
+
+<div class="box">
+  <div class="splitcontent">
+    <div class="splitcontentleft">
+      <h3><%= l(:label_foton_contacts_add_member) %></h3>
+      <%= form_with url: search_members_contact_group_path(@contact_group), method: :get, data: { turbo_frame: "contact_search_results" } do |f| %>
+        <p>
+          <%= f.text_field :q, 
+                           placeholder: l(:label_foton_contacts_search_contact), 
+                           class: 'full-width', 
+                           data: { controller: 'contact-search', action: 'input->contact-search#search' } %>
+          <%= f.submit l(:button_search), name: nil %>
+        </p>
+      <% end %>
+      <%= turbo_frame_tag "contact_search_results", 
+                          class: "list", 
+                          src: search_members_contact_group_path(@contact_group),
+                          data: { "contact-search-target": "resultsFrame" } do %>
+        <p class="loading"><%= l(:label_loading) %></p>
+      <% end %>
+    </div>
+
+    <div class="splitcontentright">
+      <h3><%= l(:label_member_plural) %> (<%= @members.count %>)</h3>
+      <div id="group_members" class="list-container">
+        <% if @members.any? %>
+          <% @members.each do |member| %>
+            <%= render partial: 'contact_groups/member', locals: { member: member, group: @contact_group } %>
+          <% end %>
+        <% else %>
+          <p id="no-members-message" class="no-data"><%= l(:label_foton_contacts_no_members_in_group) %></p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="box">
+  <h3><%= l(:label_issue_plural) %></h3>
+  <% if @issues.any? %>
+    <table class="list issues">
+      <thead>
+        <tr>
+          <th><%= l(:field_issue) %></th>
+          <th><%= l(:field_status) %></th>
+          <th><%= l(:field_updated_on) %></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @issues.each do |issue| %>
+          <tr>
+            <td class="issue"><%= link_to issue.subject, issue_path(issue) %></td>
+            <td><%= issue.status %></td>
+            <td><%= format_time(issue.updated_on) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <p class="no-data"><%= l(:label_foton_contacts_no_issues_for_group) %></p>
+  <% end %>
+</div>
