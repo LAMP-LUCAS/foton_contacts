@@ -39,7 +39,10 @@ Redmine::Plugin.register :foton_contacts do
 
   # Permissões
   project_module :contacts do |map|
-    map.permission :view_contacts, { contacts: [:index, :show, :analytics], contact_groups: [:index, :show] }
+    map.permission :view_contacts, { 
+      contacts: [:index, :show, :analytics], 
+      contact_groups: [:index, :show] 
+    }
     map.permission :manage_contacts, {
       contacts: [:new, :create, :edit, :update, :destroy, :import],
       contact_groups: [:new, :create, :edit, :update, :destroy, :add_member, :remove_member],

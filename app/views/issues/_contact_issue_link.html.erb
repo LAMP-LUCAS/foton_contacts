@@ -1,15 +1,23 @@
 <%= turbo_frame_tag contact_issue_link do %>
   <span class="tag tag-<%= contact_issue_link.contact_id.present? ? 'person' : 'group' %>">
     <% if contact_issue_link.contact %>
-      <%= link_to contact_issue_link.contact.name, contact_path(contact_issue_link.contact) %>
+      <%= link_to contact_issue_link.contact.name,
+                  contact_path(contact_issue_link.contact),
+                  target: "_blank",
+                  data: { turbo: false } %>
       <span class="icon icon-contact"></span>
     <% elsif contact_issue_link.contact_group %>
-      <%= link_to contact_issue_link.contact_group.name, contact_group_path(contact_issue_link.contact_group) %>
+      <%= link_to contact_issue_link.contact_group.name,
+                  contact_group_path(contact_issue_link.contact_group),
+                  target: "_blank",
+                  data: { turbo: false } %>
       <span class="icon icon-group"></span>
     <% end %>
-    <%= link_to l(:button_delete),
-                issue_contact_issue_link_path(contact_issue_link.issue, contact_issue_link),
-                data: { turbo_method: :delete, turbo_confirm: l(:text_are_you_sure) },
-                class: 'delete-icon' %>
+    <% if User.current.allowed_to?(:manage_contacts, contact_issue_link.issue.project) %>
+      <%= link_to l(:button_delete),
+                  issue_contact_issue_link_path(contact_issue_link.issue, contact_issue_link),
+                  data: { turbo_method: :delete, turbo_confirm: l(:text_are_you_sure) },
+                  class: 'delete-icon' %>
+    <% end %>
   </span>
 <% end %>

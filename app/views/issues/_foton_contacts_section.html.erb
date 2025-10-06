@@ -1,34 +1,38 @@
-<div class="box">
-  <h3><%= l(:label_foton_contacts_linked_contacts) %></h3>
+<% if @issue.project.module_enabled?(:contacts) && User.current.allowed_to?(:view_contacts, @issue.project) %>
+  <div class="box">
+    <h3><%= l(:label_foton_contacts_linked_contacts) %></h3>
 
-  <div class="splitcontent">
-    <div class="splitcontentleft">
-      <h5><%= l(:label_foton_contacts_search_contact_or_group) %></h5>
-      <%= form_with url: search_links_contacts_path, method: :get do |f| %>
-        <%= f.hidden_field :issue_id, value: issue.id %>
-        <p><%= f.text_field :q,
-                             placeholder: l(:label_foton_contacts_search_contact_or_group),
-                             data: { controller: 'contact-search', action: 'input->contact-search#search keydown->contact-search#handleKeydown' },
-                             class: 'full-width' %></p>
+    <div class="splitcontent">
+      <% if User.current.allowed_to?(:manage_contacts, @issue.project) %>
+        <div class="splitcontentleft">
+          <h5><%= l(:label_foton_contacts_search_contact_or_group) %></h5>
+          <%= form_with url: search_links_contacts_path, method: :get do |f| %>
+            <%= f.hidden_field :issue_id, value: issue.id %>
+            <p><%= f.text_field :q,
+                                 placeholder: l(:label_foton_contacts_search_contact_or_group),
+                                 data: { controller: 'contact-search', action: 'input->contact-search#search keydown->contact-search#handleKeydown' },
+                                 class: 'full-width' %></p>
+          <% end %>
+
+          <%= turbo_frame_tag "contact_search_results",
+                              class: "list",
+                              src: search_links_contacts_path(issue_id: issue.id),
+                              data: { 'contact-search-target': "resultsFrame" } do %>
+            <p class="loading"><%= l(:label_loading) %></p>
+          <% end %>
+        </div>
       <% end %>
 
-      <%= turbo_frame_tag "contact_search_results",
-                          class: "list",
-                          src: search_links_contacts_path(issue_id: issue.id),
-                          data: { 'contact-search-target': "resultsFrame" } do %>
-        <p class="loading"><%= l(:label_loading) %></p>
-      <% end %>
-    </div>
-
-    <div class="splitcontentright">
-      <h5><%= l(:label_foton_contacts_selected_contacts) %></h5>
-      <div id="issue_contact_links" class="list-container">
-        <% if issue.contact_issue_links.any? %>
-          <%= render partial: 'issues/contact_issue_link', collection: issue.contact_issue_links, as: :contact_issue_link %>
-        <% else %>
-          <p id="no-contacts-message" class="no-data"><%= l(:label_foton_contacts_no_linked_contacts) %></p>
-        <% end %>
+      <div class="<%= User.current.allowed_to?(:manage_contacts, @issue.project) ? 'splitcontentright' : '' %>">
+        <h5><%= l(:label_foton_contacts_selected_contacts) %></h5>
+        <div id="issue_contact_links" class="list-container">
+          <% if issue.contact_issue_links.any? %>
+            <%= render partial: 'issues/contact_issue_link', collection: issue.contact_issue_links, as: :contact_issue_link %>
+          <% else %>
+            <p id="no-contacts-message" class="no-data"><%= l(:label_foton_contacts_no_linked_contacts) %></p>
+          <% end %>
+        </div>
       </div>
     </div>
   </div>
-</div>
+<% end %>

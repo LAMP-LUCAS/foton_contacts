@@ -47,12 +47,11 @@ class ContactIssueLinksController < ApplicationController
 
   def destroy
     @contact_issue_link = @issue.contact_issue_links.find(params[:id])
+    @linked_object = @contact_issue_link.linked_object
 
     if @contact_issue_link.destroy
       respond_to do |format|
-        format.turbo_stream do
-          render turbo_stream: turbo_stream.remove(@contact_issue_link)
-        end
+        format.turbo_stream
         format.html { redirect_to @issue }
       end
     else
