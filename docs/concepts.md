@@ -32,6 +32,10 @@ A interação do usuário é inteiramente controlada pelo Hotwire, um conjunto d
     - **Lazy-Loading:** Carregamento sob demanda do conteúdo de abas, otimizando a performance.
 - **Turbo Streams:** Entregam atualizações de página a partir do servidor, permitindo modificar partes específicas do DOM em resposta a ações do usuário (como criar, atualizar ou deletar um registro). É a tecnologia por trás da atualização dinâmica da lista de contatos após uma edição no modal.
 
+### Componentização com Partials
+
+Para promover a reutilização e a clareza, a interface é dividida em componentes independentes usando partials do Rails. Elementos de UI complexos ou recorrentes, como a lista de tarefas vinculadas a um contato (`app/views/issues/_issue_list.html.erb`), são encapsulados em seus próprios partials. Isso torna o código das views mais limpo e facilita a manutenção.
+
 ### JavaScript com Stimulus
 
 - **Interatividade Leve e Focada:** O Stimulus é usado para interatividade que complementa o ciclo do Hotwire. Os controllers Stimulus são pequenos e focados em um único comportamento, como:

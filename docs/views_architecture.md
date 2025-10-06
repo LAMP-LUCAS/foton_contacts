@@ -88,3 +88,35 @@ graph TD
 
     I --> B;
 ```
+
+
+## 6. Estrutura de Views
+
+### 6.1. Página de Detalhes do Contato (`/contacts/{id}`)
+
+A página de visualização de um contato é o coração do plugin e segue uma arquitetura componentizada para máximo desempenho e clareza.
+
+- **`show.html.erb`**: É o template principal. Ele é responsável por renderizar o cabeçalho com o nome do contato, os botões de ação (Editar, Analisar, Deletar) e a estrutura de abas.
+
+- **Controlador de Abas (`show-tabs-controller.js`)**: Um controller Stimulus gerencia a lógica de alternância entre as abas, garantindo que apenas o conteúdo da aba ativa seja exibido.
+
+- **Partials de Abas (`/app/views/contacts/show_tabs/`)**: O conteúdo de cada aba é dividido em dois estágios para permitir o carregamento sob demanda (lazy-loading):
+    1.  **Frame (`*_frame.html.erb`)**: Este é o primeiro partial carregado. Ele contém apenas um `turbo_frame_tag` com um atributo `src` que aponta para a action do controller correspondente e `loading="lazy"`. Ex: `_issues_frame.html.erb`.
+    2.  **Conteúdo (`*.html.erb`)**: Este partial é carregado dinamicamente pelo Turbo Frame quando a aba se torna visível. Ele contém a lógica real para buscar e exibir os dados. Ex: `_issues.html.erb`.
+
+- **Listagem de Tarefas (`/app/views/issues/_issue_list.html.erb`)**: Para manter a consistência e a reutilização, a lista de tarefas vinculadas a um contato é renderizada por um partial dedicado. Este partial (`_issue_list.html.erb`) recebe a coleção de issues e as exibe em um formato de tabela padronizado, similar à lista de tarefas nativa do Redmine.
+
+O fluxograma de renderização da aba de tarefas é o seguinte:
+
+```mermaid
+graph TD
+    A[Request: `/contacts/123`] --> B[contacts#show];
+    B --> C[Renderiza `show.html.erb`];
+    C --> D[Renderiza `_issues_frame.html.erb` para a aba de tarefas];
+    D -- Turbo Frame (lazy) --> E{Request: `/contacts/123/tasks`};
+    E --> F[contacts#tasks];
+    F -- `@issues = @contact.issues.visible` --> G[Busca issues];
+    G --> H[Renderiza `_issues.html.erb`];
+    H -- `@issues.present?` --> I[Renderiza `_issue_list.html.erb`];
+    I --> J[Exibe a lista de tarefas];
+```
