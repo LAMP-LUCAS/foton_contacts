@@ -4,16 +4,19 @@
   <div class="splitcontent">
     <div class="splitcontentleft">
       <h5><%= l(:label_foton_contacts_search_contact_or_group) %></h5>
-      <%= form_with url: search_links_contacts_path, method: :get, data: { turbo_frame: "contact_search_results" } do |f| %>
+      <%= form_with url: search_links_contacts_path, method: :get do |f| %>
         <%= f.hidden_field :issue_id, value: issue.id %>
-        <p><%= f.text_field :q, 
-                             placeholder: l(:label_foton_contacts_search_contact_or_group), 
-                             data: { controller: 'contact-search', action: 'input->contact-search#search' },
+        <p><%= f.text_field :q,
+                             placeholder: l(:label_foton_contacts_search_contact_or_group),
+                             data: { controller: 'contact-search', action: 'input->contact-search#search keydown->contact-search#handleKeydown' },
                              class: 'full-width' %></p>
       <% end %>
 
-      <%= turbo_frame_tag "contact_search_results", class: "list" do %>
-        <%# Search results will be loaded here %>
+      <%= turbo_frame_tag "contact_search_results",
+                          class: "list",
+                          src: search_links_contacts_path(issue_id: issue.id),
+                          data: { 'contact-search-target': "resultsFrame" } do %>
+        <p class="loading"><%= l(:label_loading) %></p>
       <% end %>
     </div>
 

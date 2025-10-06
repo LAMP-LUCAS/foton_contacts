@@ -10,9 +10,8 @@
         <div class="contact-result">
           <span class="name"><%= contact.name %></span>
           <%= button_to l(:button_add), 
-                        issue_contact_issue_links_path(issue, contact_issue_link: { contact_id: contact.id }),
-                        method: :post,
-                        class: 'button-small' %>
+                      issue_contact_issue_links_path(issue, contact_issue_link: { contact_id: contact.id }),
+                      class: 'button-small' %>
         </div>
       </li>
     <% end %>
@@ -23,9 +22,8 @@
         <div class="contact-result">
           <span class="name"><%= group.name %></span>
           <%= button_to l(:button_add), 
-                        issue_contact_issue_links_path(issue, contact_issue_link: { contact_group_id: group.id }),
-                        method: :post,
-                        class: 'button-small' %>
+                      issue_contact_issue_links_path(issue, contact_issue_link: { contact_group_id: group.id }),
+                      class: 'button-small' %>
         </div>
       </li>
     <% end %>

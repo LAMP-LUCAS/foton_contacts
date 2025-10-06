@@ -1,34 +1,33 @@
 // assets/javascripts/controllers/contact_search_controller.js
-(function() {
-  const interval = setInterval(() => {
-    if (window.Stimulus) {
-      clearInterval(interval);
+window.ContactSearchController = class extends window.Stimulus.Controller {
+  static targets = [ "resultsFrame" ];
 
-      const application = window.Stimulus.Application.getApplications()[0] || window.Stimulus.Application.start();
-      const Controller = window.Stimulus.Controller;
+  initialize() {
+    this.search = this.debounce(this.search.bind(this), 300);
+  }
 
-      if (application.controllers.find(c => c.identifier === "contact-search")) {
-        return;
-      }
+  search() {
+    const form = this.element.form;
+    if (!form) { return; }
+    const url = new URL(form.action);
+    const params = new URLSearchParams(new FormData(form));
+    url.search = params.toString();
 
-      application.register("contact-search", class extends Controller {
-        initialize() {
-          this.search = this.debounce(this.search.bind(this), 300);
-        }
+    this.resultsFrameTarget.src = url;
+  }
 
-        search() {
-          this.element.form.requestSubmit();
-        }
-
-        debounce(func, wait) {
-          let timeout;
-          return function(...args) {
-            const context = this;
-            clearTimeout(timeout);
-            timeout = setTimeout(() => func.apply(context, args), wait);
-          };
-        }
-      });
+  handleKeydown(event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
     }
-  }, 50);
-})();
+  }
+
+  debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+      const context = this;
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(context, args), wait);
+    };
+  }
+};

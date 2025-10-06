@@ -2,7 +2,7 @@
 
 ## 🧭 Apresentação
 
-Este documento é o plano de trabalho central para o desenvolvimento do plugin **Foton Contacts**. Ele organiza as tarefas em fases e registra o backlog de funcionalidades e bugs.
+Este documento é o plano de trabalho central para o desenvolvimento do plugin **Foton Contacts**. Ele organiza as tarefas em fases e registra o backlog de funcionalidades e bugs. Este plugin está implantado no Redmine 6.0.7, ruby 3.3.9, Rails 7.2.2.2 e Puma 7.0.4, rodando na imagem oficial do Redmine e banco de dados postgres 15 no Docker.
 
 O objetivo do plugin é ser a solução definitiva para gestão de contatos e relacionamentos (CRM) no Redmine, com foco na indústria de Arquitetura, Engenharia e Construção (AEC).
 
@@ -42,7 +42,9 @@ Para garantir a consistência e a qualidade, o desenvolvimento é guiado por um 
 #### Comportamento Esperado (BDD - Behavior-Driven Development)
 
 - **Dado que** estou visualizando uma issue,
-- **Então** devo ver uma nova seção chamada "Contatos Vinculados".
+- **Então** devo ver uma nova seção chamada "Contatos Vinculados" com os contatos e/ou grupos vinculados a ela.
+- **Dadp que** estoi editando uma issue,
+- **Então** devo ver uma seção chamada "Contatos Vinculados".
 - **Quando** eu digitar o nome de uma pessoa ou grupo no campo de busca dentro desta seção,
 - **Então** o sistema deve me apresentar uma lista de sugestões correspondentes, separadas por "Pessoas" e "Grupos".
 - **Quando** eu selecionar um item da lista,
@@ -102,6 +104,73 @@ A implementação seguirá a filosofia moderna já estabelecida na Fase 1.
     -   [ ] **3.4. Configurar o `TomSelectController` (Stimulus):**
         -   Adaptar ou estender o controller `tom_select_controller.js` para carregar os dados do endpoint de busca (`/contacts/search`).
         -   Configurá-lo para, ao selecionar um item, submeter o formulário de adição automaticamente.
+
+#### Elementos de Ui/Ux
+
+[
+  {
+    "id": 1,
+    "title": "Busca Instantânea com Debounce",
+    "description": "À medida que o usuário digita no campo de busca, os resultados são atualizados em tempo real, sem a necessidade de clicar em um botão. O 'debounce' evita que uma nova busca seja feita a cada tecla pressionada, esperando uma pequena pausa na digitação para disparar a consulta. Isso torna a experiência fluida e rápida.",
+    "hotwire_example": "Utilizar um controller Stimulus para monitorar o evento 'input' do campo de busca. O controller aplicaria o debounce e, em seguida, atualizaria um `<turbo-frame id='search_results'>` com os resultados vindos do servidor."
+  },
+  {
+    "id": 2,
+    "title": "Seleção Visual e Feedback Imediato",
+    "description": "Ao clicar no botão 'Adicionar', o contato é visualmente movido ou copiado para a lista de 'Selecionados'. O item na lista de busca original muda de estado (ex: fica esmaecido e o botão se transforma em 'Adicionado') para dar um feedback claro de que a ação foi concluída e evitar duplicidade.",
+    "hotwire_example": "O clique no botão 'Adicionar' pode disparar uma ação de Turbo Stream que simultaneamente anexa o contato na lista de selecionados e atualiza o estado do contato na lista de resultados (replace)."
+  },
+  {
+    "id": 3,
+    "title": "Área de 'Arrastar e Soltar' (Drag and Drop)",
+    "description": "Permitir que os usuários arrastem contatos da lista de resultados e os soltem na lista de selecionados. É uma interação intuitiva e muito satisfatória, especialmente para montar listas rapidamente.",
+    "hotwire_example": "Implementar com um controller Stimulus que gerencia os eventos de drag-and-drop. Ao 'soltar', o controller pode fazer uma requisição assíncrona para adicionar o contato e usar Turbo Streams para atualizar a UI."
+  },
+  {
+    "id": 4,
+    "title": "Barra de Ações Flutuante",
+    "description": "Assim que o primeiro contato é adicionado, uma barra de ações flutuante surge na parte inferior da tela. Ela mostra o número de contatos selecionados e o botão 'Salvar Grupo'. Isso mantém as ações principais sempre visíveis, sem que o usuário precise rolar a página.",
+    "hotwire_example": "A primeira ação de adicionar um contato via Turbo Stream pode incluir uma stream adicional para anexar (append) a barra de ações flutuante ao `<body>` da página."
+  },
+  {
+    "id": 5,
+    "title": "Edição Inline de Funções/Notas na Lista de Seleção",
+    "description": "Na lista de contatos selecionados, permitir que o usuário clique no campo 'função' ou 'notas' (se aplicável) e o edite diretamente, sem abrir um modal. O campo se transforma em um input de texto e salva ao perder o foco ou ao pressionar Enter.",
+    "hotwire_example": "Cada item da lista de selecionados pode ser um `<turbo-frame>`. Ao clicar em 'Editar', o conteúdo do frame é substituído por um formulário de edição. Ao submeter, o frame é atualizado com a informação nova."
+  },
+  {
+    "id": 6,
+    "title": "Desfazer Remoção com 'Toast Notification'",
+    "description": "Ao remover um contato da lista de selecionados, ele desaparece da lista, mas uma notificação 'toast' aparece por alguns segundos com a mensagem 'Contato removido. [Desfazer]'. Isso previne remoções acidentais e dá mais segurança ao usuário.",
+    "hotwire_example": "A ação de remover dispara uma Turbo Stream para remover o item da lista e outra para adicionar o 'toast' com o link de 'desfazer'. O link de desfazer chamaria outra ação no controller para re-adicionar o item via stream."
+  },
+  {
+    "id": 7,
+    "title": "Pré-visualização de Contatos com 'Hover'",
+    "description": "Ao passar o mouse sobre um contato na lista de busca, um pequeno card de pré-visualização aparece ao lado, mostrando mais detalhes como endereço, empresa e descrição, sem a necessidade de clicar. Isso agiliza a identificação do contato correto.",
+    "hotwire_example": "Um controller Stimulus nos itens da lista pode, no evento `mouseover`, carregar de forma preguiçosa (lazy-load) o conteúdo detalhado do contato dentro de um `<turbo-frame>` posicionado de forma absoluta na tela."
+  },
+  {
+    "id": 8,
+    "title": "Busca Secundária Expansível",
+    "description": "A UI principal mostra apenas o campo de busca por nome. Um link ou ícone de 'Busca Avançada' expande uma seção com filtros adicionais (email, telefone, empresa, etc.), mantendo a interface limpa e focada para o caso de uso mais comum.",
+    "hotwire_example": "O link de 'Busca Avançada' pode simplesmente acionar um controller Stimulus para mostrar/esconder um `div` com os campos extras, ou pode carregar um formulário mais complexo via `<turbo-frame>`."
+  },
+  {
+    "id": 9,
+    "title": "Animações Sutis na Adição e Remoção",
+    "description": "Usar transições de CSS para que os itens deslizem suavemente para dentro e para fora da lista de selecionados. Uma animação de 'fade in' na entrada e 'fade out' na saída torna a experiência menos abrupta e mais polida.",
+    "hotwire_example": "Turbo já facilita isso. As Turbo Streams disparam eventos (`turbo:before-stream-render`). Podemos usar classes de animação (ex: com Animate.css ou Tailwind UI transitions) que são adicionadas antes do elemento ser inserido ou removido, criando o efeito desejado."
+  },
+  {
+    "id": 10,
+    "title": "Salvar Grupo com Sugestão de Nome Inteligente",
+    "description": "Ao salvar a lista, se o sistema detectar que vários contatos pertencem à mesma empresa (ex: 'Foton'), ele pode pré-preencher o campo de nome do grupo com uma sugestão como 'Equipe Foton' ou 'Contatos Foton', agilizando o processo.",
+    "hotwire_example": "A lógica seria no backend. Ao renderizar o formulário para salvar o grupo (que pode ser carregado num modal via `<turbo-frame>`), o controller analisaria os contatos selecionados e passaria a sugestão de nome como valor padrão para o campo de input."
+  }
+]
+
+**Atenção:** O exemplo de implementação dos elementos está na pasta ./exemplos
 
 ---
 

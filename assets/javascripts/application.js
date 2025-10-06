@@ -37,4 +37,3 @@ document.addEventListener("turbo:load", function() {
       this.submitTarget.innerHTML = this.submitTarget.dataset.originalText;
     }
   });
-});

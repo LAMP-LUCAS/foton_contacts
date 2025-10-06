@@ -254,16 +254,23 @@ class ContactsController < ApplicationController
     query = params[:q].to_s.strip
     @issue = Issue.find(params[:issue_id])
 
-    @contacts = Contact.visible(User.current)
-                       .where(contact_type: :person)
-                       .where('LOWER(name) LIKE LOWER(?)', "%#{query}%")
-                       .limit(10)
+    if query.blank?
+      @contacts = Contact.visible(User.current)
+                         .where(contact_type: :person)
+                         .limit(10)
+      @groups = ContactGroup.visible(User.current)
+                            .limit(5)
+    else
+      @contacts = Contact.visible(User.current)
+                         .where(contact_type: :person)
+                         .where('LOWER(name) LIKE LOWER(?)', "%#{query}%")
+                         .limit(10)
 
-    @groups = ContactGroup.visible(User.current)
-                          .where('LOWER(name) LIKE LOWER(?)', "%#{query}%")
-                          .limit(5)
-    
-    # Exclude already linked contacts and groups
+      @groups = ContactGroup.visible(User.current)
+                            .where('LOWER(name) LIKE LOWER(?)', "%#{query}%")
+                            .limit(5)
+    end
+
     if @issue.present?
       existing_contact_ids = @issue.contact_issue_links.where.not(contact_id: nil).pluck(:contact_id)
       existing_group_ids = @issue.contact_issue_links.where.not(contact_group_id: nil).pluck(:contact_group_id)
@@ -272,12 +279,15 @@ class ContactsController < ApplicationController
     end
 
     respond_to do |format|
+      format.html do
+        render partial: 'issues/search_results',
+               locals: { contacts: @contacts, groups: @groups, issue: @issue },
+               layout: false
+      end
       format.turbo_stream do
-        render turbo_stream: turbo_stream.update(
-          'contact_search_results',
-          partial: 'issues/search_results',
-          locals: { contacts: @contacts, groups: @groups, issue: @issue }
-        )
+        render turbo_stream: turbo_stream.update('contact_search_results',
+                                                 partial: 'issues/search_results',
+                                                 locals: { contacts: @contacts, groups: @groups, issue: @issue })
       end
     end
   end
