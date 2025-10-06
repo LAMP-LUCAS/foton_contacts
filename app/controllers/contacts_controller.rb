@@ -57,7 +57,7 @@ class ContactsController < ApplicationController
       {
         name: 'details',
         partial: 'contacts/show_tabs/details',
-        label: :label_details
+        label: :label_details_plural
       }
     ]
 

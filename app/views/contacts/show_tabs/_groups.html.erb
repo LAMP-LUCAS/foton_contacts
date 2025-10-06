@@ -1,5 +1,5 @@
 <%= turbo_frame_tag "contact_groups" do %>
-  <h3> l(:label_groups_title) </h3>
+  <h3><%= l(:label_groups_title) %></h3>
   <% if @contact_groups.present? %>
     <ul class="contact-groups">
       <% @contact_groups.each do |group| %>

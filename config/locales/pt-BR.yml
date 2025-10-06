@@ -9,6 +9,9 @@ pt-BR:
   label_active: "Ativo"
   label_inactive: "Inativo"
   label_discontinued: "Descontinuado"
+  field_contact_type: "Tipo de Contato"
+  field_project: "Projeto"
+  field_description: "Descrição"
 
   field_name: "Nome"
   field_email: "E-mail"
@@ -71,7 +74,9 @@ pt-BR:
   field_is_private: "Privado"
   label_add_company_role: "Adicionar Vínculo (Empresa)"
   label_group_plural: "Grupos"
+  label_groups: "Grupos"
   label_issue_plural: "Tarefas Relacionadas"
+  label_issues: "Tarefas"
   label_companies: "Empresas Vinculadas"
   button_analysis: "Visualizar Análise"
   # Traduções da página de listagem (index)
@@ -80,7 +85,6 @@ pt-BR:
   label_career: "Carreira"
   label_alerts: "Alertas"
   label_active_links: "Vínculos Ativos"
-  field_project: "Projeto"
   label_and_more: "e mais %{count}"
   label_no_data: "Sem dados para exibir"
   button_import: "Importar"
@@ -111,3 +115,20 @@ pt-BR:
   label_foton_contacts_no_results: "Nenhum contato encontrado."
   text_foton_contacts_are_you_sure: "Você tem certeza que deseja remover este vínculo?"
 
+  label_history: "Histórico"
+
+  text_contact_type_description: "Selecione se o contato é uma pessoa ou uma empresa."
+  text_name_description: "Nome do contato ou da empresa."
+  text_email_description: "Endereço de e-mail principal do contato."
+  text_phone_description: "Telefone principal para contato."
+  text_address_description: "Endereço completo do contato."
+  text_status_description: "Status atual do contato."
+  text_project_description: "Associe este contato a um projeto existente."
+  text_description_description: "Adicione uma descrição detalhada sobre o contato."
+  text_is_private_description: "Se marcado, o contato será visível apenas para você e para administradores."
+
+  label_employment_new: "Novo Vínculo"
+
+  label_employee: "Colaborador"
+
+  label_employment_edit: "Editar Vínculo"

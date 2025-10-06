@@ -1,5 +1,5 @@
 <%= turbo_frame_tag "contact_tasks" do %>
-  <h3> l(:label_issues_title) </h3>
+  <h3><%= l(:label_issues_title) %></h3>
   <% if @issues.present? %>
     <%= render partial: 'issues/list_simple', locals: { issues: @issues } %>
   <% else %>

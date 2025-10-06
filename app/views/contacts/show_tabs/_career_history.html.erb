@@ -10,7 +10,7 @@
       <thead>
         <tr>
           <th><%= l(:field_company) %></th>
-          <th><%= l(:field_role) %></th>
+          <th><%= l(:field_position) %></th>
           <th><%= l(:field_start_date) %></th>
           <th><%= l(:field_end_date) %></th>
           <th></th>
@@ -21,6 +21,6 @@
       </tbody>
     </table>
   <% else %>
-    <p class="nodata"><%= l(:label_no_employments_found) %></p>
+    <p class="nodata"><%= l(:label_no_career_history_for_contact) %></p>
   <% end %>
 <% end %>
