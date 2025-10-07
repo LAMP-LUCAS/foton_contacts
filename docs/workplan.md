@@ -105,6 +105,24 @@ A implementação seguirá a filosofia moderna já estabelecida na Fase 1.
         -   Adaptar ou estender o controller `tom_select_controller.js` para carregar os dados do endpoint de busca (`/contacts/search`).
         -   Configurá-lo para, ao selecionar um item, submeter o formulário de adição automaticamente.
 
+4.  **Contexto e Detalhes: Função do Contato e Descrição do Grupo**
+    -   **Justificativa:** Para aumentar a riqueza dos dados, vamos implementar a UI e a lógica para usar dois campos que já existem no banco de dados: `role` em `contact_issue_links` e `description` em `contact_groups`. *Time to connect the dots!* ✨
+    -   [ ] **4.1. Implementar "Função do Contato" na Issue com UI aprimorada:**
+        -   **Backend:**
+            -   [ ] Permitir o parâmetro `role` na criação e atualização de `ContactIssueLink`.
+            -   [ ] Adicionar a rota e ação `update` para edição inline da função.
+        -   **Frontend (Inspirado no mockup `exemplos/ex_CRUD_contatos-issue.html`):**
+            -   [ ] Substituir a exibição de contatos vinculados de "pílulas" para uma **lista de cards**. Cada contato vinculado será um card individual.
+            -   [ ] O card do contato deverá exibir suas informações principais (avatar, nome, telefone/email).
+            -   [ ] Dentro do card, haverá um campo de texto para a **Função (Role)**. Este campo será editável "inline", salvando automaticamente ao perder o foco (`blur` event), proporcionando uma experiência de edição fluida e sem recarregamento de página.
+            -   [ ] Cada card terá um botão de remoção ("x") para desvincular o contato da issue instantaneamente via Turbo Stream.
+    -   [ ] **4.2. Implementar "Descrição do Grupo":**
+        -   **Backend:**
+            -   [ ] Garantir que `:description` é um parâmetro permitido no `ContactGroupsController`.
+        -   **Frontend:**
+            -   [ ] Adicionar um `textarea` para a descrição no formulário de criação/edição de grupo.
+            -   [ ] Exibir a descrição na página de detalhes do grupo.
+
 #### Checklist de Tarefas - Ui/Ux
 
 - {

@@ -3,7 +3,12 @@
   <% if contact_groups.present? %>
     <ul class="contact-groups">
       <% contact_groups.each do |group| %>
-        <li><%= link_to group.name, contact_group_path(group) %></li>
+        <li>
+          <%= link_to group.name, contact_group_path(group) %>
+          <% if group.description.present? %>
+            <p class="group-description"><em><%= group.description %></em></p>
+          <% end %>
+        </li>
       <% end %>
     </ul>
   <% else %>

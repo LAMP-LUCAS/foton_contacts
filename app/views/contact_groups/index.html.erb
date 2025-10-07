@@ -9,6 +9,7 @@
     <thead>
       <tr>
         <th><%= l(:field_name) %></th>
+        <th><%= l(:field_description) %></th>
         <th><%= l(:label_member_count) %></th>
         <th><%= l(:label_issue_plural) %></th>
         <th></th>
@@ -19,7 +20,8 @@
         <% @contact_groups.each do |group| %>
           <tr id="<%= dom_id(group) %>" class="contact-group <%= cycle('odd', 'even') %>">
             <td class="name"><%= link_to group.name, contact_group_path(group) %></td>
-            <td><%= group.contacts.count %></td>
+            <td class="description"><%= group.description %></td>
+            <td><%= group.contacts.size %></td>
             <td><%= group.issues.size %></td>
             <td class="buttons">
               <%= link_to l(:button_edit), edit_contact_group_path(group), class: 'icon icon-edit' %>
@@ -29,7 +31,7 @@
         <% end %>
       <% else %>
         <tr>
-          <td colspan="4" class="no-data"><%= l(:label_no_data) %></td>
+          <td colspan="5" class="no-data"><%= l(:label_no_data) %></td>
         </tr>
       <% end %>
     </tbody>

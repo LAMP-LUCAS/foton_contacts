@@ -1,7 +1,26 @@
-<div id="<%= dom_id(member) %>" class="contact-group-member">
-  <%= link_to member.name, contact_path(member) %>
-  <%= link_to l(:button_delete), 
-              remove_member_contact_group_path(group, contact_id: member.id), 
-              data: { turbo_method: :delete },
-              class: 'icon icon-del' %>
-</div>
+<%# app/views/contact_groups/_member.html.erb %>
+<%= turbo_frame_tag membership do %>
+  <div class="contact-group-member-card">
+    <div class="contact-info">
+      <span class="icon icon-user"></span>
+      <%= link_to membership.contact.name, membership.contact, class: "contact-name" %>
+    </div>
+
+    <div class="contact-role" data-controller="inline-edit">
+      <%= form_with model: membership, url: contact_group_membership_path(membership), method: :patch do |f| %>
+        <%= f.label :role, "#{l(:field_role)}:" %>
+        <%= f.text_field :role, 
+                         placeholder: l(:label_foton_contacts_role_placeholder),
+                         data: { action: "blur->inline-edit#submit" } %>
+      <% end %>
+    </div>
+
+    <div class="contact-actions">
+      <%= link_to '', 
+                  remove_member_contact_group_path(membership.contact_group, contact_id: membership.contact.id), 
+                  data: { turbo_method: :delete, turbo_confirm: l(:text_are_you_sure) },
+                  class: 'icon icon-del',
+                  title: l(:button_delete) %>
+    </div>
+  </div>
+<% end %>

@@ -28,11 +28,11 @@
     </div>
 
     <div class="splitcontentright">
-      <h3><%= l(:label_member_plural) %> (<%= @members.count %>)</h3>
+      <h3><%= l(:label_member_plural) %> (<%= @memberships.count %>)</h3>
       <div id="group_members" class="list-container">
-        <% if @members.any? %>
-          <% @members.each do |member| %>
-            <%= render partial: 'contact_groups/member', locals: { member: member, group: @contact_group } %>
+        <% if @memberships.any? %>
+          <% @memberships.each do |membership| %>
+            <%= render partial: 'contact_groups/member', locals: { membership: membership } %>
           <% end %>
         <% else %>
           <p id="no-members-message" class="no-data"><%= l(:label_foton_contacts_no_members_in_group) %></p>

@@ -187,7 +187,7 @@ class ContactsController < ApplicationController
 
     # Combine, uniq and fetch visible issues
     all_issue_ids = (direct_issue_ids + group_issue_ids).uniq
-    @issues = Issue.where(id: all_issue_ids).visible
+    @issues = Issue.where(id: all_issue_ids).visible.includes(:contact_issue_links)
 
     render partial: 'contacts/show_tabs/issues', layout: false
   end

@@ -5,6 +5,9 @@
         <th>#</th>
         <th><%= l(:field_project) %></th>
         <th><%= l(:field_subject) %></th>
+        <% if local_assigns.key?(:contact) %>
+          <th><%= l(:field_role) %></th>
+        <% end %>
         <th><%= l(:field_status) %></th>
         <th><%= l(:field_start_date) %></th>
         <th><%= l(:field_due_date) %></th>
@@ -16,6 +19,9 @@
           <td class="id"><%= link_to issue.id, issue_path(issue) %></td>
           <td class="project"><%= link_to issue.project, project_path(issue.project) %></td>
           <td class="subject"><%= link_to issue.subject, issue_path(issue) %></td>
+          <% if local_assigns.key?(:contact) %>
+            <td class="role"><%= issue.contact_issue_links.find { |link| link.contact_id == contact.id }&.role %></td>
+          <% end %>
           <td class="status"><%= issue.status.name %></td>
           <td class="start_date"><%= format_date(issue.start_date) %></td>
           <td class="due_date"><%= format_date(issue.due_date) %></td>

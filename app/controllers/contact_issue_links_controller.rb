@@ -1,5 +1,6 @@
 class ContactIssueLinksController < ApplicationController
-  before_action :find_issue, only: [:create, :destroy]
+  before_action :find_issue, only: [:create, :destroy, :update]
+  before_action :find_contact_issue_link, only: [:update, :destroy]
   before_action :authorize
 
   def create
@@ -54,8 +55,25 @@ class ContactIssueLinksController < ApplicationController
     end
   end
 
+  def update
+    if @contact_issue_link.update(contact_issue_link_params)
+      respond_to do |format|
+        format.turbo_stream {
+          render turbo_stream: turbo_stream.replace(@contact_issue_link,
+            partial: "issues/contact_issue_link",
+            locals: { contact_issue_link: @contact_issue_link })
+        }
+        format.html { redirect_to @issue, notice: l(:notice_successful_update) }
+      end
+    else
+      respond_to do |format|
+        format.html { redirect_to @issue, alert: 'Failed to update contact link.' }
+        format.turbo_stream { head :unprocessable_entity }
+      end
+    end
+  end
+
   def destroy
-    @contact_issue_link = @issue.contact_issue_links.find(params[:id])
     @linked_object = @contact_issue_link.linked_object
 
     if @contact_issue_link.destroy
@@ -97,8 +115,12 @@ class ContactIssueLinksController < ApplicationController
     render_404
   end
 
+  def find_contact_issue_link
+    @contact_issue_link = @issue.contact_issue_links.find(params[:id])
+  end
+
   def contact_issue_link_params
-    params.require(:contact_issue_link).permit(:contact_id, :contact_group_id)
+    params.require(:contact_issue_link).permit(:contact_id, :contact_group_id, :role)
   end
 
   def authorize

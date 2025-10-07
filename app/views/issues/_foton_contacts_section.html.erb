@@ -30,7 +30,7 @@
         </h5>
         <div id="issue_contact_links" class="list-container">
           <% 
-            all_links = issue.contact_issue_links.includes(contact: :groups, contact_group: :contacts)
+            all_links = issue.contact_issue_links.includes(contact: :contact_groups, contact_group: :contacts)
             linked_groups = all_links.map(&:contact_group).compact
             contact_ids_in_groups = linked_groups.flat_map(&:contact_ids).uniq
 

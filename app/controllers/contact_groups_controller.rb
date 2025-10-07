@@ -31,7 +31,7 @@ class ContactGroupsController < ApplicationController
   before_action :authorize_global
   
   def index
-    scope = ContactGroup.visible(User.current).includes(:author, :issues).order(:name)
+    scope = ContactGroup.visible(User.current).includes(:author, :issues, :contacts).order(:name)
     @group_count = scope.count
     @group_pages = Paginator.new @group_count, per_page_option, params['page']
     @contact_groups = scope.offset(@group_pages.offset).limit(@group_pages.per_page).to_a
@@ -43,7 +43,7 @@ class ContactGroupsController < ApplicationController
   end
   
   def show
-    @members = @contact_group.contacts.includes(:author).order(:name)
+    @memberships = @contact_group.memberships.includes(contact: :author).order('contacts.name')
     @issues = @contact_group.issues.visible.order(updated_on: :desc)
     
     respond_to do |format|
@@ -129,7 +129,7 @@ class ContactGroupsController < ApplicationController
         format.turbo_stream do
           render turbo_stream: turbo_stream.append("group_members", 
             partial: "contact_groups/member", 
-            locals: { member: @contact, group: @contact_group })
+            locals: { membership: @membership })
         end
         format.html do
           flash[:notice] = l(:notice_contact_added_to_group)
@@ -148,7 +148,7 @@ class ContactGroupsController < ApplicationController
     @membership.destroy
 
     respond_to do |format|
-      format.turbo_stream { render turbo_stream: turbo_stream.remove(@contact) }
+      format.turbo_stream { render turbo_stream: turbo_stream.remove(@membership) }
       format.html do
         flash[:notice] = l(:notice_contact_removed_from_group)
         redirect_to contact_group_path(@contact_group)
