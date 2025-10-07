@@ -4,6 +4,7 @@
 //= require controllers/nested_form_controller
 //= require controllers/modal_controller
 //= require controllers/show_tabs_controller
+//= require controllers/inline_edit_controller
 
 document.addEventListener("turbo:load", function() {
   if (!window.Stimulus) {
@@ -33,5 +34,8 @@ document.addEventListener("turbo:load", function() {
   }
   if (window.ShowTabsController && !application.router.modulesByIdentifier.has("show-tabs")) {
     application.register("show-tabs", window.ShowTabsController);
+  }
+  if (window.InlineEditController && !application.router.modulesByIdentifier.has("inline-edit")) {
+    application.register("inline-edit", window.InlineEditController);
   }
 });

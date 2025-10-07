@@ -1,4 +1,5 @@
 class ContactsController < ApplicationController
+  helper FotonContactsLinkHelper
   before_action :require_login
   before_action :find_contact, only: [:show, :edit, :update, :destroy, :career_history, :employees_list, :groups, :tasks, :history, :analytics, :show_edit]
   before_action :authorize_global, only: [:index, :show, :new, :create]

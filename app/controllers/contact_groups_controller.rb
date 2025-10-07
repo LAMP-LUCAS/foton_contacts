@@ -26,6 +26,7 @@
 '''
 
 class ContactGroupsController < ApplicationController
+  helper FotonContactsLinkHelper
   before_action :require_login
   before_action :find_contact_group, only: [:show, :edit, :update, :destroy, :add_member, :remove_member, :search_members]
   before_action :authorize_global

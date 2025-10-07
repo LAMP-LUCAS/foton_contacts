@@ -1,4 +1,5 @@
 class ContactGroupMembershipsController < ApplicationController
+  helper FotonContactsLinkHelper
   before_action :find_membership, only: [:update]
   before_action :authorize_membership_update
 

@@ -1,4 +1,5 @@
 class ContactIssueLinksController < ApplicationController
+  helper FotonContactsLinkHelper
   before_action :find_issue, only: [:create, :destroy, :update]
   before_action :find_contact_issue_link, only: [:update, :destroy]
   before_action :authorize

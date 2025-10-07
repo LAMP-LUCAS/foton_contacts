@@ -226,3 +226,12 @@ A implementação seguirá a filosofia moderna já estabelecida na Fase 1.
 *   **Problema:** No modal de edição de um contato, o link para remover um vínculo empregatício não funciona como esperado.
 *   **Comportamento Desejado:** O campo do formulário do vínculo deve ser removido visualmente da interface do modal (via Stimulus), e a exclusão do registro deve ser marcada para ocorrer apenas na submissão do formulário principal (via atributo `_destroy`).
 *   **Próxima Ação / Hipótese:** Investigar a implementação do controller Stimulus responsável por essa interação, pois ele pode não estar conectado corretamente ou a lógica de remoção pode estar falhando.
+
+---
+
+## 💡 Backlog de Tecnologia e Otimizações
+
+### Implementar Gerenciador de Links (Porteiro) no Frontend
+- **Problema:** A gestão de links para fora do plugin (e mesmo entre páginas completas dentro do plugin) está sendo feita no servidor com um *helper* que adiciona `data-turbo="false"` a todos os links de navegação. Embora funcional, isso causa um recarregamento completo da página, perdendo o benefício de velocidade do Turbo Drive.
+- **Solução Proposta:** No futuro, implementar um "porteiro" em JavaScript (via Stimulus controller) que gerencia o comportamento dos links de forma inteligente no lado do cliente. Isso permitiria manter a navegação rápida do Turbo Drive para todas as páginas, mas executando um `Turbo.visit()` programaticamente para garantir que o estado da página (como a URL no navegador) seja atualizado corretamente, oferecendo a melhor experiência de usuário possível.
+- **Status:** Pendente. A abordagem via helper no servidor foi priorizada para garantir a funcionalidade imediata.
