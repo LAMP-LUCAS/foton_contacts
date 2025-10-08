@@ -24,6 +24,9 @@ pt-BR:
   label_contact_group_plural: "Grupos"
   label_contact_group_new: "Novo Grupo"
 
+  field_role: "Função"
+  label_group_and_role: "Grupo/Função"
+
   notice_contact_group_updated: "Grupo atualizao com sucesso!"
   notice_contact_group_created: "Grupo criado com sucesso!"
   notice_contact_group_created_from_issue: "Grupo criado a partir da tarefa!"
