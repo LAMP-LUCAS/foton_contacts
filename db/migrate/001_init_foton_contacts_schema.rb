@@ -35,13 +35,15 @@ class InitFotonContactsSchema < ActiveRecord::Migration[6.1]
     end
 
     create_table :contact_issue_links do |t|
-      t.references :contact, null: false, foreign_key: true
       t.references :issue, null: false, foreign_key: true
+      t.references :contact, null: true, foreign_key: true
+      t.references :contact_group, null: true, foreign_key: true
       t.string :role
       t.text :notes
       t.timestamps
 
-      t.index [:contact_id, :issue_id], unique: true
+      t.index [:issue_id, :contact_id], name: 'idx_contact_issue_links_on_issue_and_contact', unique: true, where: 'contact_id IS NOT NULL'
+      t.index [:issue_id, :contact_group_id], name: 'idx_contact_issue_links_on_issue_and_group', unique: true, where: 'contact_group_id IS NOT NULL'
     end
 
     create_table :contact_employments do |t|

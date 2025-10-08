@@ -18,13 +18,21 @@ Este documento é o registro histórico e o manual de funcionalidades do plugin 
 
 ### Relacionamentos
 
-- **Vínculos Empregatícios:** Associação de contatos (pessoas) a empresas com cargos específicos, incluindo histórico de carreira.
-- **Grupos de Contatos:** Criação de grupos de contatos para organização.
-- **Vínculo com Tarefas:** Associação de contatos a tarefas do Redmine.
+- **Vínculos Empregatícios (Carreira):** Associação dinâmica de contatos (pessoas) a empresas. A criação, edição e remoção de vínculos ocorrem em um modal com Hotwire, permitindo a construção de um histórico de carreira detalhado (cargo, datas de início e fim) sem recarregar a página.
+- **Grupos de Contatos:** CRUD completo e dinâmico para criação de grupos, permitindo organizar contatos de forma segmentada. A adição e remoção de membros são feitas de forma interativa.
+
+### Integração com Tarefas (Issues)
+
+Esta é a funcionalidade central que conecta a gestão de contatos ao trabalho diário no Redmine.
+
+- **Vínculo Direto a Tarefas:** Permite associar múltiplos contatos e/ou grupos de contatos diretamente a uma tarefa, criando um registro claro de todos os stakeholders envolvidos.
+- **Atribuição de Funções (Roles):** Ao vincular um contato a uma tarefa, é possível atribuir uma **função** específica a ele (ex: "Aprovador", "Fornecedor", "Cliente"). Esse campo é editável diretamente na lista de contatos da tarefa, salvando automaticamente.
+- **Busca Inteligente na Tarefa:** Dentro da tela de uma tarefa, uma caixa de busca permite encontrar e adicionar contatos ou grupos rapidamente, sem interromper o fluxo de trabalho. A busca sugere resultados em tempo real.
+- **Gestão Visual:** Os contatos vinculados são exibidos como "cards" informativos na própria tarefa, cada um com um botão para remoção rápida e a opção de editar a função.
 
 ### Integração com Redmine
 
-- **Permissões:** Sistema de permissões integrado ao Redmine para controlar o acesso aos contatos.
+- **Permissões:** Sistema de permissões integrado ao Redmine para controlar o acesso aos contatos (visualizar, criar, editar, etc.).
 - **Visibilidade:** Controle de visibilidade de contatos (público, privado, por projeto).
 - **Perfil de Usuário:** Vínculo de um contato a um usuário do Redmine.
 

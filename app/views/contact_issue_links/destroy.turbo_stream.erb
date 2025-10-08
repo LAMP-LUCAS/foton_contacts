@@ -1,0 +1,11 @@
+<%= turbo_stream.remove @contact_issue_link %>
+
+<% if @linked_object.is_a?(Contact) %>
+  <%= turbo_stream.append "contact-search-list", 
+                           partial: "issues/search_result_item", 
+                           locals: { contact: @linked_object, issue: @issue } %>
+<% elsif @linked_object.is_a?(ContactGroup) %>
+  <%= turbo_stream.append "contact-search-list", 
+                           partial: "issues/search_result_group_item", 
+                           locals: { group: @linked_object, issue: @issue } %>
+<% end %>

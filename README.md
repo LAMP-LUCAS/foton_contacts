@@ -7,86 +7,53 @@
 
 ### 🚀 Visão Geral
 
-O **Plugin de Contatos para Redmine** é uma solução desenvolvida para empresas da indústria AEC (Arquitetura, Engenharia e Construção) que precisam gerenciar relacionamentos profissionais com clareza, segurança e agilidade.
+O **Plugin de Contatos para Redmine** é uma solução completa para gestão de stakeholders na indústria AEC (Arquitetura, Engenharia e Construção). Ele centraliza dados de pessoas e empresas, mapeia o histórico de vínculos profissionais e, mais importante, **integra essas informações diretamente às tarefas e projetos do Redmine**.
 
-Ele centraliza os dados de stakeholders, mapeia o histórico de vínculos profissionais e transforma esses dados em insights, tudo com uma interface moderna, responsiva e totalmente integrada ao Redmine.
+Com uma interface moderna e reativa construída com **Hotwire**, o plugin transforma dados de contato em insights acionáveis, permitindo uma visão 360º dos relacionamentos que impulsionam seus projetos.
 
 ---
 
 ### 🧩 Funcionalidades Principais
 
-- **Cadastro Inteligente:** CRUD completo para contatos do tipo "Pessoa" e "Empresa".
-- **Vínculos Múltiplos:** Associe uma pessoa a múltiplas empresas com cargos, status e histórico.
-- **Grupos de Contatos:** Crie e gerencie grupos para organizar seus contatos.
-- **Integração com Projetos:** Vincule contatos a tarefas e projetos do Redmine.
+- **Cadastro Unificado:** CRUD completo para contatos do tipo "Pessoa" e "Empresa".
+- **Vínculos Profissionais:** Associe pessoas a múltiplas empresas com cargos, datas e histórico de carreira.
+- **Grupos Dinâmicos:** Crie e gerencie grupos de contatos para segmentação e comunicação.
+- **Integração Profunda com Tarefas:**
+    - Vincule múltiplos contatos e grupos diretamente a qualquer tarefa do Redmine.
+    - Atribua **funções** específicas aos contatos em uma tarefa (ex: "Aprovador", "Fornecedor", "Cliente").
+    - Busque e adicione contatos a uma tarefa de forma rápida, sem sair da tela da tarefa.
 - **Visualização Analítica (BI):** Acesse um modal de análise para cada contato, com informações sobre carreira, projetos, vínculos e alertas de inconsistência de dados.
 - **Importação e Exportação:** Importe contatos de arquivos CSV e exporte para vCard e CSV.
 
-Para uma lista exaustiva de todas as funcionalidades e um manual detalhado de como o plugin funciona, consulte nosso **[Roadmap e Manual de Funcionalidades](docs/ROADMAP.md)**.
+Para uma lista exaustiva de todas as funcionalidades e um manual detalhado, consulte nosso **[Roadmap e Manual de Funcionalidades](docs/ROADMAP.md)**.
 
 ---
 
 ### 🏛️ Arquitetura e Filosofia de Design
 
-A interface do plugin é construída seguindo princípios de design modernos para garantir uma experiência de usuário fluida, intuitiva e totalmente integrada ao Redmine. A arquitetura de frontend está em transição para o **framework Hotwire (Turbo + Stimulus)** para maximizar a performance e a reatividade.
+A interface do plugin é construída com o **framework Hotwire (Turbo + Stimulus)**, garantindo uma experiência de usuário fluida, rápida e moderna, que se integra de forma nativa ao Redmine. A filosofia é de "HTML-over-the-wire", minimizando a complexidade no frontend.
 
-Para aprofundar em nossos conceitos de UI/UX, diretrizes de desenvolvimento e arquitetura de frontend, leia o **[Relatório de Arquitetura de Views](docs/views_architecture.md)**.
+- **Navegação Acelerada com Turbo Drive:** Interações rápidas, sem recarregamento de página.
+- **Componentes Reativos com Turbo Frames e Streams:** Modais, abas e listas são atualizados dinamicamente, proporcionando uma experiência de SPA (Single Page Application).
+- **Interatividade com Stimulus:** Controladores JavaScript leves para funcionalidades como busca, formulários dinâmicos e feedback visual.
 
----
-
-### ⚡ Integração Hotwire (Turbo + Stimulus)
-
-Para que as funcionalidades modernas de interface (como os modais de cadastro e relatórios instantâneos) funcionem, é necessário que o Hotwire esteja configurado como o *framework* JavaScript principal no Redmine.
-
-Se o seu Redmine ainda não usa o Hotwire, siga estas etapas de configuração manual:
-
-#### 1\. Instalação e Configuração de Arquivos
-
-Execute este comando para adicionar as bibliotecas Hotwire e criar os diretórios de controladores no seu Redmine:
-
-```bash
-# Na raiz do seu Redmine
-rails hotwire:install
-```
-
-#### 2\. Criar o Entrypoint Global
-
-O instalador do Rails pode não encontrar o arquivo principal do JavaScript do Redmine. Você precisa garantir que o **arquivo `app/javascript/application.js`** exista e contenha os `import`s de inicialização:
-
-```bash
-# Crie o arquivo, se não existir
-touch app/javascript/application.js
-
-# Edite e adicione o conteúdo:
-cat <<EOT > app/javascript/application.js
-// app/javascript/application.js
-import "@hotwired/turbo-rails"
-import "./controllers"
-EOT
-```
-
-#### 3\. Configurar o Hook do Plugin
-
-O Plugin de Contatos injeta o *entrypoint* Hotwire no cabeçalho (seção `<head>`) do Redmine via um *hook* de visualização.
-
-Verifique se a classe `ViewsLayoutsHook` está usando o `javascript_include_tag('application', type: 'module')` para garantir que o arquivo `application.js` configurado acima seja carregado corretamente como um módulo JavaScript moderno.
-
-#### 4\. Corrigir o Gemfile (Importante\!)
-
-Durante a instalação, o Ruby pode alertar sobre dependências duplicadas. **É crucial corrigir o `Gemfile`** para evitar erros de estabilidade:
-
-1.  Edite o arquivo **`Gemfile`** na raiz do Redmine.
-2.  Procure e **remova as entradas duplicadas** da *gem* `puma`.
-3.  Execute `bundle install` novamente para finalizar:
-    ```bash
-    bundle install
-    ```
+Para aprofundar em nossos conceitos de UI/UX e arquitetura, leia o **[Relatório de Arquitetura de Views](docs/views_architecture.md)**.
 
 ---
 
-### ⚙️ Requisitos e Instalação
+### ⚡ Requisitos de Ambiente
 
-Este plugin gerencia suas próprias dependências. O processo de instalação é simples:
+O plugin foi desenhado para funcionar em um ambiente Redmine moderno que utilize **Hotwire** e **importmap-rails**.
+
+Se o seu Redmine ainda não está configurado para usar `importmap`, será necessário adaptar o carregamento de JavaScript. O plugin injeta um *hook* (`javascript_include_tag('application', type: 'module')`) que depende dessa configuração.
+
+**Nota:** As instruções detalhadas de instalação do Hotwire foram removidas por estarem desatualizadas. A recomendação é seguir a documentação oficial do `hotwire-rails` para configurar seu ambiente Redmine adequadamente.
+
+---
+
+### ⚙️ Instalação e Configuração
+
+O processo de instalação é simples:
 
 1.  **Clone o repositório** para a pasta de plugins do seu Redmine:
     ```bash
@@ -105,16 +72,13 @@ Este plugin gerencia suas próprias dependências. O processo de instalação é
 
 4.  **Reinicie o servidor** do Redmine para carregar o plugin.
 
----
-
-### 🔧 Configuração
+#### Configuração Pós-Instalação
 
 Acesse: **Administração → Configurações → Contatos**
 
 Configure:
 
 - Campos personalizados
-- Tipos de contato (Pessoa, Empresa)
 - Permissões por função
 - Mapeamento de campos para CSV/vCard
 - Visibilidade padrão (global, privada, por projeto)
@@ -136,7 +100,7 @@ Este plugin é **Livre e OpenSource**. Toda contribuição é bem-vinda!
 Dúvidas, sugestões ou parcerias?  
 📧 contato@mundoaec.com  
 🌐 [mundoaec.com](https://mundoaec.com/)  
-🐙 [github.com/LAMP-LUCAS](https://mundoaec.com/)
+🐙 [github.com/LAMP-LUCAS](https://github.com/LAMP-LUCAS/foton_contacts)
 
 ---
 

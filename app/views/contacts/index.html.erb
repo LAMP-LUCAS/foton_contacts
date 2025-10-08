@@ -1,6 +1,8 @@
 <div class="contextual">
-  <%= link_to l(:label_new_contact), new_contact_path(type: 'person'), data: { turbo_frame: 'modal' }, class: 'icon icon-add' %>
-  <%= link_to l(:label_new_contact) + " (#{l(:label_company).downcase})", new_contact_path(type: 'company'), data: { turbo_frame: 'modal' }, class: 'icon icon-add' %>
+  <%= link_to l(:label_contact_new), new_contact_path, class: 'icon icon-add' %>
+  <%= link_to l(:label_contact_groups), contact_groups_path, class: 'icon icon-folder' %>
+  <%= link_to l(:label_import_contacts), import_contacts_path, class: 'icon icon-add' %>
+  <%= link_to l(:label_export_contacts), export_contacts_path(format: 'csv'), class: 'icon icon-download' %>
 </div>
 
 <h2><%= l(:label_contacts) %></h2>

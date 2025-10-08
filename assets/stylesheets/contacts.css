@@ -96,3 +96,95 @@ body:has(turbo-frame[id="modal"]:not(:empty))::before {
 @keyframes spinner-border {
   to { transform: rotate(360deg); }
 }
+
+/* Contact Issue Link Card */
+.contact-issue-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.contact-issue-card .contact-info {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+}
+
+.contact-issue-card .contact-info .icon {
+  margin-right: 8px;
+}
+
+.contact-issue-card .contact-role {
+  min-width: 200px; /* Give some space for the role */
+  padding: 0 10px;
+  color: #777;
+}
+
+.contact-issue-card .contact-role form {
+  display: flex;
+  align-items: center;
+}
+
+.contact-issue-card .contact-role label {
+  margin-right: 5px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.contact-issue-card .contact-actions {
+  text-align: right;
+}
+
+/* Contact Group Member Card */
+.contact-group-member-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.contact-group-member-card .contact-info {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+}
+
+.contact-group-member-card .contact-info .icon {
+  margin-right: 8px;
+}
+
+.contact-group-member-card .contact-role {
+  min-width: 200px;
+  padding: 0 10px;
+  color: #777;
+}
+
+.contact-group-member-card .contact-role form {
+  display: flex;
+  align-items: center;
+}
+
+.contact-group-member-card .contact-role label {
+  margin-right: 5px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.contact-group-member-card .contact-actions {
+  text-align: right;
+}
+
+/* Fix for invisible icon-only links */
+.contact-issue-card .icon-del,
+.contact-group-member-card .icon-del {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+}
