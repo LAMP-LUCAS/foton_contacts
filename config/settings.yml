@@ -11,6 +11,7 @@ production:
   enable_issue_links: true
   enable_custom_fields: true
   enable_attachments: true
+  default_workload_hours: 8
 
 development:
   contact_types:

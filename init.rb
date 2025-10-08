@@ -31,6 +31,15 @@ Redmine::Plugin.register :foton_contacts do
        caption: :label_contacts,
        if: Proc.new { User.current.allowed_to?(:view_contacts, nil, global: true) }
 
+
+  # Menu Projeto
+  # menu :project_menu,
+  #      :contacts,
+  #      { controller: 'contacts', action: 'index' },
+  #      caption: :label_contacts,
+  #      after: :activity,
+  #      param: :project_id
+
   # Menu de configurações
   menu :admin_menu,
        :contact_settings,
@@ -40,11 +49,12 @@ Redmine::Plugin.register :foton_contacts do
   # Permissões
   project_module :contacts do |map|
     map.permission :view_contacts, { 
-      contacts: [:index, :show, :analytics], 
-      contact_groups: [:index, :show] 
+      contacts: [:index, :show], 
+      contact_groups: [:index, :show],
+      analytics: [:index]
     }
     map.permission :manage_contacts, {
-      contacts: [:new, :create, :edit, :update, :destroy, :import],
+      contacts: [:new, :create, :edit, :update, :destroy, :import, :analytics],
       contact_groups: [:new, :create, :edit, :update, :destroy, :add_member, :remove_member],
       contact_issue_links: [:create, :destroy]
     }

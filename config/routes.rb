@@ -19,6 +19,7 @@ resources :contacts do
     post 'import'
     get 'export'
     post 'close_modal'
+    post 'check_workload'
   end
 end
 
@@ -40,5 +41,20 @@ end
 resources :projects do
   resources :contacts
 end
+# Analytics (BI)
+namespace :analytics do
+  get '/', to: 'analytics#index', as: 'dashboard'
+  get 'team_performance'
+  get 'workload'
+
+  # Rotas para os widgets do dashboard
+  get 'irpa_widget'
+  get 'data_quality_widget'
+  get 'partner_analysis_widget'
+
+  get 'contact_details/:id', to: 'analytics#contact_details', as: :contact_details
+  get 'dynamic_dashboard', to: 'analytics#dynamic_dashboard', as: :dynamic_dashboard
+end
+
 # Configurações do plugin
 get 'settings/plugin/foton_contacts', to: 'settings#plugin', as: 'contact_settings'

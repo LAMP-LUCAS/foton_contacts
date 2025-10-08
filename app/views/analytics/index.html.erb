@@ -1,0 +1,27 @@
+<div class="tabs" data-controller="analytics-tabs">
+    <ul>
+        <li><a class="selected" href="#" data-action="click->analytics-tabs#switch" data-analytics-tabs-target="tab">Visão Geral</a></li>
+        <li><a href="#" data-action="click->analytics-tabs#switch" data-analytics-tabs-target="tab">Análise de Equipes</a></li>
+        <li><a href="#" data-action="click->analytics-tabs#switch" data-analytics-tabs-target="tab">Carga de Trabalho</a></li>
+    </ul>
+</div>
+
+<div id="tab-content-overview" class="tab-content" data-analytics-tabs-target="content">
+    <h2>Visão Geral do BI</h2>
+    <p>Widgets de análise preditiva e saúde dos dados aparecerão aqui.</p>
+    <%= turbo_frame_tag "irpa_widget", src: url_for(controller: 'analytics', action: 'irpa_widget'), loading: :lazy %>
+    <%= turbo_frame_tag "data_quality_widget", src: url_for(controller: 'analytics', action: 'data_quality_widget'), loading: :lazy %>
+    <%= turbo_frame_tag "partner_analysis_widget", src: url_for(controller: 'analytics', action: 'partner_analysis_widget'), loading: :lazy %>
+</div>
+
+<div id="tab-content-team-analysis" class="tab-content" style="display:none" data-analytics-tabs-target="content">
+    <%= turbo_frame_tag "team_performance_widget", src: url_for(controller: 'analytics/analytics', action: 'team_performance'), loading: :lazy %>
+</div>
+
+<div id="tab-content-workload" class="tab-content" style="display:none" data-analytics-tabs-target="content">
+    <%= turbo_frame_tag "workload_widget", src: url_for(controller: 'analytics/analytics', action: 'workload'), loading: :lazy %>
+</div>
+
+<% content_for :header_tags do %>
+  <%= javascript_include_tag "application", plugin: "foton_contacts" %>
+<% end %>

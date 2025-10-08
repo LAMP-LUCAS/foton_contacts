@@ -1,0 +1,26 @@
+<%= turbo_frame_tag "modal" do %>
+  <div class="modal-content box">
+    <div class="modal-header">
+      <h3>Análise de Risco: <%= @contact.name %></h3>
+      <%= link_to "x", "#", class: "close", data: { action: "click->modal#close" } %>
+    </div>
+    <div class="modal-body">
+      <h4>Score IRPA: <span style="color: red;"><%= @irpa_data[:risk_score] %>%</span></h4>
+      <hr />
+      <p><strong>Taxa de Atraso Histórica:</strong> <%= @irpa_data[:tah_percent] %>%</p>
+      <p><strong>Índice de Retrabalho:</strong> <%= @irpa_data[:ir_percent] %>%</p>
+      <p><strong>Fator de Criticidade Ponderado (médio):</strong> <%= @irpa_data[:fcp_avg] %></p>
+      
+      <h4>Histórico Profissional</h4>
+      <% if @contact.employments_as_person.any? %>
+        <ul>
+          <% @contact.employments_as_person.each do |employment| %>
+            <li><%= employment.position %> na <%= employment.company.name %></li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="nodata">Nenhum histórico profissional cadastrado.</p>
+      <% end %>
+    </div>
+  </div>
+<% end %>

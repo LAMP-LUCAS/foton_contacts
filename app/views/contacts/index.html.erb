@@ -1,6 +1,7 @@
 <div class="contextual">
   <%= link_to l(:label_contact_new), new_contact_path, class: 'icon icon-add' %>
   <%= link_to l(:label_contact_groups), contact_groups_path, class: 'icon icon-folder' %>
+  <%= link_to l(:label_analytics), analytics_dashboard_path, class: 'icon icon-stats' %>
   <%= link_to l(:label_import_contacts), import_contacts_path, class: 'icon icon-add' %>
   <%= link_to l(:label_export_contacts), export_contacts_path(format: 'csv'), class: 'icon icon-download' %>
 </div>
@@ -8,7 +9,14 @@
 <h2><%= l(:label_contacts) %></h2>
 
 <%= turbo_frame_tag "contacts" do %>
-  <%= form_tag(contacts_path, method: :get, id: 'query_form') do %>
+  <%= form_tag(contacts_path, 
+      method: :get, 
+      id: 'query_form', 
+      data: { 
+        controller: "contact-filter-observer",
+        'contact-filter-observer-base-url-value': analytics_dynamic_dashboard_path,
+        'contact-filter-observer-frame-target': '#dynamic_dashboard'
+      }) do %>
     <fieldset id="filters" class="collapsible">
       <legend onclick="toggleFieldset(this);"><%= l(:label_filter_plural) %></legend>
       <div style="">
@@ -68,3 +76,7 @@
 <% end %>
 
 <%= turbo_frame_tag "modal" %>
+
+<hr />
+
+<%= turbo_frame_tag "dynamic_dashboard", src: analytics_dynamic_dashboard_path(@filter_params) %>

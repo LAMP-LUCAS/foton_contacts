@@ -1,0 +1,23 @@
+<%= turbo_frame_tag "dynamic_dashboard" do %>
+  <div class="box">
+    <h3>Análise da Seleção (<%= @filtered_contacts.count %>)</h3>
+    <div class="splitcontent">
+      <div class="splitcontentleft">
+        <h4>Score de Risco Médio (IRPA)</h4>
+        <p style="font-size: 2em; font-weight: bold;"><%= @average_risk_score %>%</p>
+      </div>
+      <div class="splitcontentright">
+        <h4>Contatos com Maior Risco</h4>
+        <% if @irpa_data.any? %>
+          <ul>
+            <% @irpa_data.sort_by { |h| -h[:risk_score] }.first(5).each do |data| %>
+              <li><%= data[:contact_name] %> (<%= data[:risk_score] %>%)</li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="nodata">Nenhum dado para exibir.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>
