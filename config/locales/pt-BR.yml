@@ -9,6 +9,31 @@ pt-BR:
   label_active: "Ativo"
   label_inactive: "Inativo"
   label_discontinued: "Descontinuado"
+  field_contact_type: "Tipo de Contato"
+  field_project: "Projeto"
+  field_description: "Descrição"
+  label_export_contacts: "Exportar Contatos"
+  label_contact_new: "Criar Novo Contato"
+  label_foton_contacts_add_member: "Adicionar Membro"
+  label_foton_contacts_remove_member: "Remover Membro"
+  label_foton_contacts_no_issues_for_group: "Não existem tarefas vinculadas a este Grupo"
+  label_foton_contacts_search_contact: "Buscar Contato"
+  label_foton_contacts_search_group: "Buscar Grupo"
+  
+  label_member_count: "Quantidade de Membros"
+  label_contact_group_plural: "Grupos"
+  label_contact_group_new: "Novo Grupo"
+
+  field_role: "Função"
+  label_group_and_role: "Grupo/Função"
+
+  notice_contact_group_updated: "Grupo atualizao com sucesso!"
+  notice_contact_group_created: "Grupo criado com sucesso!"
+  notice_contact_group_created_from_issue: "Grupo criado a partir da tarefa!"
+
+  button_create_group: Criar Grupo
+  button_search: Buscar
+  button_update_group: "Atualizar Grupo"
 
   field_name: "Nome"
   field_email: "E-mail"
@@ -71,7 +96,9 @@ pt-BR:
   field_is_private: "Privado"
   label_add_company_role: "Adicionar Vínculo (Empresa)"
   label_group_plural: "Grupos"
+  label_groups: "Grupos"
   label_issue_plural: "Tarefas Relacionadas"
+  label_issues: "Tarefas"
   label_companies: "Empresas Vinculadas"
   button_analysis: "Visualizar Análise"
   # Traduções da página de listagem (index)
@@ -80,7 +107,6 @@ pt-BR:
   label_career: "Carreira"
   label_alerts: "Alertas"
   label_active_links: "Vínculos Ativos"
-  field_project: "Projeto"
   label_and_more: "e mais %{count}"
   label_no_data: "Sem dados para exibir"
   button_import: "Importar"
@@ -98,3 +124,34 @@ pt-BR:
   label_no_career_history_for_contact: "Nenhum histórico de carreira para este contato."
   label_no_employees_for_company: "Nenhum funcionário registrado para esta empresa."
 
+  # Foton Contacts - Issue Linking UI
+  label_foton_contacts_linked_contacts: "Contatos Vinculados"
+  label_foton_contacts_search_contact_or_group: "Buscar contato ou grupo..."
+  label_foton_contacts_selected_contacts: "Contatos Selecionados"
+  label_foton_contacts_no_linked_contacts: Nenhum contato vinculado a esta tarefa.
+  label_foton_contacts_no_members_in_group: Não há membros neste grupo.
+  label_foton_contacts_added: "Adicionado"
+  label_foton_contacts_add: "Adicionar"
+  label_foton_contacts_remove: "Remover"
+  label_foton_contacts_search_results: "Resultados da Busca"
+  label_foton_contacts_loading: "Carregando..."
+  label_foton_contacts_no_results: "Nenhum contato encontrado."
+  text_foton_contacts_are_you_sure: "Você tem certeza que deseja remover este vínculo?"
+
+  label_history: "Histórico"
+
+  text_contact_type_description: "Selecione se o contato é uma pessoa ou uma empresa."
+  text_name_description: "Nome do contato ou da empresa."
+  text_email_description: "Endereço de e-mail principal do contato."
+  text_phone_description: "Telefone principal para contato."
+  text_address_description: "Endereço completo do contato."
+  text_status_description: "Status atual do contato."
+  text_project_description: "Associe este contato a um projeto existente."
+  text_description_description: "Adicione uma descrição detalhada sobre o contato."
+  text_is_private_description: "Se marcado, o contato será visível apenas para você e para administradores."
+
+  label_employment_new: "Novo Vínculo"
+
+  label_employee: "Colaborador"
+
+  label_employment_edit: "Editar Vínculo"

@@ -1,0 +1,3 @@
+<%= turbo_frame_tag "contact_search_results" do %>
+  <%= render partial: 'issues/search_results', locals: { contacts: @contacts, groups: @groups, issue: @issue } %>
+<% end %>

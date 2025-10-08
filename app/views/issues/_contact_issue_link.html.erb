@@ -1,0 +1,32 @@
+<%# app/views/issues/_contact_issue_link.html.erb %>
+<%= turbo_frame_tag contact_issue_link do %>
+  <div class="contact-issue-card">
+    <div class="contact-info">
+      <span class="icon icon-<%= contact_issue_link.contact_id.present? ? 'user' : 'group' %>"></span>
+      <% if contact = contact_issue_link.linked_object %>
+        <%= link_to contact.name, contact, target: "_blank", data: { turbo: false }, class: "contact-name" %>
+      <% end %>
+    </div>
+
+    <div class="contact-role" data-controller="inline-edit">
+      <%= form_with model: contact_issue_link, 
+                    url: issue_contact_issue_link_path(contact_issue_link.issue, contact_issue_link), 
+                    method: :patch do |f| %>
+        <%= f.label :role, "#{l(:field_role)}:" %>
+        <%= f.text_field :role, 
+                         placeholder: l(:label_foton_contacts_role_placeholder),
+                         data: { action: "blur->inline-edit#submit" } %>
+      <% end %>
+    </div>
+
+    <div class="contact-actions">
+      <% if User.current.allowed_to?(:manage_contacts, contact_issue_link.issue.project) %>
+        <%= link_to '',
+                    issue_contact_issue_link_path(contact_issue_link.issue, contact_issue_link),
+                    data: { turbo_method: :delete, turbo_confirm: l(:text_are_you_sure) },
+                    class: 'icon icon-del',
+                    title: l(:button_delete) %>
+      <% end %>
+    </div>
+  </div>
+<% end %>

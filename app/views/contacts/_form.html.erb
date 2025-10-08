@@ -7,31 +7,31 @@
     <%= f.select :contact_type,
                 [[l(:label_person), 'person'], [l(:label_company), 'company']],
                 required: true %>
-    <br><span class="description">Selecione se o contato é uma pessoa ou uma empresa.</span>
+    <br><span class="description"><%= l(:text_contact_type_description) %></span>
   </p>
 
   <p class="required">
     <%= f.label :name %>
     <%= f.text_field :name, required: true, size: 60, placeholder: "Nome completo ou razão social" %>
-    <br><span class="description">Nome do contato ou da empresa.</span>
+    <br><span class="description"><%= l(:text_name_description) %></span>
   </p>
 
   <p>
     <%= f.label :email %>
     <%= f.text_field :email, size: 60, placeholder: "exemplo@dominio.com" %>
-    <br><span class="description">Endereço de e-mail principal do contato.</span>
+    <br><span class="description"><%= l(:text_email_description) %></span>
   </p>
 
   <p>
     <%= f.label :phone %>
     <%= f.text_field :phone, size: 30, placeholder: "(99) 99999-9999" %>
-    <br><span class="description">Telefone principal para contato.</span>
+    <br><span class="description"><%= l(:text_phone_description) %></span>
   </p>
 
   <p>
     <%= f.label :address %>
     <%= f.text_area :address, rows: 5, placeholder: "Rua, número, bairro, cidade, estado, CEP" %>
-    <br><span class="description">Endereço completo do contato.</span>
+    <br><span class="description"><%= l(:text_address_description) %></span>
   </p>
 
   <p class="required">
@@ -41,7 +41,7 @@
                  [l(:label_inactive), 'inactive'],
                  [l(:label_discontinued), 'discontinued']],
                 required: true %>
-    <br><span class="description">Status atual do contato.</span>
+    <br><span class="description"><%= l(:text_status_description) %></span>
   </p>
 
   <p>
@@ -49,7 +49,7 @@
     <%= f.select :project_id,
                 @contact.allowed_target_projects.collect { |p| [p.name, p.id] },
                 include_blank: true %>
-    <br><span class="description">Associe este contato a um projeto existente.</span>
+    <br><span class="description"><%= l(:text_project_description) %></span>
   </p>
 
   <p>
@@ -58,7 +58,7 @@
                     cols: 60,
                     rows: 15,
                     class: 'wiki-edit',
-                    placeholder: "Adicione uma descrição detalhada sobre o contato." %>
+                    placeholder: l(:text_description_description) %>
   </p>
 
 
@@ -73,7 +73,7 @@
     </div>
 
     <div data-nested-form-target="template">
-      <%= link_to l(:label_employment_add), new_employment_field_contacts_path, class: 'icon icon-add', data: { turbo_stream: true } %>
+      <%= link_to l(:label_add_employment), new_employment_field_contacts_path, class: 'icon icon-add', data: { turbo_stream: true } %>
     </div>
   </fieldset>
 
@@ -85,7 +85,7 @@
   <p>
     <%= f.label :is_private %>
     <%= f.check_box :is_private %>
-    <br><span class="description">Se marcado, o contato será visível apenas para você e para administradores.</span>
+    <br><span class="description"><%= l(:text_is_private_description) %></span>
   </p>
 
   <%= call_hook(:view_contacts_form_details, contact: @contact, form: f) %>

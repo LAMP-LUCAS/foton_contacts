@@ -88,3 +88,61 @@ graph TD
 
     I --> B;
 ```
+
+
+## 6. Estrutura de Views
+
+### 6.1. Página de Detalhes do Contato (`/contacts/{id}`)
+
+A página de visualização de um contato é o coração do plugin e segue uma arquitetura componentizada para máximo desempenho e clareza.
+
+- **`show.html.erb`**: É o template principal. Ele é responsável por renderizar o cabeçalho com o nome do contato, os botões de ação (Editar, Analisar, Deletar) e a estrutura de abas.
+
+- **Controlador de Abas (`show-tabs-controller.js`)**: Um controller Stimulus gerencia a lógica de alternância entre as abas, garantindo que apenas o conteúdo da aba ativa seja exibido.
+
+- **Partials de Abas (`/app/views/contacts/show_tabs/`)**: O conteúdo de cada aba é dividido em dois estágios para permitir o carregamento sob demanda (lazy-loading):
+    1.  **Frame (`*_frame.html.erb`)**: Este é o primeiro partial carregado. Ele contém apenas um `turbo_frame_tag` com um atributo `src` que aponta para a action do controller correspondente e `loading="lazy"`. Ex: `_issues_frame.html.erb`.
+    2.  **Conteúdo (`*.html.erb`)**: Este partial é carregado dinamicamente pelo Turbo Frame quando a aba se torna visível. Ele contém a lógica real para buscar e exibir os dados. Ex: `_issues.html.erb`.
+
+- **Listagem de Tarefas (`/app/views/issues/_issue_list.html.erb`)**: Para manter a consistência e a reutilização, a lista de tarefas vinculadas a um contato é renderizada por um partial dedicado. Este partial (`_issue_list.html.erb`) recebe a coleção de issues e as exibe em um formato de tabela padronizado, similar à lista de tarefas nativa do Redmine.
+
+O fluxograma de renderização da aba de tarefas é o seguinte:
+
+```mermaid
+graph TD
+    A[Request: `/contacts/123`] --> B[contacts#show];
+    B --> C[Renderiza `show.html.erb`];
+    C --> D[Renderiza `_issues_frame.html.erb` para a aba de tarefas];
+    D -- Turbo Frame (lazy) --> E{Request: `/contacts/123/tasks`};
+    E --> F[contacts#tasks];
+    F -- `@issues = @contact.issues.visible` --> G[Busca issues];
+    G --> H[Renderiza `_issues.html.erb`];
+    H -- `@issues.present?` --> I[Renderiza `_issue_list.html.erb`];
+    I --> J[Exibe a lista de tarefas];
+```
+
+---
+
+## 7. Gestão de Navegação (Link Helper)
+
+Para garantir uma experiência de usuário consistente e previsível, especialmente na transição entre as páginas aceleradas por Hotwire do plugin e as páginas tradicionais do Redmine, o plugin implementa uma estratégia de gerenciamento de links no lado do servidor.
+
+### 7.1. Propósito
+
+O objetivo é evitar comportamentos inesperados do Turbo Drive, onde uma página nativa do Redmine poderia ser carregada dentro de um contexto do plugin, quebrando a navegação e a UI. A abordagem garante que a navegação entre páginas de "contexto diferente" sempre funcione de forma robusta, mesmo que isso signifique abrir mão da aceleração do Turbo Drive em alguns casos.
+
+### 7.2. Arquitetura: Sobrescrita do `link_to` Helper
+
+A solução é implementada no `app/helpers/foton_contacts_link_helper.rb`. Este helper sobrescreve o `link_to` padrão do Rails com uma lógica específica:
+
+1.  **Verificação de Intenção:** O helper primeiro verifica se o link já possui uma ação Turbo explícita definida em seus `data` attributes (ex: `data-turbo-frame`, `data-turbo-method`).
+
+2.  **Aplicação do Padrão:** Se nenhuma ação Turbo for encontrada, o helper assume que se trata de um link de navegação padrão (ex: um link para outra página do plugin, para uma issue ou para um projeto). Nesse caso, ele **injeta automaticamente o atributo `data-turbo="false"`** no link.
+
+3.  **Preservação da Interatividade:** Links que já utilizam a stack Hotwire para interatividade (como abrir modais, submeter formulários ou executar ações via `turbo_method`) são deixados intactos, permitindo que funcionem conforme o esperado.
+
+### 7.3. Resultado Prático
+
+-   **Navegação Segura:** Todos os links que levam a uma página inteiramente nova (seja dentro do plugin ou para o Redmine nativo) forçam um recarregamento completo. Isso garante que a página de destino seja renderizada corretamente, com seus próprios assets e layout, eliminando qualquer conflito.
+-   **Experiência Interativa Mantida:** A rica interatividade dentro das páginas do plugin (modais, atualizações via Turbo Streams, etc.) não é afetada.
+-   **Simplicidade:** Esta abordagem centraliza a lógica no servidor, eliminando a necessidade de um "porteiro" complexo em JavaScript no lado do cliente. É uma solução robusta e de fácil manutenção, alinhada com a filosofia "HTML-over-the-wire".

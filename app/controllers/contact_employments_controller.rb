@@ -1,4 +1,5 @@
 class ContactEmploymentsController < ApplicationController
+  helper FotonContactsLinkHelper
   helper :contacts
   before_action :require_login
   before_action :find_employment, only: [:edit, :update, :destroy]

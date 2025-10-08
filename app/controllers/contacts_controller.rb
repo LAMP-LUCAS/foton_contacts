@@ -1,4 +1,5 @@
 class ContactsController < ApplicationController
+  helper FotonContactsLinkHelper
   before_action :require_login
   before_action :find_contact, only: [:show, :edit, :update, :destroy, :career_history, :employees_list, :groups, :tasks, :history, :analytics, :show_edit]
   before_action :authorize_global, only: [:index, :show, :new, :create]
@@ -57,7 +58,7 @@ class ContactsController < ApplicationController
       {
         name: 'details',
         partial: 'contacts/show_tabs/details',
-        label: :label_details
+        label: :label_details_plural
       }
     ]
 
@@ -168,12 +169,27 @@ class ContactsController < ApplicationController
   end
   
   def groups
-    @contact_groups = @contact.contact_groups
-    render partial: 'contacts/show_tabs/groups', layout: false
+    @contact_groups = @contact.contact_groups.visible(User.current)
+    
+    respond_to do |format|
+      format.html { render partial: 'contacts/show_tabs/groups', locals: { contact_groups: @contact_groups } }
+      format.api
+    end
   end
   
   def tasks
-    @issues = @contact.issues.visible
+    # Find issue IDs linked directly to the contact
+    direct_issue_ids = @contact.issue_ids
+
+    # Find issue IDs linked to the groups the contact is a member of
+    group_issue_ids = Issue.joins(:contact_issue_links)
+                           .where(contact_issue_links: { contact_group_id: @contact.contact_group_ids })
+                           .pluck(:id)
+
+    # Combine, uniq and fetch visible issues
+    all_issue_ids = (direct_issue_ids + group_issue_ids).uniq
+    @issues = Issue.where(id: all_issue_ids).visible.includes(:contact_issue_links)
+
     render partial: 'contacts/show_tabs/issues', layout: false
   end
   
@@ -215,12 +231,82 @@ class ContactsController < ApplicationController
   end
   
   def search
-    @contacts = Contact.visible(User.current)
-                      .where('LOWER(name) LIKE LOWER(?)', "%#{params[:q]}%")
-                      .limit(10)
-    
+    query = params[:q].to_s.strip
+    results = []
+
+    if query.present?
+      # Search for Contacts (Pessoas)
+      persons = Contact.visible(User.current)
+                       .where(contact_type: Contact.contact_types[:person])
+                       .where('LOWER(name) LIKE LOWER(?)', "%#{query.downcase}%")
+                       .limit(5)
+
+      if persons.any?
+        results << {
+          label: l(:label_foton_contacts_persons),
+          options: persons.map { |p| { value: "contact-#{p.id}", text: p.name, type: 'person' } }
+        }
+      end
+
+      # Search for ContactGroups (Grupos)
+      groups = ContactGroup.visible(User.current)
+                           .where('LOWER(name) LIKE LOWER(?)', "%#{query.downcase}%")
+                           .limit(5)
+
+      if groups.any?
+        results << {
+          label: l(:label_foton_contacts_groups),
+          options: groups.map { |g| { value: "group-#{g.id}", text: g.name, type: 'group' } }
+        }
+      end
+    end
+
     respond_to do |format|
-      format.json { render json: @contacts.map { |c| { id: c.id, text: c.name } } }
+      format.json { render json: results }
+    end
+  end
+
+  def search_links
+    query = params[:q].to_s.strip
+    @issue = Issue.find(params[:issue_id])
+
+    if query.blank?
+      @contacts = Contact.visible(User.current)
+                         .where(contact_type: :person)
+                         .limit(10)
+      @groups = ContactGroup.visible(User.current)
+                            .limit(5)
+    else
+      @contacts = Contact.visible(User.current)
+                         .where(contact_type: :person)
+                         .where('LOWER(name) LIKE LOWER(?)', "%#{query}%")
+                         .limit(10)
+
+      @groups = ContactGroup.visible(User.current)
+                            .where('LOWER(name) LIKE LOWER(?)', "%#{query}%")
+                            .limit(5)
+    end
+
+    if @issue.present?
+      existing_contact_ids = @issue.contact_issue_links.where.not(contact_id: nil).pluck(:contact_id)
+      existing_group_ids = @issue.contact_issue_links.where.not(contact_group_id: nil).pluck(:contact_group_id)
+
+      if existing_group_ids.any?
+        member_ids = ContactGroupMembership.where(contact_group_id: existing_group_ids).pluck(:contact_id)
+        existing_contact_ids.concat(member_ids)
+      end
+
+      @contacts = @contacts.where.not(id: existing_contact_ids.uniq)
+      @groups = @groups.where.not(id: existing_group_ids)
+    end
+
+    respond_to do |format|
+      format.html { render :search_links }
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.update('contact_search_results',
+                                                 partial: 'issues/search_results',
+                                                 locals: { contacts: @contacts, groups: @groups, issue: @issue })
+      end
     end
   end
   

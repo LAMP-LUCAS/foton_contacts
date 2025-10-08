@@ -2,7 +2,7 @@
 
 ## 🧭 Apresentação
 
-Este documento é o plano de trabalho central para o desenvolvimento do plugin **Foton Contacts**. Ele organiza as tarefas em fases e registra o backlog de funcionalidades e bugs.
+Este documento é o plano de trabalho central para o desenvolvimento do plugin **Foton Contacts**. Ele organiza as tarefas em fases e registra o backlog de funcionalidades e bugs. Este plugin está implantado no Redmine 6.0.7, ruby 3.3.9, Rails 7.2.2.2 e Puma 7.0.4, rodando na imagem oficial do Redmine e banco de dados postgres 15 no Docker.
 
 O objetivo do plugin é ser a solução definitiva para gestão de contatos e relacionamentos (CRM) no Redmine, com foco na indústria de Arquitetura, Engenharia e Construção (AEC).
 
@@ -35,14 +35,16 @@ Para garantir a consistência e a qualidade, o desenvolvimento é guiado por um 
 
 ---
 
-### 🎯 Fase 2: Vínculo de Contatos e Grupos às Issues (Em Andamento)
+### 🎯 Fase 2: Vínculo de Contatos e Grupos às Issues (Concluída)
 
 **Objetivo Primordial:** Implementar a capacidade de associar contatos (pessoas) e grupos de contatos diretamente a uma issue do Redmine, fornecendo contexto crucial sobre os stakeholders de cada tarefa.
 
 #### Comportamento Esperado (BDD - Behavior-Driven Development)
 
 - **Dado que** estou visualizando uma issue,
-- **Então** devo ver uma nova seção chamada "Contatos Vinculados".
+- **Então** devo ver uma nova seção chamada "Contatos Vinculados" com os contatos e/ou grupos vinculados a ela.
+- **Dado que** estou editando uma issue,
+- **Então** devo ver uma seção chamada "Contatos Vinculados".
 - **Quando** eu digitar o nome de uma pessoa ou grupo no campo de busca dentro desta seção,
 - **Então** o sistema deve me apresentar uma lista de sugestões correspondentes, separadas por "Pessoas" e "Grupos".
 - **Quando** eu selecionar um item da lista,
@@ -74,34 +76,117 @@ A implementação seguirá a filosofia moderna já estabelecida na Fase 1.
 #### Etapas Detalhadas de Implementação
 
 1.  **Estrutura do Banco de Dados (Backend)**
-    -   [ ] **1.1. Criar a Migração:** Gerar e executar uma nova migração para criar a tabela `contact_issue_links` com as colunas: `issue_id` (integer), `contact_id` (integer, nullable), `contact_group_id` (integer, nullable). Adicionar índices para performance.
-    -   [ ] **1.2. Configurar o Modelo `ContactIssueLink`:** Criar/ajustar o arquivo `app/models/contact_issue_link.rb`.
+    -   [x] **1.1. Criar a Migração:** Gerar e executar uma nova migração para criar a tabela `contact_issue_links` com as colunas: `issue_id` (integer), `contact_id` (integer, nullable), `contact_group_id` (integer, nullable). Adicionar índices para performance.
+    -   [x] **1.2. Configurar o Modelo `ContactIssueLink`:** Criar/ajustar o arquivo `app/models/contact_issue_link.rb`.
         -   Adicionar `belongs_to :issue`, `belongs_to :contact, optional: true`, `belongs_to :contact_group, optional: true`.
         -   Implementar a validação que garante que `contact_id` ou `contact_group_id` esteja presente, mas não ambos.
-    -   [ ] **1.3. Atualizar Associações (Patches):**
+    -   [x] **1.3. Atualizar Associações (Patches):**
         -   No patch `lib/patches/issue_patch.rb`, adicionar `has_many :contact_issue_links, dependent: :destroy`, `has_many :contacts, through: :contact_issue_links`, e `has_many :contact_groups, through: :contact_issue_links`.
         -   No modelo `Contact`, adicionar `has_many :contact_issue_links` e `has_many :issues, through: :contact_issue_links`.
         -   No modelo `ContactGroup`, adicionar `has_many :contact_issue_links` e `has_many :issues, through: :contact_issue_links`.
 
 2.  **Lógica de Negócio (Backend)**
-    -   [ ] **2.1. Definir Rotas:** Em `config/routes.rb`, aninhar `resources :contact_issue_links, only: [:create, :destroy]` dentro do resource de `issues` para criar os endpoints necessários.
-    -   [ ] **2.2. Implementar `ContactIssueLinksController`:** Criar o controller em `app/controllers/contact_issue_links_controller.rb`.
+    -   [x] **2.1. Definir Rotas:** Em `config/routes.rb`, aninhar `resources :contact_issue_links, only: [:create, :destroy]` dentro do resource de `issues` para criar os endpoints necessários.
+    -   [x] **2.2. Implementar `ContactIssueLinksController`:** Criar o controller em `app/controllers/contact_issue_links_controller.rb`.
         -   Implementar a ação `create` para criar o vínculo. A ação deve responder com um `turbo_stream.append` para adicionar a "tag" na view.
         -   Implementar a ação `destroy` para remover o vínculo. A ação deve responder com um `turbo_stream.remove` para remover a "tag" da view.
         -   Garantir que as permissões de usuário são verificadas em ambas as ações.
-    -   [ ] **2.3. Criar Endpoint de Busca:** Criar uma nova ação em um controller (ex: `ContactsController#search`) que responda a requisições do Tom Select, retornando um JSON com Pessoas e Grupos formatados para `optgroup`.
+    -   [x] **2.3. Criar Endpoint de Busca:** Criar uma nova ação em um controller (ex: `ContactsController#search`) que responda a requisições do Tom Select, retornando um JSON com Pessoas e Grupos formatados para `optgroup`.
 
 3.  **Interface do Usuário (Frontend)**
-    -   [ ] **3.1. Registrar o Hook da View:** Em `lib/hooks/views_layouts_hook.rb`, registrar um `render_on :view_issues_show_details_bottom` que renderizará uma partial na página da issue.
-    -   [ ] **3.2. Criar a Partial Principal:** Criar a view `app/views/issues/_foton_contacts_section.html.erb`.
+    -   [x] **3.1. Registrar o Hook da View:** Em `lib/hooks/views_layouts_hook.rb`, registrar um `render_on :view_issues_show_details_bottom` que renderizará uma partial na página da issue.
+    -   [x] **3.2. Criar a Partial Principal:** Criar a view `app/views/issues/_foton_contacts_section.html.erb`.
         -   Esta partial conterá um `<turbo-frame>` para isolar a seção.
         -   Listará os contatos e grupos já vinculados (`issue.contact_issue_links`).
         -   Renderizará as "tags" de contatos/grupos, cada uma com seu link de `destroy` (usando `data-turbo-method="delete"`).
-    -   [ ] **3.3. Criar o Formulário de Adição:** Dentro da partial principal, criar o formulário (`form_with`) que aponta para `ContactIssueLinksController#create`.
+    -   [x] **3.3. Criar o Formulário de Adição:** Dentro da partial principal, criar o formulário (`form_with`) que aponta para `ContactIssueLinksController#create`.
         -   O formulário conterá o campo de texto que será transformado em um `Tom Select` pelo Stimulus.
-    -   [ ] **3.4. Configurar o `TomSelectController` (Stimulus):**
+    -   [x] **3.4. Configurar o `TomSelectController` (Stimulus):**
         -   Adaptar ou estender o controller `tom_select_controller.js` para carregar os dados do endpoint de busca (`/contacts/search`).
         -   Configurá-lo para, ao selecionar um item, submeter o formulário de adição automaticamente.
+
+4.  **Contexto e Detalhes: Função do Contato e Descrição do Grupo**
+    -   **Justificativa:** Para aumentar a riqueza dos dados, vamos implementar a UI e a lógica para usar dois campos que já existem no banco de dados: `role` em `contact_issue_links` e `description` em `contact_groups`. *Time to connect the dots!* ✨
+    -   [x] **4.1. Implementar "Função do Contato" na Issue com UI aprimorada:**
+        -   **Backend:**
+            -   [x] Permitir o parâmetro `role` na criação e atualização de `ContactIssueLink`.
+            -   [x] Adicionar a rota e ação `update` para edição inline da função.
+        -   **Frontend (Inspirado no mockup `exemplos/ex_CRUD_contatos-issue.html`):**
+            -   [x] Substituir a exibição de contatos vinculados de "pílulas" para uma **lista de cards**. Cada contato vinculado será um card individual.
+            -   [x] O card do contato deverá exibir suas informações principais (avatar, nome, telefone/email).
+            -   [x] Dentro do card, haverá um campo de texto para a **Função (Role)**. Este campo será editável "inline", salvando automaticamente ao perder o foco (`blur` event), proporcionando uma experiência de edição fluida e sem recarregamento de página.
+            -   [x] Cada card terá um botão de remoção ("x") para desvincular o contato da issue instantaneamente via Turbo Stream.
+    -   [x] **4.2. Implementar "Descrição do Grupo":**
+        -   **Backend:**
+            -   [x] Garantir que `:description` é um parâmetro permitido no `ContactGroupsController`.
+        -   **Frontend:**
+            -   [x] Adicionar um `textarea` para a descrição no formulário de criação/edição de grupo.
+            -   [x] Exibir a descrição na página de detalhes do grupo.
+
+#### Checklist de Tarefas - Ui/Ux
+
+- {
+    "id": 1,
+    "title": "Busca Instantânea com Debounce",
+    "description": "À medida que o usuário digita no campo de busca, os resultados são atualizados em tempo real, sem a necessidade de clicar em um botão. O 'debounce' evita que uma nova busca seja feita a cada tecla pressionada, esperando uma pequena pausa na digitação para disparar a consulta. Isso torna a experiência fluida e rápida.",
+    "hotwire_example": "Utilizar um controller Stimulus para monitorar o evento 'input' do campo de busca. O controller aplicaria o debounce e, em seguida, atualizaria um `<turbo-frame id='search_results'>` com os resultados vindos do servidor."
+  },
+-  {
+    "id": 2,
+    "title": "Seleção Visual e Feedback Imediato",
+    "description": "Ao clicar no botão 'Adicionar', o contato é visualmente movido ou copiado para a lista de 'Selecionados'. O item na lista de busca original muda de estado (ex: fica esmaecido e o botão se transforma em 'Adicionado') para dar um feedback claro de que a ação foi concluída e evitar duplicidade.",
+    "hotwire_example": "O clique no botão 'Adicionar' pode disparar uma ação de Turbo Stream que simultaneamente anexa o contato na lista de selecionados e atualiza o estado do contato na lista de resultados (replace)."
+  },
+-  {
+    "id": 3,
+    "title": "Área de 'Arrastar e Soltar' (Drag and Drop)",
+    "description": "Permitir que os usuários arrastem contatos da lista de resultados e os soltem na lista de selecionados. É uma interação intuitiva e muito satisfatória, especialmente para montar listas rapidamente.",
+    "hotwire_example": "Implementar com um controller Stimulus que gerencia os eventos de drag-and-drop. Ao 'soltar', o controller pode fazer uma requisição assíncrona para adicionar o contato e usar Turbo Streams para atualizar a UI."
+  },
+-  {
+    "id": 4,
+    "title": "Barra de Ações Flutuante",
+    "description": "Assim que o primeiro contato é adicionado, uma barra de ações flutuante surge na parte inferior da tela. Ela mostra o número de contatos selecionados e o botão 'Salvar Grupo'. Isso mantém as ações principais sempre visíveis, sem que o usuário precise rolar a página.",
+    "hotwire_example": "A primeira ação de adicionar um contato via Turbo Stream pode incluir uma stream adicional para anexar (append) a barra de ações flutuante ao `<body>` da página."
+  },
+-  {
+    "id": 5,
+    "title": "Edição Inline de Funções/Notas na Lista de Seleção",
+    "description": "Na lista de contatos selecionados, permitir que o usuário clique no campo 'função' ou 'notas' (se aplicável) e o edite diretamente, sem abrir um modal. O campo se transforma em um input de texto e salva ao perder o foco ou ao pressionar Enter.",
+    "hotwire_example": "Cada item da lista de selecionados pode ser um `<turbo-frame>`. Ao clicar em 'Editar', o conteúdo do frame é substituído por um formulário de edição. Ao submeter, o frame é atualizado com a informação nova."
+  },
+-  {
+    "id": 6,
+    "title": "Desfazer Remoção com 'Toast Notification'",
+    "description": "Ao remover um contato da lista de selecionados, ele desaparece da lista, mas uma notificação 'toast' aparece por alguns segundos com a mensagem 'Contato removido. [Desfazer]'. Isso previne remoções acidentais e dá mais segurança ao usuário.",
+    "hotwire_example": "A ação de remover dispara uma Turbo Stream para remover o item da lista e outra para adicionar o 'toast' com o link de 'desfazer'. O link de desfazer chamaria outra ação no controller para re-adicionar o item via stream."
+  },
+-  {
+    "id": 7,
+    "title": "Pré-visualização de Contatos com 'Hover'",
+    "description": "Ao passar o mouse sobre um contato na lista de busca, um pequeno card de pré-visualização aparece ao lado, mostrando mais detalhes como endereço, empresa e descrição, sem a necessidade de clicar. Isso agiliza a identificação do contato correto.",
+    "hotwire_example": "Um controller Stimulus nos itens da lista pode, no evento `mouseover`, carregar de forma preguiçosa (lazy-load) o conteúdo detalhado do contato dentro de um `<turbo-frame>` posicionado de forma absoluta na tela."
+  },
+-  {
+    "id": 8,
+    "title": "Busca Secundária Expansível",
+    "description": "A UI principal mostra apenas o campo de busca por nome. Um link ou ícone de 'Busca Avançada' expande uma seção com filtros adicionais (email, telefone, empresa, etc.), mantendo a interface limpa e focada para o caso de uso mais comum.",
+    "hotwire_example": "O link de 'Busca Avançada' pode simplesmente acionar um controller Stimulus para mostrar/esconder um `div` com os campos extras, ou pode carregar um formulário mais complexo via `<turbo-frame>`."
+  },
+-  {
+    "id": 9,
+    "title": "Animações Sutis na Adição e Remoção",
+    "description": "Usar transições de CSS para que os itens deslizem suavemente para dentro e para fora da lista de selecionados. Uma animação de 'fade in' na entrada e 'fade out' na saída torna a experiência menos abrupta e mais polida.",
+    "hotwire_example": "Turbo já facilita isso. As Turbo Streams disparam eventos (`turbo:before-stream-render`). Podemos usar classes de animação (ex: com Animate.css ou Tailwind UI transitions) que são adicionadas antes do elemento ser inserido ou removido, criando o efeito desejado."
+  },
+-  {
+    "id": 10,
+    "title": "Salvar Grupo com Sugestão de Nome Inteligente",
+    "description": "Ao salvar a lista, se o sistema detectar que vários contatos pertencem à mesma empresa (ex: 'Foton'), ele pode pré-preencher o campo de nome do grupo com uma sugestão como 'Equipe Foton' ou 'Contatos Foton', agilizando o processo.",
+    "hotwire_example": "A lógica seria no backend. Ao renderizar o formulário para salvar o grupo (que pode ser carregado num modal via `<turbo-frame>`), o controller analisaria os contatos selecionados e passaria a sugestão de nome como valor padrão para o campo de input."
+  }
+
+**Atenção:** O exemplo de implementação dos elementos está na pasta ./exemplos
 
 ---
 
@@ -141,3 +226,12 @@ A implementação seguirá a filosofia moderna já estabelecida na Fase 1.
 *   **Problema:** No modal de edição de um contato, o link para remover um vínculo empregatício não funciona como esperado.
 *   **Comportamento Desejado:** O campo do formulário do vínculo deve ser removido visualmente da interface do modal (via Stimulus), e a exclusão do registro deve ser marcada para ocorrer apenas na submissão do formulário principal (via atributo `_destroy`).
 *   **Próxima Ação / Hipótese:** Investigar a implementação do controller Stimulus responsável por essa interação, pois ele pode não estar conectado corretamente ou a lógica de remoção pode estar falhando.
+
+---
+
+## 💡 Backlog de Tecnologia e Otimizações
+
+### Implementar Gerenciador de Links (Porteiro) no Frontend
+- **Problema:** A gestão de links para fora do plugin (e mesmo entre páginas completas dentro do plugin) está sendo feita no servidor com um *helper* que adiciona `data-turbo="false"` a todos os links de navegação. Embora funcional, isso causa um recarregamento completo da página, perdendo o benefício de velocidade do Turbo Drive.
+- **Solução Proposta:** No futuro, implementar um "porteiro" em JavaScript (via Stimulus controller) que gerencia o comportamento dos links de forma inteligente no lado do cliente. Isso permitiria manter a navegação rápida do Turbo Drive para todas as páginas, mas executando um `Turbo.visit()` programaticamente para garantir que o estado da página (como a URL no navegador) seja atualizado corretamente, oferecendo a melhor experiência de usuário possível.
+- **Status:** Pendente. A abordagem via helper no servidor foi priorizada para garantir a funcionalidade imediata.

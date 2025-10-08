@@ -1,0 +1,10 @@
+<li id="search-result-group-<%= group.id %>">
+  <div class="contact-result">
+    <span class="name"><%= group.name %></span>
+    <% if User.current.allowed_to?(:manage_contacts, issue.project) %>
+      <%= button_to l(:button_add),
+                  issue_contact_issue_links_path(issue, contact_issue_link: { contact_group_id: group.id }),
+                  class: 'button-small' %>
+    <% end %>
+  </div>
+</li>

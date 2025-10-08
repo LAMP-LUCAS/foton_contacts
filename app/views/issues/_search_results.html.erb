@@ -1,0 +1,13 @@
+<%# Renders the search results for contacts and groups %>
+
+<% if contacts.blank? && groups.blank? %>
+  <p class="no-data"><%= l(:label_no_data) %></p>
+<% else %>
+  <ul class="list" id="contact-search-list">
+    <%# Render contacts %>
+    <%= render partial: "issues/search_result_item", collection: contacts, as: :contact, locals: { issue: issue } %>
+
+    <%# Render groups %>
+    <%= render partial: "issues/search_result_group_item", collection: groups, as: :group, locals: { issue: issue } %>
+  </ul>
+<% end %>
