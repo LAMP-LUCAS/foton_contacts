@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foton Contacts - Dashboard de BI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar-redmine {
+            background-color: var(--primary-color);
+        }
+        
+        .sidebar {
+            background-color: var(--dark-color);
+            color: white;
+            min-height: calc(100vh - 56px);
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.75rem 1rem;
+        }
+        
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .card {
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            border: none;
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            font-weight: 600;
+        }
+        
+        .metric-card {
+            text-align: center;
+            padding: 15px;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        
+        .metric-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .risk-high {
+            color: var(--danger-color);
+        }
+        
+        .risk-medium {
+            color: var(--warning-color);
+        }
+        
+        .risk-low {
+            color: var(--success-color);
+        }
+        
+        .heatmap-cell {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 2px;
+            text-align: center;
+            line-height: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .heatmap-0 { background-color: #e8f5e9; }
+        .heatmap-1 { background-color: #c8e6c9; }
+        .heatmap-2 { background-color: #a5d6a7; }
+        .heatmap-3 { background-color: #81c784; }
+        .heatmap-4 { background-color: #66bb6a; }
+        .heatmap-5 { background-color: #4caf50; }
+        .heatmap-6 { background-color: #43a047; }
+        .heatmap-7 { background-color: #388e3c; }
+        .heatmap-8 { background-color: #2e7d32; }
+        .heatmap-9 { background-color: #1b5e20; color: white; }
+        
+        .workload-overload {
+            background-color: var(--danger-color) !important;
+            color: white;
+        }
+        
+        .tab-content {
+            background-color: white;
+            border-radius: 0 0 8px 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        .badge-risk {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+        }
+        
+        .modal-xl {
+            max-width: 95%;
+        }
+        
+        .kpi-card {
+            border-left: 4px solid var(--secondary-color);
+            padding-left: 15px;
+        }
+        
+        .kpi-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+        
+        .kpi-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .nav-tabs .nav-link.active {
+            font-weight: 600;
+            border-bottom: 3px solid var(--secondary-color);
+        }
+        
+        .dashboard-dynamic {
+            background-color: #f1f8ff;
+            border-left: 4px solid var(--secondary-color);
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 0 8px 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar Redmine -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-redmine">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-journal-text"></i> Redmine
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="bi bi-house"></i> Início</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="bi bi-kanban"></i> Projetos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#"><i class="bi bi-person-lines-fill"></i> Contatos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="bi bi-graph-up"></i> Relatórios</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="bi bi-gear"></i> Administração</a>
+                    </li>
+                </ul>
+                <form class="d-flex">
+                    <input class="form-control me-2" type="search" placeholder="Buscar...">
+                    <button class="btn btn-outline-light" type="submit">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </form>
+                <ul class="navbar-nav ms-3">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> João Silva
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Meu perfil</a></li>
+                            <li><a class="dropdown-item" href="#">Minhas preferências</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">Sair</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 sidebar d-none d-md-block">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">
+                            <i class="bi bi-list-ul"></i> Lista de Contatos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="bi bi-graph-up"></i> Dashboard de BI
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="bi bi-people"></i> Grupos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="bi bi-gear"></i> Configurações
+                        </a>
+                    </li>
+                    <li class="nav-item mt-4">
+                        <h6 class="px-3 text-uppercase text-muted">Projetos</h6>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="bi bi-building"></i> Torre Sul
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="bi bi-building"></i> Residencial Horizonte
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="bi bi-building"></i> Shopping Center
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-10 ms-sm-auto px-4 py-4">
+                <!-- Page Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="h3 mb-0">Contatos</h1>
+                    <div>
+                        <button class="btn btn-primary">
+                            <i class="bi bi-plus-circle"></i> Novo Contato
+                        </button>
+                        <button class="btn btn-outline-secondary">
+                            <i class="bi bi-upload"></i> Importar
+                        </button>
+                        <button class="btn btn-outline-secondary">
+                            <i class="bi bi-download"></i> Exportar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabs Navigation -->
+                <ul class="nav nav-tabs mb-3" id="contactsTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="list-tab" data-bs-toggle="tab" data-bs-target="#list" type="button" role="tab">
+                            <i class="bi bi-list-ul"></i> Lista de Contatos
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="bi-tab" data-bs-toggle="tab" data-bs-target="#bi" type="button" role="tab">
+                            <i class="bi bi-graph-up"></i> Dashboard de BI
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="groups-tab" data-bs-toggle="tab" data-bs-target="#groups" type="button" role="tab">
+                            <i class="bi bi-people"></i> Grupos
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content" id="contactsTabsContent">
+                    <!-- Lista de Contatos Tab -->
+                    <div class="tab-pane fade show active" id="list" role="tabpanel">
+                        <!-- Quality Monitor Cards -->
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <div class="card metric-card">
+                                    <div class="metric-value risk-high">12</div>
+                                    <div class="metric-label">Contatos Órfãos</div>
+                                    <small class="text-muted">Sem empresas vinculadas</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card metric-card">
+                                    <div class="metric-value risk-medium">8</div>
+                                    <div class="metric-label">Funções a Padronizar</div>
+                                    <small class="text-muted">Variações de nomenclatura</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card metric-card">
+                                    <div class="metric-value risk-medium">15</div>
+                                    <div class="metric-label">Contatos Desatualizados</div>
+                                    <small class="text-muted">Sem atualização há mais de 1 ano</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Filters -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-3">
+                                        <label class="form-label">Nome</label>
+                                        <input type="text" class="form-control" placeholder="Buscar contato...">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Empresa</label>
+                                        <select class="form-select">
+                                            <option selected>Todas</option>
+                                            <option>Estruturas Metálicas XYZ</option>
+                                            <option>Concreto Forte Ltda</option>
+                                            <option>Instalações Elétricas A</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Tipo</label>
+                                        <select class="form-select">
+                                            <option selected>Todos</option>
+                                            <option>Pessoa</option>
+                                            <option>Empresa</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Status</label>
+                                        <select class="form-select">
+                                            <option selected>Todos</option>
+                                            <option>Ativo</option>
+                                            <option>Inativo</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2 d-flex align-items-end">
+                                        <button class="btn btn-primary w-100">Aplicar Filtros</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contacts Table -->
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Todos os Contatos</h5>
+                                <div class="text-muted">Mostrando 1-10 de 124 contatos</div>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Nome</th>
+                                                <th>Tipo</th>
+                                                <th>Telefone</th>
+                                                <th>Email</th>
+                                                <th>Data de Criação</th>
+                                                <th>Status</th>
+                                                <th>Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="flex-shrink-0">
+                                                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                                                <span class="text-white fw-bold">MR</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="flex-grow-1 ms-3">
+                                                            <strong>Marcos Rocha</strong>
+                                                            <div class="text-muted small">Estruturas Metálicas XYZ</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>Pessoa</td>
+                                                <td>(11) 99999-9999</td>
+                                                <td>marcos.rocha@email.com</td>
+                                                <td>15/03/2022</td>
+                                                <td><span class="badge bg-success">Ativo</span></td>
+                                                <td>
+                                                    <div class="btn-group btn-group-sm">
+                                                        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#analysisModal">
+                                                            <i class="bi bi-graph-up"></i> Análise
+                                                        </button>
+                                                        <button class="btn btn-outline-secondary">
+                                                            <i class="bi bi-pencil"></i> Editar
+                                                        </button>
+                                                        <button class="btn btn-outline-danger">
+                                                            <i class="bi bi-trash"></i> Excluir
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="flex-shrink-0">
+                                                            <div class="bg-success rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                                                <span class="text-white fw-bold">AS</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="flex-grow-1 ms-3">
+                                                            <strong>Ana Silva</strong>
+                                                            <div class="text-muted small">Concreto Forte Ltda</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>Pessoa</td>
+                                                <td>(11) 88888-8888</td>
+                                                <td>ana.silva@email.com</td>
+                                                <td>22/05/2021</td>
+                                                <td><span class="badge bg-success">Ativo</span></td>
+                                                <td>
+                                                    <div class="btn-group btn-group-sm">
+                                                        <button class="btn btn-outline-primary">
+                                                            <i class="bi bi-graph-up"></i> Análise
+                                                        </button>
+                                                        <button class="btn btn-outline-secondary">
+                                                            <i class="bi bi-pencil"></i> Editar
+                                                        </button>
+                                                        <button class="btn btn-outline-danger">
+                                                            <i class="bi bi-trash"></i> Excluir
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="flex-shrink-0">
+                                                            <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                                                <span class="text-white fw-bold">CP</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="flex-grow-1 ms-3">
+                                                            <strong>Carlos Pereira</strong>
+                                                            <div class="text-muted small">Instalações Elétricas A</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>Pessoa</td>
+                                                <td>(11) 77777-7777</td>
+                                                <td>carlos.pereira@email.com</td>
+                                                <td>10/11/2020</td>
+                                                <td><span class="badge bg-success">Ativo</span></td>
+                                                <td>
+                                                    <div class="btn-group btn-group-sm">
+                                                        <button class="btn btn-outline-primary">
+                                                            <i class="bi bi-graph-up"></i> Análise
+                                                        </button>
+                                                        <button class="btn btn-outline-secondary">
+                                                            <i class="bi bi-pencil"></i> Editar
+                                                        </button>
+                                                        <button class="btn btn-outline-danger">
+                                                            <i class="bi bi-trash"></i> Excluir
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <nav aria-label="Contacts pagination">
+                                    <ul class="pagination justify-content-center mb-0">
+                                        <li class="page-item disabled">
+                                            <a class="page-link" href="#" tabindex="-1">Anterior</a>
+                                        </li>
+                                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="#">Próxima</a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Dashboard -->
+                        <div class="dashboard-dynamic">
+                            <h5><i class="bi bi-speedometer2"></i> Dashboard Dinâmico</h5>
+                            <p class="text-muted">Métricas atualizadas com base nos filtros aplicados</p>
+                            
+                            <div class="row mt-3">
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        <div class="card-body text-center">
+                                            <h3 class="risk-high">92.0</h3>
+                                            <p class="mb-0">Score de Risco Médio</p>
+                                            <small class="text-muted">IRPA do grupo selecionado</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        <div class="card-body text-center">
+                                            <h3>1</h3>
+                                            <p class="mb-0">Contato com Maior Risco</p>
+                                            <small class="text-muted">Marcos Rocha (IRPA: 92.0)</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        <div class="card-body text-center">
+                                            <h3 class="risk-medium">68%</h3>
+                                            <p class="mb-0">Taxa de Atraso Agregada</p>
+                                            <small class="text-muted">Média do grupo selecionado</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dashboard de BI Tab -->
+                    <div class="tab-pane fade" id="bi" role="tabpanel">
+                        <!-- BI Tabs Navigation -->
+                        <ul class="nav nav-tabs mb-3" id="biTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
+                                    <i class="bi bi-house"></i> Visão Geral
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="teams-tab" data-bs-toggle="tab" data-bs-target="#teams" type="button" role="tab">
+                                    <i class="bi bi-people"></i> Análise de Equipes
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="workload-tab" data-bs-toggle="tab" data-bs-target="#workload" type="button" role="tab">
+                                    <i class="bi bi-calendar-check"></i> Carga de Trabalho
+                                </button>
+                            </li>
+                        </ul>
+
+                        <!-- BI Tab Content -->
+                        <div class="tab-content" id="biTabsContent">
+                            <!-- Visão Geral -->
+                            <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <!-- IRPA Table -->
+                                        <div class="card">
+                                            <div class="card-header d-flex justify-content-between align-items-center">
+                                                <h5 class="mb-0">Índice de Risco Preditivo de Alocação (IRPA)</h5>
+                                                <div class="text-muted">Contatos com maior risco no topo</div>
+                                            </div>
+                                            <div class="card-body p-0">
+                                                <div class="table-responsive">
+                                                    <table class="table table-hover mb-0">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Contato</th>
+                                                                <th>Empresa</th>
+                                                                <th>IRPA</th>
+                                                                <th>Taxa de Atraso</th>
+                                                                <th>Índice Retrabalho</th>
+                                                                <th>Status</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr class="table-danger">
+                                                                <td>
+                                                                    <a href="#" data-bs-toggle="modal" data-bs-target="#analysisModal" class="text-decoration-none">
+                                                                        <strong>Marcos Rocha</strong>
+                                                                    </a>
+                                                                </td>
+                                                                <td>Estruturas Metálicas XYZ</td>
+                                                                <td><span class="badge bg-danger badge-risk">92.0</span></td>
+                                                                <td>78%</td>
+                                                                <td>45%</td>
+                                                                <td><span class="badge bg-danger">Alto Risco</span></td>
+                                                            </tr>
+                                                            <tr class="table-warning">
+                                                                <td><strong>Carlos Pereira</strong></td>
+                                                                <td>Instalações Elétricas A</td>
+                                                                <td><span class="badge bg-warning badge-risk">76.5</span></td>
+                                                                <td>62%</td>
+                                                                <td>32%</td>
+                                                                <td><span class="badge bg-warning">Médio Risco</span></td>
+                                                            </tr>
+                                                            <tr class="table-warning">
+                                                                <td><strong>Roberto Alves</strong></td>
+                                                                <td>Hidráulica Solutions</td>
+                                                                <td><span class="badge bg-warning badge-risk">68.2</span></td>
+                                                                <td>55%</td>
+                                                                <td>28%</td>
+                                                                <td><span class="badge bg-warning">Médio Risco</span></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td><strong>Ana Silva</strong></td>
+                                                                <td>Concreto Forte Ltda</td>
+                                                                <td><span class="badge bg-success badge-risk">42.1</span></td>
+                                                                <td>35%</td>
+                                                                <td>15%</td>
+                                                                <td><span class="badge bg-success">Baixo Risco</span></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <!-- Quality Monitor -->
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0">Monitor de Qualidade dos Dados</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-3">
+                                                    <div class="d-flex justify-content-between mb-1">
+                                                        <span>Contatos com dados completos</span>
+                                                        <span>78%</span>
+                                                    </div>
+                                                    <div class="progress">
+                                                        <div class="progress-bar bg-success" style="width: 78%"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <div class="d-flex justify-content-between mb-1">
+                                                        <span>Empresas com vínculos atualizados</span>
+                                                        <span>65%</span>
+                                                    </div>
+                                                    <div class="progress">
+                                                        <div class="progress-bar bg-warning" style="width: 65%"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <div class="d-flex justify-content-between mb-1">
+                                                        <span>Funções padronizadas</span>
+                                                        <span>42%</span>
+                                                    </div>
+                                                    <div class="progress">
+                                                        <div class="progress-bar bg-danger" style="width: 42%"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="mt-4">
+                                                    <button class="btn btn-outline-primary w-100">
+                                                        <i class="bi bi-exclamation-triangle"></i> Ver Detalhes dos Problemas
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Partner Analysis -->
+                                        <div class="card mt-4">
+                                            <div class="card-header">
+                                                <h5 class="mb-0">Análise de Empresas Parceiras</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <canvas id="partnerBubbleChart" height="250"></canvas>
+                                                <div class="mt-3 small text-muted">
+                                                    <div><span class="badge bg-primary me-1"></span> Estabilidade vs Experiência</div>
+                                                    <div class="mt-1">Tamanho: Número de colaboradores</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Análise de Equipes -->
+                            <div class="tab-pane fade" id="teams" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-md-7">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0">Comparativo de Performance das Equipes</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <canvas id="teamRadarChart" height="300"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0">Ranking de Equipes</h5>
+                                            </div>
+                                            <div class="card-body p-0">
+                                                <div class="table-responsive">
+                                                    <table class="table table-hover mb-0">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Equipe</th>
+                                                                <th>Score Geral</th>
+                                                                <th>Risco Médio</th>
+                                                                <th>Posição</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <strong>Equipe Alfa</strong>
+                                                                    <div class="text-muted small">Estruturas Metálicas</div>
+                                                                </td>
+                                                                <td><span class="badge bg-success">84.2</span></td>
+                                                                <td>32%</td>
+                                                                <td><span class="badge bg-primary">1º</span></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    <strong>Equipe Gama</strong>
+                                                                    <div class="text-muted small">Instalações Elétricas</div>
+                                                                </td>
+                                                                <td><span class="badge bg-warning">71.5</span></td>
+                                                                <td>48%</td>
+                                                                <td><span class="badge bg-secondary">2º</span></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    <strong>Equipe Beta</strong>
+                                                                    <div class="text-muted small">Hidráulica e Sanitária</div>
+                                                                </td>
+                                                                <td><span class="badge bg-danger">62.8</span></td>
+                                                                <td>67%</td>
+                                                                <td><span class="badge bg-secondary">3º</span></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="card mt-4">
+                                            <div class="card-header">
+                                                <h5 class="mb-0">Detalhes da Equipe Beta</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-3">
+                                                    <strong>Maior risco médio:</strong> 67%
+                                                    <div class="progress mt-1">
+                                                        <div class="progress-bar bg-danger" style="width: 67%"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <strong>Menor coesão:</strong> 2.3 meses
+                                                    <div class="progress mt-1">
+                                                        <div class="progress-bar bg-warning" style="width: 30%"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <strong>Taxa de atraso agregada:</strong> 58%
+                                                    <div class="progress mt-1">
+                                                        <div class="progress-bar bg-danger" style="width: 58%"></div>
+                                                    </div>
+                                                </div>
+                                                <button class="btn btn-outline-primary w-100 mt-2">
+                                                    <i class="bi bi-zoom-in"></i> Ver Análise Detalhada
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Carga de Trabalho -->
+                            <div class="tab-pane fade" id="workload" role="tabpanel">
+                                <div class="card">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">Mapa de Calor da Carga de Trabalho</h5>
+                                        <div>
+                                            <select class="form-select form-select-sm d-inline-block w-auto">
+                                                <option>Vista Semanal</option>
+                                                <option>Vista Mensal</option>
+                                                <option>Vista Anual</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Filters -->
+                                        <div class="row mb-4">
+                                            <div class="col-md-4">
+                                                <input type="text" class="form-control" placeholder="Filtrar por nome...">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <select class="form-select">
+                                                    <option>Alocação: Todos</option>
+                                                    <option>Subutilizados (< 60%)</option>
+                                                    <option>Balanceados (60-100%)</option>
+                                                    <option>Sobrecarregados (> 100%)</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <input type="text" class="form-control" placeholder="Período: 01/10/2023 - 31/10/2023">
+                                            </div>
+                                            <div class="col-md-2">
+                                                <button class="btn btn-primary w-100">Aplicar</button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Workload Heatmap -->
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Colaborador</th>
+                                                        <th>Seg</th>
+                                                        <th>Ter</th>
+                                                        <th>Qua</th>
+                                                        <th>Qui</th>
+                                                        <th>Sex</th>
+                                                        <th>Sáb</th>
+                                                        <th>Dom</th>
+                                                        <th>Alocação</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox">
+                                                                <label class="form-check-label">
+                                                                    <strong>Marcos Rocha</strong>
+                                                                </label>
+                                                            </div>
+                                                        </td>
+                                                        <td><div class="heatmap-cell heatmap-5">85%</div></td>
+                                                        <td><div class="heatmap-cell heatmap-9 workload-overload">130%</div></td>
+                                                        <td><div class="heatmap-cell heatmap-7">95%</div></td>
+                                                        <td><div class="heatmap-cell heatmap-6">90%</div></td>
+                                                        <td><div class="heatmap-cell heatmap-4">75%</div></td>
+                                                        <td><div class="heatmap-cell heatmap-0">0%</div></td>
+                                                        <td><div class="heatmap-cell heatmap-0">0%</div></td>
+                                                        <td><span class="badge bg-danger">82%</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox">
+                                                                <label class="form-check-label">
+                                                                    <strong>Ana Silva</strong>
+                                                                </label>
+                                                            </div>
+                                                        </td>
+                                                        <td><div class="heatmap-cell heatmap-3">65%</div></td>
+                                                        <td><div class="heatmap-cell heatmap-4">70%</div></td>
+                                                        <td><div class="heatmap-cell heatmap-3">65%</div></td>
+                                                        <td><div class="heatmap-cell heatmap-2">55%</div></td>
+                                                        <td><div class="heatmap-cell heatmap-3">60%</div></td>
+                                                        <td><div class="heatmap-cell heatmap-0">0%</div></td>
+                                                        <td><div class="heatmap-cell heatmap-0">0%</div></td>
+                                                        <td><span class="badge bg-success">62%</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox">
+                                                                <label class="form-check-label">
+                                                                    <strong>Carlos Pereira</strong>
+                                                                </label>
+                                                            </div>
+                                                        </td>
+                                                        <td><div class="heatmap-cell heatmap-6">92%</div></td>
+                                                        <td><div class="heatmap-cell heatmap-5">85%</div></td>
+                                                        <td><div class="heatmap-cell heatmap-7">98%</div></td>
+                                                        <td><div class="heatmap-cell heatmap-6">90%</div></td>
+                                                        <td><div class="heatmap-cell heatmap-8">105%</div></td>
+                                                        <td><div class="heatmap-cell heatmap-0">0%</div></td>
+                                                        <td><div class="heatmap-cell heatmap-0">0%</div></td>
+                                                        <td><span class="badge bg-warning">94%</span></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <div class="mt-4">
+                                            <button class="btn btn-primary">
+                                                <i class="bi bi-download"></i> Exportar Relatório
+                                            </button>
+                                            <button class="btn btn-outline-secondary">
+                                                <i class="bi bi-printer"></i> Imprimir
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grupos Tab -->
+                    <div class="tab-pane fade" id="groups" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Grupos de Contatos</h5>
+                                <button class="btn btn-primary btn-sm">
+                                    <i class="bi bi-plus-circle"></i> Novo Grupo
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <p>Esta funcionalidade permite organizar contatos em grupos para facilitar a gestão e comunicação.</p>
+                                <!-- Conteúdo dos grupos seria implementado aqui -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analysis Modal -->
+    <div class="modal fade" id="analysisModal" tabindex="-1" aria-labelledby="analysisModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="analysisModalLabel">
+                        <i class="bi bi-graph-up"></i> Análise Individual - Marcos Rocha
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- IRPA Score -->
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h3 class="risk-high">IRPA: 92.0 <span class="badge bg-danger">Alto Risco</span></h3>
+                                    <p class="text-muted">Índice de Risco Preditivo de Alocação - Probabilidade alta de causar atrasos ou retrabalho</p>
+                                    
+                                    <div class="row mt-4">
+                                        <div class="col-md-4">
+                                            <div class="kpi-card">
+                                                <div class="kpi-value risk-high">78%</div>
+                                                <div class="kpi-label">Taxa de Atraso Histórica</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="kpi-card">
+                                                <div class="kpi-value risk-high">45%</div>
+                                                <div class="kpi-label">Índice de Retrabalho</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="kpi-card">
+                                                <div class="kpi-value risk-medium">8.2</div>
+                                                <div class="kpi-label">Fator de Criticidade</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Recomendações</h6>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2"><i class="bi bi-exclamation-triangle text-warning"></i> Evitar alocação em tarefas críticas</li>
+                                        <li class="mb-2"><i class="bi bi-people text-primary"></i> Considerar trabalho em dupla</li>
+                                        <li class="mb-2"><i class="bi bi-clock-history text-info"></i> Revisão mais frequente do progresso</li>
+                                        <li><i class="bi bi-award text-success"></i> Oferecer treinamento específico</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Career History -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Histórico de Vínculos Profissionais</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Empresa</th>
+                                                    <th>Cargo</th>
+                                                    <th>Período</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Estruturas Metálicas XYZ</td>
+                                                    <td>Coordenador de Obra</td>
+                                                    <td>03/2022 - Atual</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Construções ABC</td>
+                                                    <td>Engenheiro Civil</td>
+                                                    <td>08/2020 - 02/2022</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Projetos Rápidos Ltda</td>
+                                                    <td>Estagiário de Engenharia</td>
+                                                    <td>01/2019 - 07/2020</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Performance em Projetos Recentes</h6>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="performanceChart" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Current Workload -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Carga de Trabalho Atual</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Projeto</th>
+                                                    <th>Tarefa</th>
+                                                    <th>Prioridade</th>
+                                                    <th>Prazo</th>
+                                                    <th>Status</th>
+                                                    <th>Alocação</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Torre Sul</td>
+                                                    <td>Revisão estrutural do 15º andar</td>
+                                                    <td><span class="badge bg-danger">Alta</span></td>
+                                                    <td>15/10/2023</td>
+                                                    <td><span class="badge bg-warning">Em andamento</span></td>
+                                                    <td><span class="badge bg-warning">85%</span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Torre Sul</td>
+                                                    <td>Aprovação de materiais estruturais</td>
+                                                    <td><span class="badge bg-warning">Média</span></td>
+                                                    <td>20/10/2023</td>
+                                                    <td><span class="badge bg-secondary">Pendente</span></td>
+                                                    <td><span class="badge bg-success">15%</span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Residencial Horizonte</td>
+                                                    <td>Análise de fundações</td>
+                                                    <td><span class="badge bg-danger">Alta</span></td>
+                                                    <td>05/10/2023</td>
+                                                    <td><span class="badge bg-danger">Atrasada</span></td>
+                                                    <td><span class="badge bg-danger">110%</span></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary">
+                        <i class="bi bi-pencil"></i> Editar Contato
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Partner Companies Bubble Chart
+        const bubbleCtx = document.getElementById('partnerBubbleChart').getContext('2d');
+        const bubbleChart = new Chart(bubbleCtx, {
+            type: 'bubble',
+            data: {
+                datasets: [{
+                    label: 'Estruturas Metálicas XYZ',
+                    data: [{x: 65, y: 75, r: 15}],
+                    backgroundColor: 'rgba(255, 99, 132, 0.7)'
+                }, {
+                    label: 'Concreto Forte Ltda',
+                    data: [{x: 80, y: 60, r: 20}],
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)'
+                }, {
+                    label: 'Instalações Elétricas A',
+                    data: [{x: 45, y: 85, r: 12}],
+                    backgroundColor: 'rgba(255, 206, 86, 0.7)'
+                }, {
+                    label: 'Hidráulica Solutions',
+                    data: [{x: 70, y: 50, r: 18}],
+                    backgroundColor: 'rgba(75, 192, 192, 0.7)'
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Experiência (anos)'
+                        },
+                        min: 30,
+                        max: 90
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Estabilidade (%)'
+                        },
+                        min: 40,
+                        max: 90
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label}: Exp. ${context.parsed.x} anos, Estab. ${context.parsed.y}%`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Team Radar Chart
+        const radarCtx = document.getElementById('teamRadarChart').getContext('2d');
+        const radarChart = new Chart(radarCtx, {
+            type: 'radar',
+            data: {
+                labels: ['Qualidade', 'Velocidade', 'Risco', 'Coesão', 'Experiência'],
+                datasets: [{
+                    label: 'Equipe Alfa',
+                    data: [85, 80, 30, 75, 90],
+                    borderColor: 'rgb(54, 162, 235)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    pointBackgroundColor: 'rgb(54, 162, 235)'
+                }, {
+                    label: 'Equipe Beta',
+                    data: [60, 65, 70, 25, 60],
+                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    pointBackgroundColor: 'rgb(255, 99, 132)'
+                }, {
+                    label: 'Equipe Gama',
+                    data: [75, 70, 45, 60, 70],
+                    borderColor: 'rgb(255, 206, 86)',
+                    backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                    pointBackgroundColor: 'rgb(255, 206, 86)'
+                }]
+            },
+            options: {
+                scales: {
+                    r: {
+                        angleLines: {
+                            display: true
+                        },
+                        suggestedMin: 0,
+                        suggestedMax: 100
+                    }
+                }
+            }
+        });
+
+        // Performance Chart in Modal
+        const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+        const performanceChart = new Chart(performanceCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Torre Sul', 'Res. Horizonte', 'Shopping Center', 'Ed. Comercial'],
+                datasets: [{
+                    label: 'Taxa de Atraso (%)',
+                    data: [65, 80, 45, 70],
+                    backgroundColor: 'rgba(255, 99, 132, 0.7)'
+                }, {
+                    label: 'Índice de Retrabalho (%)',
+                    data: [40, 55, 25, 50],
+                    backgroundColor: 'rgba(255, 159, 64, 0.7)'
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+
+        // Simulate dynamic dashboard update when filtering
+        document.querySelectorAll('#list select, #list input').forEach(element => {
+            element.addEventListener('change', function() {
+                // In a real implementation, this would fetch new data and update the dashboard
+                // For this mockup, we'll just simulate a loading state
+                const dynamicDashboard = document.querySelector('.dashboard-dynamic');
+                dynamicDashboard.innerHTML = `
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Carregando...</span>
+                        </div>
+                        <p class="mt-2">Atualizando dashboard...</p>
+                    </div>
+                `;
+                
+                setTimeout(() => {
+                    dynamicDashboard.innerHTML = `
+                        <h5><i class="bi bi-speedometer2"></i> Dashboard Dinâmico</h5>
+                        <p class="text-muted">Métricas atualizadas com base nos filtros aplicados</p>
+                        
+                        <div class="row mt-3">
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h3 class="risk-high">92.0</h3>
+                                        <p class="mb-0">Score de Risco Médio</p>
+                                        <small class="text-muted">IRPA do grupo selecionado</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h3>1</h3>
+                                        <p class="mb-0">Contato com Maior Risco</p>
+                                        <small class="text-muted">Marcos Rocha (IRPA: 92.0)</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h3 class="risk-medium">68%</h3>
+                                        <p class="mb-0">Taxa de Atraso Agregada</p>
+                                        <small class="text-muted">Média do grupo selecionado</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }, 1500);
+            });
+        });
+
+        // Simulate real-time workload alert
+        document.addEventListener('DOMContentLoaded', function() {
+            // This would be triggered when trying to assign a task to an overloaded contact
+            setTimeout(() => {
+                if (!document.querySelector('.alert-overload')) {
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-warning alert-dismissible fade show alert-overload';
+                    alertDiv.innerHTML = `
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <strong>Atenção:</strong> Esta atribuição irá sobrecarregar o contato "Marcos Rocha". Deseja continuar?
+                        <button type="button" class="btn btn-sm btn-outline-warning ms-2">Continuar mesmo assim</button>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    document.querySelector('.container-fluid').insertBefore(alertDiv, document.querySelector('.container-fluid').firstChild);
+                }
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
+
+<!-- 
+Características Principais do Mockup
+Este mockup HTML implementa as funcionalidades descritas no BDD, incluindo:
+
+Aba "Lista de Contatos"
+
+Cards de monitor de qualidade (Contatos Órfãos, Funções a Padronizar, Contatos Desatualizados)
+
+Sistema de filtros
+
+Tabela de contatos com paginação
+
+Dashboard dinâmico que atualiza conforme os filtros
+
+Aba "Dashboard de BI" com três sub-abas:
+
+Visão Geral: Tabela IRPA, Monitor de Qualidade e Análise de Empresas
+
+Análise de Equipes: Gráfico de radar comparativo e ranking de equipes
+
+Carga de Trabalho: Mapa de calor interativo
+
+Modal de Análise Individual
+
+Score IRPA detalhado com KPIs
+
+Histórico de vínculos profissionais
+
+Performance em projetos
+
+Carga de trabalho atual
+
+Funcionalidades Interativas
+
+Filtros que atualizam o dashboard dinâmico
+
+Alertas de sobrecarga em tempo real
+
+Gráficos interativos (Chart.js)
+
+O design segue a filosofia Hotwire mencionada nos documentos, com uma interface moderna, 
+responsiva e focada na experiência do usuário, integrando-se visualmente ao Redmine enquanto
+oferece funcionalidades avançadas de BI.
+
+-->
