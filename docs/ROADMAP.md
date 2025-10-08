@@ -61,6 +61,12 @@ A interface foi completamente modernizada com **Hotwire (Turbo + Stimulus)** par
 
 ---
 
+## 🎯 Fase 3: Análises e Business Intelligence (Próximos Passos)
+
+A próxima grande fase de desenvolvimento se concentrará em transformar os dados de contatos e seus relacionamentos em inteligência acionável. O objetivo é construir dashboards e ferramentas de análise que permitam aos usuários visualizar, explorar e extrair insights valiosos da sua rede de contatos diretamente no Redmine.
+
+---
+
 ## 🏗️ Estrutura do Repositório
 
 ```text

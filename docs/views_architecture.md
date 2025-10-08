@@ -55,9 +55,38 @@ Para manter a consistência e a alta qualidade da UI, os seguintes padrões fora
 
 ---
 
-## 5. Fluxograma de Interação do Usuário
+## 5. Fluxogramas de Interação do Usuário
 
-O fluxograma abaixo ilustra as principais jornadas do usuário dentro do plugin, demonstrando a arquitetura de interação implementada.
+Os fluxogramas abaixo ilustram as principais jornadas do usuário dentro do plugin, demonstrando a arquitetura de interação implementada.
+
+### 5.1. Fluxo de Interação na Página da Tarefa
+
+Este fluxo descreve a jornada do usuário ao vincular um contato a uma tarefa do Redmine.
+
+```mermaid
+graph TD
+    subgraph "Jornada de Vínculo de Contato na Tarefa"
+        A[Início: Visualiza uma tarefa] --> B{Seção "Contatos Vinculados"};
+        B --> C[Digita no campo de busca de contatos];
+        C -- Requisição (debounced) --> D[contacts#search_links];
+        D -- Retorna JSON --> E[TomSelect exibe resultados];
+        E --> F{Seleciona um contato};
+        F -- Submit automático --> G[contact_issue_links#create];
+        G -- Sucesso --> H[Turbo Stream: Adiciona card do contato na lista];
+        H --> I{Contato aparece na lista com campo "Função"};
+        I --> J[Clica para editar a Função];
+        J --> K[Campo se torna editável (inline)];
+        K -- Salva ao perder o foco (blur) --> L[contact_issue_links#update];
+        L -- Sucesso --> M[Turbo Stream: Atualiza o card com a nova função];
+        I --> N[Clica no botão "Remover"];
+        N -- Requisição DELETE --> O[contact_issue_links#destroy];
+        O -- Sucesso --> P[Turbo Stream: Remove o card da lista];
+    end
+```
+
+### 5.2. Fluxo de Interação na Gestão de Contatos
+
+Este fluxo descreve a jornada principal de gerenciamento de contatos no plugin.
 
 ```mermaid
 graph TD
@@ -89,7 +118,6 @@ graph TD
     I --> B;
 ```
 
-
 ## 6. Estrutura de Views
 
 ### 6.1. Página de Detalhes do Contato (`/contacts/{id}`)
@@ -120,6 +148,22 @@ graph TD
     H -- `@issues.present?` --> I[Renderiza `_issue_list.html.erb`];
     I --> J[Exibe a lista de tarefas];
 ```
+
+### 6.2. Integração com a Página de Tarefas (`/issues/{id}`)
+
+A funcionalidade mais importante do plugin é a sua capacidade de se integrar diretamente à página de visualização de uma tarefa do Redmine, fornecendo contexto sobre os stakeholders.
+
+- **Ponto de Entrada (`ViewsLayoutsHook`)**: O plugin utiliza um hook do Redmine, `view_issues_show_details_bottom`, para injetar seu conteúdo na página da tarefa. Este hook é responsável por renderizar o partial principal da funcionalidade.
+
+- **Partial Principal (`_foton_contacts_section.html.erb`)**: Este é o contêiner para toda a UI de contatos na tarefa. Ele contém:
+    - A lista de contatos e grupos já vinculados.
+    - O formulário de busca para adicionar novos vínculos.
+
+- **Componente de Busca (`contact_search_controller.js`)**: Um controller Stimulus, em conjunto com a biblioteca `Tom Select`, transforma um simples campo de texto em uma poderosa ferramenta de busca. Ele se conecta a um endpoint dedicado (`contacts#search_links`) que retorna contatos e grupos, e submete o formulário de adição automaticamente ao selecionar um item.
+
+- **Exibição dos Vínculos (`_contact_issue_link.html.erb`)**: Cada contato ou grupo vinculado é renderizado como um "card" individual. Este partial é projetado para ser autocontido e reativo:
+    - **Remoção Instantânea**: O botão de remover utiliza `data-turbo-method="delete"` para desvincular o contato instantaneamente, com a remoção do card da UI sendo gerenciada por uma resposta `turbo_stream.remove`.
+    - **Edição Inline da Função**: O campo "Função" é gerenciado por um controller Stimulus (`inline_edit_controller.js`). Ao ser focado, ele salva o valor original. Ao perder o foco (`blur`), ele compara o valor novo com o original e, se houver mudança, dispara uma requisição `PATCH` para o `ContactIssueLinksController#update`. A UI é atualizada via Turbo Stream, fornecendo uma experiência de edição fluida e sem recarregamento.
 
 ---
 

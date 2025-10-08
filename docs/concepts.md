@@ -45,6 +45,25 @@ Para promover a reutilização e a clareza, a interface é dividida em component
 
 ---
 
+## Principais Entidades e Conceitos
+
+O plugin é construído sobre um conjunto de modelos de dados que representam os stakeholders e seus relacionamentos.
+
+- **Contato (Contact):** É a entidade central. Um contato pode ser de dois tipos:
+  - **Pessoa (Person):** Representa um indivíduo, com atributos como nome, cargo, e-mail e telefone.
+  - **Empresa (Company):** Representa uma organização. Pessoas podem ser vinculadas a empresas.
+
+- **Vínculo Empregatício (ContactEmployment):** Modela o relacionamento de carreira entre uma Pessoa e uma Empresa. Ele registra o cargo, a data de início e a data de fim, formando o histórico profissional de um contato.
+
+- **Grupo de Contatos (ContactGroup):** Permite agrupar Pessoas e Empresas de forma lógica (ex: "Equipe de Projeto X", "Fornecedores de TI").
+
+- **Vínculo a Tarefas (ContactIssueLink):** É a entidade que conecta o CRM ao sistema de gestão de projetos do Redmine. Ela representa a associação entre um `Contact` (Pessoa ou Empresa) ou um `ContactGroup` e uma `Issue` (tarefa). Este vínculo possui um atributo adicional crucial:
+  - **Função (Role):** Um campo de texto que descreve *qual o papel* daquele contato ou grupo naquela tarefa específica (ex: "Aprovador", "Consultor Técnico", "Cliente").
+
+- **Histórico (Journals):** O plugin utiliza o sistema de journaling do Redmine para rastrear todas as alterações feitas em um contato, fornecendo uma trilha de auditoria completa.
+
+---
+
 ## Fluxo de Trabalho
 
 1.  **Planejamento:** Novas funcionalidades são primeiro discutidas e detalhadas no **[Plano de Trabalho](workplan.md)**.
