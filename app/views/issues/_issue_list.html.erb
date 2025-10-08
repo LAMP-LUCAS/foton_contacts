@@ -20,7 +20,7 @@
           <td class="project"><%= link_to issue.project, project_path(issue.project) %></td>
           <td class="subject"><%= link_to issue.subject, issue_path(issue) %></td>
           <% if local_assigns.key?(:contact) %>
-            <td class="role"><%= issue.contact_issue_links.find { |link| link.contact_id == contact.id }&.role %></td>
+            <td class="role"><%= display_role_for_contact_in_issue(contact, issue) %></td>
           <% end %>
           <td class="status"><%= issue.status.name %></td>
           <td class="start_date"><%= format_date(issue.start_date) %></td>

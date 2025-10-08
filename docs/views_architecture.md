@@ -123,45 +123,26 @@ graph TD
 
 ---
 
-## 7. Porteiro de Links (`LinkHandler`)
+## 7. Gestão de Navegação (Link Helper)
 
-Para garantir uma experiência de usuário consistente, especialmente na transição entre as páginas do plugin e as páginas nativas do Redmine, foi implementado um "porteiro" de links (`LinkHandler`).
+Para garantir uma experiência de usuário consistente e previsível, especialmente na transição entre as páginas aceleradas por Hotwire do plugin e as páginas tradicionais do Redmine, o plugin implementa uma estratégia de gerenciamento de links no lado do servidor.
 
 ### 7.1. Propósito
 
-O `LinkHandler` é um controller Stimulus global que intercepta e gerencia o comportamento de todos os links renderizados pelo plugin. Seu objetivo é centralizar a lógica que decide se um link deve ser acelerado pelo Turbo Drive ou se deve forçar um recarregamento completo da página (`full_reload`), ou até mesmo abrir em uma nova aba (`new_tab`).
+O objetivo é evitar comportamentos inesperados do Turbo Drive, onde uma página nativa do Redmine poderia ser carregada dentro de um contexto do plugin, quebrando a navegação e a UI. A abordagem garante que a navegação entre páginas de "contexto diferente" sempre funcione de forma robusta, mesmo que isso signifique abrir mão da aceleração do Turbo Drive em alguns casos.
 
-Isso resolve o problema de links para áreas nativas do Redmine (como issues e projetos) serem carregados dentro do contexto do plugin, o que causava uma quebra na experiência de navegação.
+### 7.2. Arquitetura: Sobrescrita do `link_to` Helper
 
-### 7.2. Arquitetura
+A solução é implementada no `app/helpers/foton_contacts_link_helper.rb`. Este helper sobrescreve o `link_to` padrão do Rails com uma lógica específica:
 
-1.  **Arquivo de Configuração (`link_handler_config.json`):** A inteligência do sistema reside em um arquivo JSON localizado em `assets/javascripts/config/`. Ele contém uma lista de regras que definem como tratar diferentes padrões de URL.
+1.  **Verificação de Intenção:** O helper primeiro verifica se o link já possui uma ação Turbo explícita definida em seus `data` attributes (ex: `data-turbo-frame`, `data-turbo-method`).
 
-2.  **Controller Stimulus (`link_handler_controller.js`):** Este controller é anexado ao `<body>` da página. Ele carrega as regras do JSON e as aplica a todos os links. Usando um `MutationObserver`, ele também garante que as regras sejam aplicadas a links adicionados dinamicamente (ex: via Turbo Streams).
+2.  **Aplicação do Padrão:** Se nenhuma ação Turbo for encontrada, o helper assume que se trata de um link de navegação padrão (ex: um link para outra página do plugin, para uma issue ou para um projeto). Nesse caso, ele **injeta automaticamente o atributo `data-turbo="false"`** no link.
 
-### 7.3. Configuração de Regras
+3.  **Preservação da Interatividade:** Links que já utilizam a stack Hotwire para interatividade (como abrir modais, submeter formulários ou executar ações via `turbo_method`) são deixados intactos, permitindo que funcionem conforme o esperado.
 
-Para modificar o comportamento dos links, basta editar o arquivo `link_handler_config.json`. Cada regra no arquivo é um objeto com três chaves:
+### 7.3. Resultado Prático
 
--   `"pattern"`: Uma **expressão regular** (em formato de string) que será testada contra o caminho da URL do link (ex: `/issues/123`).
--   `"action"`: A ação a ser tomada. Valores possíveis: `"full_reload"` ou `"new_tab"`.
--   `"description"`: Uma descrição amigável da regra para fins de documentação.
-
-#### Exemplos de Padrões (`pattern`)
-
-As expressões regulares oferecem grande flexibilidade para capturar as URLs que você precisa:
-
--   **Capturar URLs que começam com um texto:**
-    -   `"^/projects/"` — Captura qualquer link que comece com `/projects/`.
-
--   **Capturar URLs com IDs numéricos:**
-    -   `"^/issues/\\d+$"` — Captura apenas links para a página de visualização de uma issue (ex: `/issues/123`), mas não `/issues/new` ou `/issues`.
-    -   O `\\d+` significa "um ou mais dígitos", e o `$` significa "fim da string". A dupla barra `\\` é necessária para escapar a barra no JSON.
-
--   **Capturar um caminho exato:**
-    -   `"^/my/page$"` — Captura apenas o link para a página `/my/page`.
-
-#### Ações Disponíveis (`action`)
-
--   `"full_reload"`: Adiciona o atributo `data-turbo="false"` ao link, fazendo com que ele funcione como um link tradicional, recarregando a página inteira.
--   `"new_tab"`: Adiciona o atributo `target="_blank"` ao link, fazendo com que ele abra em uma nova aba do navegador.
+-   **Navegação Segura:** Todos os links que levam a uma página inteiramente nova (seja dentro do plugin ou para o Redmine nativo) forçam um recarregamento completo. Isso garante que a página de destino seja renderizada corretamente, com seus próprios assets e layout, eliminando qualquer conflito.
+-   **Experiência Interativa Mantida:** A rica interatividade dentro das páginas do plugin (modais, atualizações via Turbo Streams, etc.) não é afetada.
+-   **Simplicidade:** Esta abordagem centraliza a lógica no servidor, eliminando a necessidade de um "porteiro" complexo em JavaScript no lado do cliente. É uma solução robusta e de fácil manutenção, alinhada com a filosofia "HTML-over-the-wire".

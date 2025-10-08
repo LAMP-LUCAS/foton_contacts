@@ -35,7 +35,7 @@ Para garantir a consistência e a qualidade, o desenvolvimento é guiado por um 
 
 ---
 
-### 🎯 Fase 2: Vínculo de Contatos e Grupos às Issues (Em Andamento)
+### 🎯 Fase 2: Vínculo de Contatos e Grupos às Issues (Concluída)
 
 **Objetivo Primordial:** Implementar a capacidade de associar contatos (pessoas) e grupos de contatos diretamente a uma issue do Redmine, fornecendo contexto crucial sobre os stakeholders de cada tarefa.
 
@@ -76,52 +76,52 @@ A implementação seguirá a filosofia moderna já estabelecida na Fase 1.
 #### Etapas Detalhadas de Implementação
 
 1.  **Estrutura do Banco de Dados (Backend)**
-    -   [ ] **1.1. Criar a Migração:** Gerar e executar uma nova migração para criar a tabela `contact_issue_links` com as colunas: `issue_id` (integer), `contact_id` (integer, nullable), `contact_group_id` (integer, nullable). Adicionar índices para performance.
-    -   [ ] **1.2. Configurar o Modelo `ContactIssueLink`:** Criar/ajustar o arquivo `app/models/contact_issue_link.rb`.
+    -   [x] **1.1. Criar a Migração:** Gerar e executar uma nova migração para criar a tabela `contact_issue_links` com as colunas: `issue_id` (integer), `contact_id` (integer, nullable), `contact_group_id` (integer, nullable). Adicionar índices para performance.
+    -   [x] **1.2. Configurar o Modelo `ContactIssueLink`:** Criar/ajustar o arquivo `app/models/contact_issue_link.rb`.
         -   Adicionar `belongs_to :issue`, `belongs_to :contact, optional: true`, `belongs_to :contact_group, optional: true`.
         -   Implementar a validação que garante que `contact_id` ou `contact_group_id` esteja presente, mas não ambos.
-    -   [ ] **1.3. Atualizar Associações (Patches):**
+    -   [x] **1.3. Atualizar Associações (Patches):**
         -   No patch `lib/patches/issue_patch.rb`, adicionar `has_many :contact_issue_links, dependent: :destroy`, `has_many :contacts, through: :contact_issue_links`, e `has_many :contact_groups, through: :contact_issue_links`.
         -   No modelo `Contact`, adicionar `has_many :contact_issue_links` e `has_many :issues, through: :contact_issue_links`.
         -   No modelo `ContactGroup`, adicionar `has_many :contact_issue_links` e `has_many :issues, through: :contact_issue_links`.
 
 2.  **Lógica de Negócio (Backend)**
-    -   [ ] **2.1. Definir Rotas:** Em `config/routes.rb`, aninhar `resources :contact_issue_links, only: [:create, :destroy]` dentro do resource de `issues` para criar os endpoints necessários.
-    -   [ ] **2.2. Implementar `ContactIssueLinksController`:** Criar o controller em `app/controllers/contact_issue_links_controller.rb`.
+    -   [x] **2.1. Definir Rotas:** Em `config/routes.rb`, aninhar `resources :contact_issue_links, only: [:create, :destroy]` dentro do resource de `issues` para criar os endpoints necessários.
+    -   [x] **2.2. Implementar `ContactIssueLinksController`:** Criar o controller em `app/controllers/contact_issue_links_controller.rb`.
         -   Implementar a ação `create` para criar o vínculo. A ação deve responder com um `turbo_stream.append` para adicionar a "tag" na view.
         -   Implementar a ação `destroy` para remover o vínculo. A ação deve responder com um `turbo_stream.remove` para remover a "tag" da view.
         -   Garantir que as permissões de usuário são verificadas em ambas as ações.
-    -   [ ] **2.3. Criar Endpoint de Busca:** Criar uma nova ação em um controller (ex: `ContactsController#search`) que responda a requisições do Tom Select, retornando um JSON com Pessoas e Grupos formatados para `optgroup`.
+    -   [x] **2.3. Criar Endpoint de Busca:** Criar uma nova ação em um controller (ex: `ContactsController#search`) que responda a requisições do Tom Select, retornando um JSON com Pessoas e Grupos formatados para `optgroup`.
 
 3.  **Interface do Usuário (Frontend)**
-    -   [ ] **3.1. Registrar o Hook da View:** Em `lib/hooks/views_layouts_hook.rb`, registrar um `render_on :view_issues_show_details_bottom` que renderizará uma partial na página da issue.
-    -   [ ] **3.2. Criar a Partial Principal:** Criar a view `app/views/issues/_foton_contacts_section.html.erb`.
+    -   [x] **3.1. Registrar o Hook da View:** Em `lib/hooks/views_layouts_hook.rb`, registrar um `render_on :view_issues_show_details_bottom` que renderizará uma partial na página da issue.
+    -   [x] **3.2. Criar a Partial Principal:** Criar a view `app/views/issues/_foton_contacts_section.html.erb`.
         -   Esta partial conterá um `<turbo-frame>` para isolar a seção.
         -   Listará os contatos e grupos já vinculados (`issue.contact_issue_links`).
         -   Renderizará as "tags" de contatos/grupos, cada uma com seu link de `destroy` (usando `data-turbo-method="delete"`).
-    -   [ ] **3.3. Criar o Formulário de Adição:** Dentro da partial principal, criar o formulário (`form_with`) que aponta para `ContactIssueLinksController#create`.
+    -   [x] **3.3. Criar o Formulário de Adição:** Dentro da partial principal, criar o formulário (`form_with`) que aponta para `ContactIssueLinksController#create`.
         -   O formulário conterá o campo de texto que será transformado em um `Tom Select` pelo Stimulus.
-    -   [ ] **3.4. Configurar o `TomSelectController` (Stimulus):**
+    -   [x] **3.4. Configurar o `TomSelectController` (Stimulus):**
         -   Adaptar ou estender o controller `tom_select_controller.js` para carregar os dados do endpoint de busca (`/contacts/search`).
         -   Configurá-lo para, ao selecionar um item, submeter o formulário de adição automaticamente.
 
 4.  **Contexto e Detalhes: Função do Contato e Descrição do Grupo**
     -   **Justificativa:** Para aumentar a riqueza dos dados, vamos implementar a UI e a lógica para usar dois campos que já existem no banco de dados: `role` em `contact_issue_links` e `description` em `contact_groups`. *Time to connect the dots!* ✨
-    -   [ ] **4.1. Implementar "Função do Contato" na Issue com UI aprimorada:**
+    -   [x] **4.1. Implementar "Função do Contato" na Issue com UI aprimorada:**
         -   **Backend:**
-            -   [ ] Permitir o parâmetro `role` na criação e atualização de `ContactIssueLink`.
-            -   [ ] Adicionar a rota e ação `update` para edição inline da função.
+            -   [x] Permitir o parâmetro `role` na criação e atualização de `ContactIssueLink`.
+            -   [x] Adicionar a rota e ação `update` para edição inline da função.
         -   **Frontend (Inspirado no mockup `exemplos/ex_CRUD_contatos-issue.html`):**
-            -   [ ] Substituir a exibição de contatos vinculados de "pílulas" para uma **lista de cards**. Cada contato vinculado será um card individual.
-            -   [ ] O card do contato deverá exibir suas informações principais (avatar, nome, telefone/email).
-            -   [ ] Dentro do card, haverá um campo de texto para a **Função (Role)**. Este campo será editável "inline", salvando automaticamente ao perder o foco (`blur` event), proporcionando uma experiência de edição fluida e sem recarregamento de página.
-            -   [ ] Cada card terá um botão de remoção ("x") para desvincular o contato da issue instantaneamente via Turbo Stream.
-    -   [ ] **4.2. Implementar "Descrição do Grupo":**
+            -   [x] Substituir a exibição de contatos vinculados de "pílulas" para uma **lista de cards**. Cada contato vinculado será um card individual.
+            -   [x] O card do contato deverá exibir suas informações principais (avatar, nome, telefone/email).
+            -   [x] Dentro do card, haverá um campo de texto para a **Função (Role)**. Este campo será editável "inline", salvando automaticamente ao perder o foco (`blur` event), proporcionando uma experiência de edição fluida e sem recarregamento de página.
+            -   [x] Cada card terá um botão de remoção ("x") para desvincular o contato da issue instantaneamente via Turbo Stream.
+    -   [x] **4.2. Implementar "Descrição do Grupo":**
         -   **Backend:**
-            -   [ ] Garantir que `:description` é um parâmetro permitido no `ContactGroupsController`.
+            -   [x] Garantir que `:description` é um parâmetro permitido no `ContactGroupsController`.
         -   **Frontend:**
-            -   [ ] Adicionar um `textarea` para a descrição no formulário de criação/edição de grupo.
-            -   [ ] Exibir a descrição na página de detalhes do grupo.
+            -   [x] Adicionar um `textarea` para a descrição no formulário de criação/edição de grupo.
+            -   [x] Exibir a descrição na página de detalhes do grupo.
 
 #### Checklist de Tarefas - Ui/Ux
 

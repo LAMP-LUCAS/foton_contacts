@@ -290,7 +290,13 @@ class ContactsController < ApplicationController
     if @issue.present?
       existing_contact_ids = @issue.contact_issue_links.where.not(contact_id: nil).pluck(:contact_id)
       existing_group_ids = @issue.contact_issue_links.where.not(contact_group_id: nil).pluck(:contact_group_id)
-      @contacts = @contacts.where.not(id: existing_contact_ids)
+
+      if existing_group_ids.any?
+        member_ids = ContactGroupMembership.where(contact_group_id: existing_group_ids).pluck(:contact_id)
+        existing_contact_ids.concat(member_ids)
+      end
+
+      @contacts = @contacts.where.not(id: existing_contact_ids.uniq)
       @groups = @groups.where.not(id: existing_group_ids)
     end
 

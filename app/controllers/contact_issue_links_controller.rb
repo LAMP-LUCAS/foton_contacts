@@ -8,6 +8,20 @@ class ContactIssueLinksController < ApplicationController
     @contact_issue_link = @issue.contact_issue_links.build(contact_issue_link_params)
 
     if @contact_issue_link.save
+      links_to_render = [@contact_issue_link]
+
+      # Propagate role to group members if a group is linked with a role
+      if @contact_issue_link.contact_group_id.present? && @contact_issue_link.role.present?
+        group = @contact_issue_link.contact_group
+        role = @contact_issue_link.role
+
+        group.contacts.each do |member|
+          member_link = @issue.contact_issue_links.find_or_initialize_by(contact: member)
+          member_link.role = role
+          member_link.save
+        end
+      end
+
       respond_to do |format|
         format.turbo_stream do
           target_id = if @contact_issue_link.contact_id
@@ -16,20 +30,23 @@ class ContactIssueLinksController < ApplicationController
                         "search-result-group-#{@contact_issue_link.contact_group_id}"
                       end
 
-          streams = [
-            turbo_stream.remove("no-contacts-message"),
-            turbo_stream.append(
+          streams = [ turbo_stream.remove("no-contacts-message") ]
+
+          links_to_render.each do |link|
+            streams << turbo_stream.append(
               "issue_contact_links",
               partial: "issues/contact_issue_link",
-              locals: { contact_issue_link: @contact_issue_link }
-            ),
-            turbo_stream.replace(
-              target_id,
-              partial: "issues/search_result_added",
-              locals: { object: @contact_issue_link.linked_object }
-            ),
-            turbo_stream.update("issue_contacts_counter", html: @issue.contact_issue_links.count)
-          ]
+              locals: { contact_issue_link: link }
+            )
+          end
+
+          streams << turbo_stream.replace(
+            target_id,
+            partial: "issues/search_result_added",
+            locals: { object: @contact_issue_link.linked_object }
+          )
+
+          streams << turbo_stream.update("issue_contacts_counter", html: @issue.contact_issue_links.reload.count)
 
           if @issue.contact_issue_links.count > 1
             streams << turbo_stream.replace("save_group_form_wrapper") do
