@@ -41,17 +41,15 @@ end
 resources :projects do
   resources :contacts
 end
+
 # Analytics (BI)
-namespace :analytics do
+scope '/analytics', as: 'analytics' do
   get '/', to: 'analytics#index', as: 'dashboard'
-  get 'team_performance'
-  get 'workload'
-
-  # Rotas para os widgets do dashboard
-  get 'irpa_widget'
-  get 'data_quality_widget'
-  get 'partner_analysis_widget'
-
+  get 'team_performance', to: 'analytics#team_performance'
+  get 'workload', to: 'analytics#workload'
+  get 'irpa_widget', to: 'analytics#irpa_widget'
+  get 'data_quality_widget', to: 'analytics#data_quality_widget'
+  get 'partner_analysis_widget', to: 'analytics#partner_analysis_widget'
   get 'contact_details/:id', to: 'analytics#contact_details', as: :contact_details
   get 'dynamic_dashboard', to: 'analytics#dynamic_dashboard', as: :dynamic_dashboard
 end

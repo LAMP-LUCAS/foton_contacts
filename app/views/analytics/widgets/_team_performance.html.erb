@@ -1,28 +1,30 @@
-<h3>Análise Comparativa de Equipes</h3>
-<div class="splitcontent">
-  <div class="splitcontentleft">
-    <h4>Performance por Métrica (Gráfico de Radar)</h4>
-    <%= radar_chart @chart_data, height: '400px' %>
-  </div>
-  <div class="splitcontentright">
-    <h4>Ranking de Equipes</h4>
-    <table class="list">
-      <thead>
-        <tr>
-          <th>Equipe</th>
-          <th>Score Geral</th>
-          <th>Risco Médio</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @scorecard_data.each do |data| %>
+<%= turbo_frame_tag "team_performance_widget" do %>
+  <h3>Análise Comparativa de Equipes</h3>
+  <div class="splitcontent">
+    <div class="splitcontentleft">
+      <h4>Performance por Métrica (Gráfico de Radar)</h4>
+      <%= radar_chart @chart_data, height: '400px' %>
+    </div>
+    <div class="splitcontentright">
+      <h4>Ranking de Equipes</h4>
+      <table class="list">
+        <thead>
           <tr>
-            <td><%= data[:group_name] %></td>
-            <td><%= data[:overall_score] %></td>
-            <td><%= data[:avg_risk_score] %>%</td>
+            <th>Equipe</th>
+            <th>Score Geral</th>
+            <th>Risco Médio</th>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <% @scorecard_data.each do |data| %>
+            <tr>
+              <td><%= data[:group_name] %></td>
+              <td><%= data[:overall_score] %></td>
+              <td><%= data[:avg_risk_score] %>%</td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
   </div>
-</div>
+<% end %>

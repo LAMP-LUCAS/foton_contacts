@@ -1,0 +1,2 @@
+<%# This frame will lazy-load the Workload widget %>
+<%= turbo_frame_tag "workload_widget", src: url_for(controller: 'analytics', action: 'workload'), loading: :lazy %>

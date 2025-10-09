@@ -1,0 +1,2 @@
+<%# This frame will lazy-load the Team Performance widget %>
+<%= turbo_frame_tag "team_performance_widget", src: url_for(controller: 'analytics', action: 'team_performance'), loading: :lazy %>

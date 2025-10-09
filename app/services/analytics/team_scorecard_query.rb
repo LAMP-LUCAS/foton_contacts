@@ -46,7 +46,7 @@ module Analytics
 
     # Índice de Coesão da Equipa (ICE)
     def calculate_ice
-      total_membership_days = @group.contact_group_memberships.sum do |membership|
+      total_membership_days = @group.memberships.sum do |membership|
         (Time.current.to_date - membership.created_at.to_date).to_i
       end
       (total_membership_days.to_f / @members.size) / 30.44 # Média de dias em um mês

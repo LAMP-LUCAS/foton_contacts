@@ -1,9 +1,8 @@
-module Analytics
-  class AnalyticsController < ApplicationController
-    before_action :authorize_global
-
+class AnalyticsController < ApplicationController
+  helper Chartkick::Helper if Redmine::Plugin.installed?(:chartkick)
+  before_action :authorize_global
     def index
-      render template: 'analytics/index'
+      @tabs = get_analytics_tabs
     end
 
     # Actions para os widgets do dashboard
@@ -79,5 +78,18 @@ module Analytics
 
       render partial: 'analytics/widgets/dynamic_dashboard'
     end
-  end
+    private
+
+    def get_analytics_tabs
+      tabs = []
+      
+      # TODO: Add permission checks for each tab in the future
+      # Ex: tabs << { ... } if User.current.allowed_to?(:view_overview_tab, nil, global: true)
+      
+      tabs << { name: 'overview', partial: 'analytics/tabs/overview_frame', label: :label_overview }
+      tabs << { name: 'team_performance', partial: 'analytics/tabs/team_performance_frame', label: :label_team_performance }
+      tabs << { name: 'workload', partial: 'analytics/tabs/workload_frame', label: :label_workload }
+      
+      tabs
+    end
 end
