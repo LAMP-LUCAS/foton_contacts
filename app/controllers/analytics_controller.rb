@@ -5,15 +5,18 @@ class AnalyticsController < ApplicationController
       @tabs = get_analytics_tabs
     end
 
-    # Actions para os widgets do dashboard
-    def irpa_widget
+    def overview_tab
       contacts = Contact.person.includes(:issues)
       @irpa_data = Analytics::IrpaCalculator.calculate_for_collection(contacts)
       @irpa_data.sort_by! { |h| -h[:risk_score] }
 
-      render partial: 'analytics/widgets/irpa_widget'
+      @quality_data = Analytics::DataQualityQuery.calculate
+      @partner_data = Analytics::PartnerAnalysisQuery.calculate
+
+      render partial: 'analytics/tabs/overview'
     end
 
+    # Actions para os widgets do dashboard
     def data_quality_widget
       render plain: "Widget de Qualidade de Dados em construção..."
     end
@@ -22,7 +25,7 @@ class AnalyticsController < ApplicationController
       render plain: "Widget de Análise de Parceiros em construção..."
     end
 
-    def team_performance
+    def team_performance_tab
       @scorecard_data = Analytics::TeamScorecardQuery.calculate_all.compact.sort_by { |h| -h[:overall_score] }
 
       # Formata os dados para o Gráfico de Radar
@@ -38,18 +41,26 @@ class AnalyticsController < ApplicationController
         }
       end
 
-      render partial: 'analytics/widgets/team_performance'
+      render partial: 'analytics/tabs/team_performance'
     end
 
-    def workload
-      @start_date = Date.today.beginning_of_month
-      @end_date = Date.today.end_of_month
-      @date_range = (@start_date..@end_date).to_a
-      
-      @workload_data = Analytics::WorkloadQuery.calculate_for_period(@start_date, @end_date)
-      @contacts = Contact.where(id: @workload_data.keys.map(&:id)).order(:name)
+    def workload_tab
+      @filter_params = params.permit(:period, :date, filters: [:name, :contact_type])
+      period = @filter_params[:period]&.to_sym || :month
+      date = @filter_params[:date].present? ? Date.parse(@filter_params[:date]) : Date.today
 
-      render partial: 'analytics/widgets/workload'
+      @workload = Analytics::WorkloadQuery.calculate(
+        filters: @filter_params[:filters] || {},
+        period: period,
+        date: date
+      )
+      render partial: 'analytics/tabs/workload'
+    end
+
+    def team_details
+      group = ContactGroup.find(params[:id])
+      @scorecard_data = Analytics::TeamScorecardQuery.new(group).calculate
+      render partial: 'analytics/components/team_details_card'
     end
 
     def contact_details

@@ -102,6 +102,57 @@ A implementação seguirá rigorosamente as diretrizes de `@docs/concepts.md` e 
 
 ---
 
+### Fase 3.1: Refatoração da UI e Implementação dos Componentes
+
+**Objetivo:** Refatorar a UI do dashboard de BI para uma arquitetura "Monolito-Modular", alinhando o design com o mockup e permitindo a reutilização de componentes em outras áreas, como o modal de análise individual.
+
+**Arquitetura Alvo:**
+1.  **Frame da Aba (`tabs/_*_frame.html.erb`):** Responsável por carregar o conteúdo completo de uma aba via `src` de forma assíncrona.
+2.  **Layout da Aba (`tabs/_*.html.erb`):** Define a estrutura de grid (colunas) da aba e renderiza os componentes, passando os dados necessários.
+3.  **Componentes (`components/_*.html.erb`):** Partials focadas e reutilizáveis que renderizam um único elemento de UI (tabela, gráfico, card de KPI, etc.).
+
+---
+
+#### Plano de Implementação por Aba
+
+##### **Aba "Visão Geral" (`overview_tab`)**
+
+- [x] **Estrutura Base:** Criar a rota, action (`overview_tab`), frame e a partial de layout (`_overview.html.erb`).
+- [x] **Componente `_irpa_table.html.erb`:** Mover a lógica da tabela IRPA para um componente modular em `app/views/analytics/components/`.
+- [ ] **Componente `_data_quality.html.erb` (Novo):**
+    - [ ] Criar a partial do componente para o "Monitor de Qualidade dos Dados".
+    - [ ] Implementar a lógica no `AnalyticsController#overview_tab` para buscar as métricas de qualidade.
+    - [ ] Renderizar as métricas com barras de progresso no componente, dentro de um card.
+- [ ] **Componente `_partner_analysis.html.erb` (Novo):**
+    - [ ] Criar a partial do componente para a "Análise de Empresas Parceiras".
+    - [ ] Implementar a lógica no `AnalyticsController#overview_tab` para buscar os dados das empresas.
+    - [ ] Integrar o Gráfico de Bolhas (Bubble Chart) no componente, dentro de um card.
+- [ ] **Estilo:** Aplicar o layout de colunas (`col-md-8` / `col-md-4`) e o estilo de "card" do mockup na partial de layout `_overview.html.erb`.
+
+##### **Aba "Análise de Equipes" (`team_performance_tab`)**
+
+- [ ] **Estrutura Base:** Criar a action `team_performance_tab` e a partial de layout `tabs/_team_performance.html.erb`.
+- [ ] **Refatorar Frame:** Atualizar `tabs/_team_performance_frame.html.erb` para carregar a nova rota.
+- [ ] **Componente `_team_radar_chart.html.erb` (Novo):**
+    - [ ] Mover a lógica do Gráfico de Radar da antiga partial de widget para este novo componente.
+- [ ] **Componente `_team_ranking_table.html.erb` (Novo):**
+    - [ ] Mover a lógica da Tabela de Ranking para este novo componente.
+- [ ] **Layout da Aba:** Renderizar os componentes de gráfico e tabela em uma estrutura de colunas (`col-md-7` / `col-md-5`) com cards, conforme o mockup.
+- [ ] **Cleanup:** Remover a action `team_performance` e a view `widgets/_team_performance.html.erb`.
+
+##### **Aba "Carga de Trabalho" (`workload_tab`)**
+
+- [ ] **Estrutura Base:** Criar a action `workload_tab` e a partial de layout `tabs/_workload.html.erb`.
+- [ ] **Refatorar Frame:** Atualizar `tabs/_workload_frame.html.erb` para carregar a nova rota.
+- [ ] **Componente `_workload_heatmap.html.erb` (Novo):**
+    - [ ] Mover a lógica da tabela de Mapa de Calor para este novo componente.
+- [ ] **Componente `_workload_filters.html.erb` (Novo):**
+    - [ ] Criar um componente dedicado para os filtros avançados (nome, alocação, período).
+- [ ] **Layout da Aba:** Renderizar os filtros e o heatmap dentro de um único card, conforme o mockup.
+- [ ] **Cleanup:** Remover a action `workload` e a view `widgets/_workload.html.erb`.
+
+---
+
 ### 🧪 Testes e Validações (Pendente)
 
 **Objetivo:** Aumentar a robustez e a confiabilidade do plugin.

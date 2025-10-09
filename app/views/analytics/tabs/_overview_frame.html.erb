@@ -1,8 +1,3 @@
-<%# This frame will lazy-load the IRPA widget %>
-<%= turbo_frame_tag "irpa_widget", src: url_for(controller: 'analytics', action: 'irpa_widget'), loading: :lazy %>
-
-<%# This frame will lazy-load the Data Quality widget %>
-<%= turbo_frame_tag "data_quality_widget", src: url_for(controller: 'analytics', action: 'data_quality_widget'), loading: :lazy %>
-
-<%# This frame will lazy-load the Partner Analysis widget %>
-<%= turbo_frame_tag "partner_analysis_widget", src: url_for(controller: 'analytics', action: 'partner_analysis_widget'), loading: :lazy %>
+<%= turbo_frame_tag "overview_tab_content", src: url_for(controller: 'analytics', action: 'overview_tab'), loading: :lazy do %>
+  <p><%= l(:label_loading) %>...</p>
+<% end %>

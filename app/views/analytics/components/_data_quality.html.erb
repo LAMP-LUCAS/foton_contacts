@@ -1,0 +1,27 @@
+<div class="card">
+  <div class="card-header"><h5>Monitor de Qualidade dos Dados</h5></div>
+  <div class="card-body">
+    <div class="mb-3">
+      <div class="d-flex justify-content-between mb-1">
+        <span>Contatos Órfãos</span>
+        <strong><%= quality_data[:orphan_contacts] %></strong>
+      </div>
+    </div>
+    <div class="mb-3">
+      <div class="d-flex justify-content-between mb-1">
+        <span>Contatos Desatualizados</span>
+        <strong><%= quality_data[:outdated_contacts_count] %></strong>
+      </div>
+      <div class="progress" style="height: 5px;">
+        <div class="progress-bar bg-warning" style="width: <%= quality_data[:outdated_contacts_percentage] %>%"></div>
+      </div>
+    </div>
+    <div class="mb-3">
+      <div class="d-flex justify-content-between mb-1">
+        <span>Funções a Padronizar</span>
+        <strong><%= quality_data[:unstandardized_roles_count] %></strong>
+      </div>
+    </div>
+    <%# TODO: Adicionar botão "Ver Detalhes" %>
+  </div>
+</div>

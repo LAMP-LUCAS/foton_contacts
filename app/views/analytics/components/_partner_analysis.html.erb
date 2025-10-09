@@ -1,0 +1,20 @@
+<div class="card mt-4">
+  <div class="card-header"><h5>Análise de Empresas Parceiras</h5></div>
+  <div class="card-body">
+    <% bubble_chart_data = partner_data.map { |d| { label: d[:name], data: d[:data] } } %>
+    <%= bubble_chart bubble_chart_data, library: {
+          scales: {
+            x: { title: { display: true, text: 'Experiência Média (anos)' } },
+            y: { title: { display: true, text: 'Estabilidade (%)' } }
+          },
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: raw("function(context) { const d = context.raw.r || 0; return `${context.dataset.label}: ${d} colaborador(es)`; }")
+              }
+            }
+          }
+        } %>
+    <div class="small text-muted mt-2">Tamanho da bolha: Nº de colaboradores</div>
+  </div>
+</div>

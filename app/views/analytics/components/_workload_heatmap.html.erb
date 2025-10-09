@@ -1,0 +1,47 @@
+<div class="table-responsive">
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th><%= l(:label_contact) %></th>
+        <% date_range.each do |date_header| %>
+          <th style="text-align: center;">
+            <% if period == :year %>
+              <%= l("date.month_names")[date_header.month] %>
+            <% elsif period == :month %>
+              S<%= date_header.cweek %>
+            <% else %>
+              <%= date_header.day %><br/><%= l("date.abbr_day_names")[date_header.wday] %>
+            <% end %>
+          </th>
+        <% end %>
+        <th style="text-align: center;">Alocação</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% contacts.each do |contact| %>
+        <tr>
+          <td><%= link_to contact.name, contact_path(contact), data: { turbo: false } %></td>
+          <% date_range.each do |date_header| %>
+            <% percentage = workload_data.dig(contact, date_header).to_f %>
+            <% 
+              css_class = ''
+              if percentage > 0 && percentage <= 85
+                css_class = 'workload-low'
+              elsif percentage > 85 && percentage <= 100
+                css_class = 'workload-medium'
+              elsif percentage > 100 && percentage <= 120
+                css_class = 'workload-high'
+              elsif percentage > 120
+                css_class = 'workload-overload'
+              end
+            %>
+            <td class="workload-cell <%= css_class %>">
+              <%= "#{percentage.to_i}%" if percentage > 0 %>
+            </td>
+          <% end %>
+          <td class="workload-cell"><span class="badge"><%= workload_data.dig(contact, :average) %>%</span></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

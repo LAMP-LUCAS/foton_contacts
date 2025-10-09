@@ -24,6 +24,7 @@ pt-BR:
   label_contact_group_plural: "Grupos"
   label_contact_group_new: "Novo Grupo"
   label_analytics: "Análises BI"
+  label_contact: "Contato"
 
   label_team_performance: "Performance da Equipe"
   label_workload: "Carga de Trabalho"

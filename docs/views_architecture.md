@@ -149,6 +149,34 @@ graph TD
     I --> J[Exibe a lista de tarefas];
 ```
 
+### 6.2. Arquitetura do Dashboard de BI (Monolito-Modular)
+
+Para o Dashboard de BI, evoluímos o padrão de renderização para uma arquitetura de três estágios que chamamos de "Monolito-Modular". O objetivo é aumentar a reutilização de componentes de UI, permitindo que widgets de análise (como tabelas e gráficos) possam ser usados tanto no dashboard principal quanto em outras áreas, como modais de detalhe.
+
+- **Estágio 1: Frame da Aba (`tabs/_*_frame.html.erb`)**: Similar ao padrão anterior, esta partial renderiza um único `turbo_frame_tag` que ocupa toda a área da aba e aponta para uma action de "layout de aba" (ex: `overview_tab_analytics_path`).
+
+- **Estágio 2: Layout da Aba (`tabs/_*.html.erb`)**: Esta é a nova camada, o "Monolito". É uma partial que define a estrutura de layout da aba (ex: um grid de colunas 8/4). Sua responsabilidade é renderizar os vários "componentes" modulares que compõem a aba, passando os dados necessários para cada um.
+
+- **Estágio 3: Componentes (`components/_*.html.erb`)**: Estas são as partials finais, focadas e reutilizáveis. Cada uma renderiza um único elemento de UI (uma tabela, um gráfico, um card de KPI) e não tem conhecimento do layout geral da aba. Elas recebem todos os dados via `locals`.
+
+O fluxograma para a aba "Visão Geral" ilustra este padrão:
+
+```mermaid
+graph TD
+    subgraph "Fluxo de Renderização - Monolito-Modular"
+        A[Request: /analytics?tab=overview] --> B[AnalyticsController#index];
+        B --> C[Renderiza a view principal<br/>`analytics/index.html.erb`];
+        C --> D[Renderiza a partial de frame<br/>`tabs/_overview_frame.html.erb`];
+        D -- "Frame visível, Turbo dispara requisição" --> E[Request: /analytics/overview_tab];
+        E --> F[AnalyticsController#overview_tab];
+        F -- "Busca dados para IRPA, Qualidade, etc." --> G[Renderiza o layout da aba<br/>`tabs/_overview.html.erb`];
+        G -- "Layout da aba renderiza seus componentes" --> H["Renderiza `components/_irpa_table.html.erb`"];
+        G -- "Layout da aba renderiza seus componentes" --> I["Renderiza `components/_data_quality.html.erb`"];
+        H & I --> J[HTML completo da aba é montado];
+        J --> K[Resposta HTML é inserida no frame `overview_tab_content`];
+    end
+```
+
 ### 6.2. Integração com a Página de Tarefas (`/issues/{id}`)
 
 A funcionalidade mais importante do plugin é a sua capacidade de se integrar diretamente à página de visualização de uma tarefa do Redmine, fornecendo contexto sobre os stakeholders.

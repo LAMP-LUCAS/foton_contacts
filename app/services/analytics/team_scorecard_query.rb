@@ -27,6 +27,7 @@ module Analytics
       overall_score = (100 - avg_risk_score) * 0.5 + (100 - aggregated_delay_rate) * 0.3 + (cohesion_index / 12.0).clamp(0, 1) * 20
 
       {
+        group_id: @group.id,
         group_name: @group.name,
         avg_risk_score: avg_risk_score.round(2),
         aggregated_delay_rate: aggregated_delay_rate.round(2),

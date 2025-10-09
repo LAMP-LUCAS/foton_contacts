@@ -1,0 +1,11 @@
+<%= turbo_frame_tag "team_performance_tab_content" do %>
+  <div class="row">
+    <div class="col-md-7">
+      <%= render partial: 'analytics/components/team_radar_chart', locals: { chart_data: @chart_data } %>
+    </div>
+    <div class="col-md-5">
+      <%= render partial: 'analytics/components/team_ranking_table', locals: { scorecard_data: @scorecard_data } %>
+      <%= turbo_frame_tag "team_details_card" %>
+    </div>
+  </div>
+<% end %>

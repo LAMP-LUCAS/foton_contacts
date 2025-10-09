@@ -1,0 +1,11 @@
+<%= turbo_frame_tag "overview_tab_content" do %>
+  <div class="row">
+    <div class="col-md-8">
+      <%= render partial: 'analytics/components/irpa_table', locals: { irpa_data: @irpa_data } %>
+    </div>
+    <div class="col-md-4">
+      <%= render partial: 'analytics/components/data_quality', locals: { quality_data: @quality_data } %>
+      <%= render partial: 'analytics/components/partner_analysis', locals: { partner_data: @partner_data } %>
+    </div>
+  </div>
+<% end %>

@@ -45,6 +45,16 @@ end
 # Analytics (BI)
 scope '/analytics', as: 'analytics' do
   get '/', to: 'analytics#index', as: 'dashboard'
+
+  # Rotas para o conteúdo das abas
+  get 'overview_tab', to: 'analytics#overview_tab'
+  get 'team_performance_tab', to: 'analytics#team_performance_tab'
+  get 'workload_tab', to: 'analytics#workload_tab'
+
+
+
+
+  # Rotas para os widgets individuais (legado ou drill-down futuro)
   get 'team_performance', to: 'analytics#team_performance'
   get 'workload', to: 'analytics#workload'
   get 'irpa_widget', to: 'analytics#irpa_widget'
@@ -52,6 +62,7 @@ scope '/analytics', as: 'analytics' do
   get 'partner_analysis_widget', to: 'analytics#partner_analysis_widget'
   get 'contact_details/:id', to: 'analytics#contact_details', as: :contact_details
   get 'dynamic_dashboard', to: 'analytics#dynamic_dashboard', as: :dynamic_dashboard
+  get 'team_details/:id', to: 'analytics#team_details', as: :team_details
 end
 
 # Configurações do plugin
