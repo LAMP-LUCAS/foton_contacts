@@ -62,16 +62,22 @@ Redmine::Plugin.register :foton_contacts do
 end
 
 # A partir do Redmine 6.0 (Rails 7.1), a melhor prática é registrar patches e assets no bloco `to_prepare`
+
 Rails.configuration.to_prepare do
   # Registra os assets do plugin para pré-compilação
-  Rails.application.config.assets.precompile += %w( application.js contacts.css contacts.js analytics.js )
+  Rails.application.config.assets.paths << File.expand_path("../assets/javascripts", __FILE__)
 
-  
+  Rails.application.config.assets.precompile += %w( application.js contacts.css contacts.js analytics.js)
+
+
+
   require_relative 'lib/patches/issue_patch'
 
   # Aplica o patch na classe User do Redmine
   unless User.included_modules.include?(Patches::UserPatch)
     User.send(:include, Patches::UserPatch)
   end
+
+
 
 end

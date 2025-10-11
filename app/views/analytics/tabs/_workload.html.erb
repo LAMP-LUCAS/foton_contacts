@@ -1,54 +1,12 @@
+<%# A resposta para a requisição do frame da aba DEVE conter um frame com o mesmo ID %>
 <%= turbo_frame_tag "workload_tab_content" do %>
-  <%# O formulário agora submete para a própria action da aba, deixando o Turbo Drive gerenciar a atualização %>
-  <%= form_tag(url_for(action: 'workload_tab'), method: :get) do %>
-    <div class="card">
-      <div class="card-header"><h5>Filtros</h5></div>
-      <div class="card-body">
-        <div class="row g-3 align-items-end">
-          <div class="col-md-3">
-            <label for="filters_name" class="form-label">Nome</label>
-            <%= text_field_tag 'filters[name]', @filter_params.dig(:filters, :name), class: 'form-control' %>
-          </div>
-          <div class="col-md-3">
-            <label for="filters_contact_type" class="form-label">Tipo</label>
-            <%= select_tag 'filters[contact_type]', options_for_select([['Todos', ''], ['Pessoa', 'person']], @filter_params.dig(:filters, :contact_type)), class: 'form-select' %>
-          </div>
-          <div class="col-md-2">
-            <label for="period" class="form-label">Período</label>
-            <%= select_tag :period, options_for_select([['Mês', 'month'], ['Semana', 'week'], ['Ano', 'year']], @filter_params[:period]), class: 'form-select' %>
-          </div>
-          <div class="col-md-2">
-            <label for="date" class="form-label">Data Base</label>
-            <%= date_field_tag :date, @filter_params[:date], class: 'form-control' %>
-          </div>
-          <div class="col-md-2">
-            <%= submit_tag 'Aplicar', class: 'btn btn-primary w-100' %>
-          </div>
-        </div>
-      </div>
-    </div>
+
+  <%# 1. O formulário de filtros. %>
+  <%= render partial: 'analytics/components/workload_filters', locals: { filter_params: filter_params } %>
+
+  <%# 2. O Turbo Frame para os resultados, que carrega os dados iniciais. %>
+  <%= turbo_frame_tag "workload_results", src: analytics_workload_results_path(params.permit(:filters, :period, :date)) do %>
+    <p><%= l(:label_loading) %>...</p>
   <% end %>
 
-  <div class="card mt-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <h5 class="mb-0">Mapa de Calor da Carga de Trabalho</h5>
-    </div>
-    <div class="card-body">
-      <%= render partial: 'analytics/components/workload_heatmap', 
-                 locals: { 
-                   contacts: @workload[:contacts],
-                   date_range: @workload[:date_range],
-                   workload_data: @workload[:data],
-                   period: @workload[:period]
-                 } %>
-    </div>
-  </div>
-
-  <div class="card mt-4">
-    <div class="card-header"><h5>Estatísticas da Seleção</h5></div>
-    <div class="card-body">
-      <p><strong>Carga Média:</strong> <%= @workload.dig(:summary, :average) %>%</p>
-      <p><strong>Carga Mediana:</strong> <%= @workload.dig(:summary, :median) %>%</p>
-    </div>
-  </div>
 <% end %>

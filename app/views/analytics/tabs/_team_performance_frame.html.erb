@@ -1,3 +1,5 @@
-<%= turbo_frame_tag "team_performance_tab_content", src: url_for(controller: 'analytics', action: 'team_performance_tab'), loading: :lazy do %>
+<%# ESTÁGIO 1: Frame da Aba %>
+<%# Este frame carrega todo o conteúdo da aba "Análise de Equipes" de forma assíncrona %>
+<%= turbo_frame_tag "team_performance_tab_content", src: analytics_team_performance_tab_path, loading: :lazy do %>
   <p><%= l(:label_loading) %>...</p>
 <% end %>

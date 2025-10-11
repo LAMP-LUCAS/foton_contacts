@@ -1,11 +1,19 @@
+<%# A resposta para uma requisição de frame DEVE conter um frame com o mesmo ID %>
 <%= turbo_frame_tag "team_performance_tab_content" do %>
+  <%# ESTÁGIO 2: Layout da Aba (Monolito) %>
+  <%# Define a estrutura de colunas e renderiza os componentes (Estágio 3) %>
   <div class="row">
+    <%# Coluna da Esquerda para o Gráfico %>
     <div class="col-md-7">
-      <%= render partial: 'analytics/components/team_radar_chart', locals: { chart_data: @chart_data } %>
+      <%= render partial: "analytics/components/team_radar_chart", locals: { scorecard_data: scorecard_data } %>
     </div>
+
+    <%# Coluna da Direita para a Tabela e Detalhes %>
     <div class="col-md-5">
-      <%= render partial: 'analytics/components/team_ranking_table', locals: { scorecard_data: @scorecard_data } %>
-      <%= turbo_frame_tag "team_details_card" %>
+      <%= render partial: "analytics/components/team_ranking_table", locals: { scorecard_data: scorecard_data } %>
+      
+      <%# Frame para carregar detalhes de uma equipe ao clicar na tabela %>
+      <%= turbo_frame_tag "team_details_card", class: "mt-4" %>
     </div>
   </div>
 <% end %>

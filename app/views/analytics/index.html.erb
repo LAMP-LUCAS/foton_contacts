@@ -1,9 +1,8 @@
-
 <div class="tabs" data-controller="show-tabs" data-show-tabs-initial-tab-value="<%= params[:tab].presence || @tabs.first[:name] %>">
   <ul>
     <% @tabs.each do |tab| %>
       <li>
-        <%# The link points to the main index action, and the Stimulus controller handles the tab switching %>
+        <%# O link aponta para a ação principal do índice, e o controller do Stimulus cuida da troca de abas %>
         <%= link_to l(tab[:label]), { controller: 'analytics', action: 'index', tab: tab[:name] },
                     data: { action: "click->show-tabs#showTab", "show-tabs-target": "tab", tab_name: tab[:name] },
                     id: "tab-link-#{tab[:name]}" %>
@@ -12,15 +11,16 @@
   </ul>
 </div>
 
+<%# Este loop renderiza o conteúdo de cada aba %>
 <% @tabs.each_with_index do |tab, i| %>
-  <%# The tab content is rendered here. The 'selected' class determines which tab is visible on page load. %>
   <div class="tab-content <%= (params[:tab].to_s == tab[:name].to_s || (params[:tab].blank? && i == 0)) ? 'selected' : nil %>" id="tab-<%= tab[:name] %>" data-show-tabs-target="content" data-tab-name="<%= tab[:name] %>">
-    <%# The partial is a 'frame' that contains the actual lazy-loaded turbo_frame_tag %>
+    <%# O controller define o caminho correto da partial em @tabs. Esta é a forma correta e dinâmica. %>
     <%= render partial: tab[:partial] %>
   </div>
 <% end %>
 
 <% content_for :header_tags do %>
-  <%= javascript_include_tag "application", plugin: "foton_contacts" %>
-  <%= stylesheet_link_tag 'contacts', plugin: 'foton_contacts' %>
+  <%# Abordagem final: Carregar Chart.js e Chartkick de CDNs para garantir que funcionem %>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartkick@4.2.0/dist/chartkick.min.js"></script>
 <% end %>

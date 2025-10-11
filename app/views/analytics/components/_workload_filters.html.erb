@@ -1,0 +1,31 @@
+<%# Este formulário mira diretamente no frame de resultados %>
+<%= form_tag(analytics_workload_results_path, 
+           method: :get, 
+           data: { "turbo-frame": "workload_results" }) do %>
+  <div class="card">
+    <div class="card-header"><h5>Filtros</h5></div>
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label for="filters_name" class="form-label">Nome</label>
+          <%= text_field_tag 'filters[name]', filter_params.dig(:filters, :name), class: 'form-control' %>
+        </div>
+        <div class="col-md-3">
+          <label for="filters_contact_type" class="form-label">Tipo</label>
+          <%= select_tag 'filters[contact_type]', options_for_select([['Todos', ''], ['Pessoa', 'person']], filter_params.dig(:filters, :contact_type)), class: 'form-select' %>
+        </div>
+        <div class="col-md-2">
+          <label for="period" class="form-label">Período</label>
+          <%= select_tag :period, options_for_select([['Mês', 'month'], ['Semana', 'week'], ['Ano', 'year']], filter_params[:period]), class: 'form-select' %>
+        </div>
+        <div class="col-md-2">
+          <label for="date" class="form-label">Data Base</label>
+          <%= date_field_tag :date, filter_params[:date], class: 'form-control' %>
+        </div>
+        <div class="col-md-2">
+          <%= submit_tag 'Aplicar', class: 'btn btn-primary w-100' %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

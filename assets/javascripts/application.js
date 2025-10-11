@@ -1,3 +1,5 @@
+//= require chartkick
+
 //= require controllers/contact_search_controller
 //= require controllers/tom_select_controller
 //= require controllers/analytics_tabs_controller

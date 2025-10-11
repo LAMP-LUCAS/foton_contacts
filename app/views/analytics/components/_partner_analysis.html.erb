@@ -1,20 +1,37 @@
 <div class="card mt-4">
   <div class="card-header"><h5>Análise de Empresas Parceiras</h5></div>
   <div class="card-body">
-    <% bubble_chart_data = partner_data.map { |d| { label: d[:name], data: d[:data] } } %>
-    <%= bubble_chart bubble_chart_data, library: {
-          scales: {
-            x: { title: { display: true, text: 'Experiência Média (anos)' } },
-            y: { title: { display: true, text: 'Estabilidade (%)' } }
-          },
-          plugins: {
-            tooltip: {
-              callbacks: {
-                label: raw("function(context) { const d = context.raw.r || 0; return `${context.dataset.label}: ${d} colaborador(es)`; }")
+    <%# 
+      Para um gráfico de bolhas, o Chartkick espera um array de séries.
+      Cada série tem um nome e um array de dados no formato [x, y, raio].
+    %> 
+    <% 
+      scatter_data = partner_data.map do |d|
+        { name: d[:name], data: d[:data] } 
+      end
+    %>
+
+    <%= scatter_chart scatter_data, library: {
+          type: 'bubble', # Diz ao Chart.js para usar o tipo 'bolha'
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false }, # Legenda não é útil com uma bolha por série
+              tooltip: {
+                callbacks: {
+                  label: raw("function(context) { const r = context.raw.r || 0; return `${context.dataset.label}: ${r} colaborador(es)`; }")
+                }
               }
+            },
+            scales: {
+              x: { title: { display: true, text: 'Experiência (Projetos)' } },
+              y: { title: { display: true, text: 'Performance (%)' } }
             }
           }
-        } %>
+        } 
+    %>
     <div class="small text-muted mt-2">Tamanho da bolha: Nº de colaboradores</div>
   </div>
 </div>
+

@@ -50,8 +50,7 @@ scope '/analytics', as: 'analytics' do
   get 'overview_tab', to: 'analytics#overview_tab'
   get 'team_performance_tab', to: 'analytics#team_performance_tab'
   get 'workload_tab', to: 'analytics#workload_tab'
-
-
+  get 'workload_results', to: 'analytics#workload_results'
 
 
   # Rotas para os widgets individuais (legado ou drill-down futuro)

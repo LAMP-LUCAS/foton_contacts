@@ -38,6 +38,8 @@ Para promover a reutilização e a clareza, a interface é dividida em component
 
 ### JavaScript com Stimulus
 
+> ATENÇÃO: Redmine 6.0.7 com Rails 7.2.2.2 não serve automaticamente arquivos JS da pasta assets/javascripts via /plugin_assets/... como fazia em versões anteriores.
+
 - **Interatividade Leve e Focada:** O Stimulus é usado para interatividade que complementa o ciclo do Hotwire. Os controllers Stimulus são pequenos e focados em um único comportamento, como:
     - Desabilitar um botão de "Salvar" durante o envio de um formulário.
     - Animar a adição/remoção de campos em formulários aninhados.

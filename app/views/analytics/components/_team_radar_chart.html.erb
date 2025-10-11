@@ -1,6 +1,38 @@
 <div class="card">
-  <div class="card-header"><h4>Comparativo de Performance das Equipes</h4></div>
+  <div class="card-header">
+    <h5 class="mb-0">Comparativo de Performance das Equipes</h5>
+  </div>
   <div class="card-body">
-    <%= radar_chart chart_data, height: '400px' %>
+    <%# 
+      Passo 1: Transformar os dados do Rails para o formato exato que o Chartkick.js espera.
+      Formato alvo: [{ name: "Serie1", data: [["LabelA", 10], ["LabelB", 20]] }, ...]
+    %> 
+    <% 
+      chart_data_for_js = scorecard_data.map do |team_data|
+        {
+          name: team_data[:group_name],
+          data: [
+            ['Qualidade', team_data[:avg_quality_score]],
+            ['Velocidade', team_data[:avg_velocity_score]],
+            ['Risco', team_data[:avg_risk_score]],
+            ['Coesão', team_data[:cohesion_score]]
+          ]
+        }
+      end
+    %>
+
+    <%# Passo 2: Criar um container div com um ID único para o gráfico %>
+    <div id="team-radar-chart-container" style="height: 350px;"></div>
+
+    <%# 
+      Passo 3: Chamar a biblioteca Chartkick.js diretamente, passando os dados e a opção de radar.
+    %>
+    <script>
+      // O script é executado assim que o Turbo o insere na página.
+      new Chartkick.LineChart("team-radar-chart-container", <%= raw chart_data_for_js.to_json %>, {
+        library: { options: { scales: { r: { suggestedMin: 0, suggestedMax: 100 } } } },
+        dataset: { type: 'radar' } 
+      });
+    </script>
   </div>
 </div>
