@@ -38,4 +38,5 @@ module ContactsHelper
     
     "#{group.name}#{role_text}"
   end
+
 end

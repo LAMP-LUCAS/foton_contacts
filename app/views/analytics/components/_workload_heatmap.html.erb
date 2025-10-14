@@ -1,12 +1,12 @@
 <div class="table-responsive">
-  <table class="table table-bordered">
+  <table class="table table-bordered table-sm" style="table-layout: fixed;">
     <thead>
       <tr>
-        <th><%= l(:label_contact) %></th>
+        <th style="width: 15%;"><%= l(:label_contact) %></th>
         <% date_range.each do |date_header| %>
-          <th style="text-align: center;">
+          <th style="text-align: center; width: 10%;">
             <% if period == :year %>
-              <%= l("date.month_names")[date_header.month] %>
+              <%= l("date.abbr_month_names")[date_header.month] %>
             <% elsif period == :month %>
               S<%= date_header.cweek %>
             <% else %>
@@ -14,32 +14,51 @@
             <% end %>
           </th>
         <% end %>
-        <th style="text-align: center;">Alocação</th>
       </tr>
     </thead>
     <tbody>
       <% contacts.each do |contact| %>
+        <% contact_workload = workload_data.fetch(contact, {}) %>
+        
+        <%# Linha 1: Carga Total %>
         <tr>
-          <td><%= link_to contact.name, contact_path(contact), data: { turbo: false } %></td>
-          <% date_range.each do |date_header| %>
-            <% percentage = workload_data.dig(contact, date_header).to_f %>
+          <td rowspan="2" style="vertical-align: middle;">
+            <%= link_to contact.name, contact_path(contact), data: { turbo: false } %>
+          </td>
+          <% date_range.each do |day| %>
+            <% day_data = contact_workload.fetch(day, {}) %>
+            <% total_hours = day_data.fetch(:individual, 0) + day_data.fetch(:group, 0) %>
+            <% total_percentage = workload_hours_to_percentage(total_hours, contact) %>
             <% 
-              css_class = ''
-              if percentage > 0 && percentage <= 85
-                css_class = 'workload-low'
-              elsif percentage > 85 && percentage <= 100
-                css_class = 'workload-medium'
-              elsif percentage > 100 && percentage <= 120
-                css_class = 'workload-high'
-              elsif percentage > 120
-                css_class = 'workload-overload'
-              end
+              css_class = case total_percentage
+                        when 1..85 then 'workload-low'
+                        when 86..100 then 'workload-medium'
+                        when 101..120 then 'workload-high'
+                        when 121..Float::INFINITY then 'workload-overload'
+                        else ''
+                        end
             %>
-            <td class="workload-cell <%= css_class %>">
-              <%= "#{percentage.to_i}%" if percentage > 0 %>
+            <td class="workload-cell <%= css_class %>" style="text-align: center; font-weight: bold;">
+              <%= "#{total_percentage}%" if total_percentage > 0 %>
             </td>
           <% end %>
-          <td class="workload-cell"><span class="badge"><%= workload_data.dig(contact, :average) %>%</span></td>
+        </tr>
+        
+        <%# Linha 2: Detalhe Individual vs Grupo %>
+        <tr class="workload-details-row">
+          <% date_range.each do |day| %>
+            <% day_data = contact_workload.fetch(day, {}) %>
+            <% individual_hours = day_data.fetch(:individual, 0) %>
+            <% group_hours = day_data.fetch(:group, 0) %>
+            <% total_hours = individual_hours + group_hours %>
+
+            <td style="text-align: center; font-size: 0.8em;">
+              <% if total_hours > 0 %>
+                <div>I: <%= workload_hours_to_percentage(individual_hours, contact) %>%</div>
+                <div>G: <%= workload_hours_to_percentage(group_hours, contact) %>%</div>
+              <% end %>
+            </td>
+          <% end %>
         </tr>
       <% end %>
     </tbody>
