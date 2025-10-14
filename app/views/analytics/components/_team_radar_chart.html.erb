@@ -12,10 +12,15 @@
         {
           name: team_data[:group_name],
           data: [
-            ['Qualidade', team_data[:avg_quality_score]],
-            ['Velocidade', team_data[:avg_velocity_score]],
-            ['Risco', team_data[:avg_risk_score]],
-            ['Coesão', team_data[:cohesion_score]]
+            # Para o gráfico, um valor maior deve ser sempre melhor.
+            # Qualidade: 100 - Índice de Retrabalho. Menos retrabalho = mais qualidade.
+            ['Qualidade', (100 - team_data[:avg_ir]).round(1)],
+            # Velocidade: 100 - Taxa de Atraso. Menos atraso = mais velocidade.
+            ['Velocidade', (100 - team_data[:avg_tah]).round(1)],
+            # Risco: 100 - Score de Risco. Menos risco = melhor.
+            ['Risco', (100 - team_data[:avg_risk_score]).round(1)],
+            # Coesão: Normalizada para uma escala de 0-100 (considerando 24 meses como 100%).
+            ['Coesão', ((team_data[:cohesion_index_months] / 24.0).clamp(0, 1) * 100).round(1)]
           ]
         }
       end

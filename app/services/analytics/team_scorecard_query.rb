@@ -16,6 +16,10 @@ module Analytics
 
       member_irpa_data = Analytics::IrpaCalculator.calculate_for_collection(@members)
       avg_risk_score = member_irpa_data.sum { |d| d[:risk_score] } / @members.size
+      
+      # Métricas para o Gráfico de Radar
+      avg_tah = member_irpa_data.sum { |d| d[:tah_percent] } / @members.size
+      avg_ir = member_irpa_data.sum { |d| d[:ir_percent] } / @members.size
 
       all_issues = @members.flat_map(&:issues).uniq
       closed_issues = all_issues.select { |i| i.status.is_closed? }
@@ -23,8 +27,13 @@ module Analytics
       aggregated_delay_rate = calculate_taa(closed_issues)
       cohesion_index = calculate_ice
 
-      # Fórmula de exemplo para o Score Geral
-      overall_score = (100 - avg_risk_score) * 0.5 + (100 - aggregated_delay_rate) * 0.3 + (cohesion_index / 12.0).clamp(0, 1) * 20
+      # Correção da fórmula do Score Geral para alinhar com bi_analysis_guide.md
+      # Fórmula: (1 - IRPA Médio/100) * 0.4 + (1 - TAA/100) * 0.4 + (ICE em meses / 12) * 0.2
+      # O resultado é uma pontuação de 0 a 1, que multiplicamos por 100 para a exibição.
+      score = (1 - avg_risk_score / 100.0) * 0.4 + \
+              (1 - aggregated_delay_rate / 100.0) * 0.4 + \
+              (cohesion_index / 12.0).clamp(0, 1) * 0.2
+      overall_score = score * 100
 
       {
         group_id: @group.id,
@@ -32,7 +41,10 @@ module Analytics
         avg_risk_score: avg_risk_score.round(2),
         aggregated_delay_rate: aggregated_delay_rate.round(2),
         cohesion_index_months: cohesion_index.round(1),
-        overall_score: overall_score.round(2)
+        overall_score: overall_score.round(2),
+        # Dados adicionados para o Gráfico de Radar
+        avg_tah: avg_tah.round(2),
+        avg_ir: avg_ir.round(2)
       }
     end
 

@@ -48,7 +48,9 @@ Para garantir a consistência e a qualidade, o desenvolvimento é guiado por um 
 
 ---
 
-### 🚀 Fase 3: Business Intelligence e Análises Avançadas (Em Planejamento)
+### 🚀 Fase 3: Business Intelligence e Análises Avançadas (Em Andamento)
+
+**Status Atual:** A arquitetura de backend e frontend para os dashboards de BI foi implementada. Os cálculos principais estão funcionais e as visualizações de dados (tabelas, gráficos) estão sendo renderizadas. O foco atual está no refinamento da UI e na validação completa dos dados apresentados.
 
 **Objetivo:** Transformar os dados do Foton Contacts em inteligência acionável. Esta fase foca em desenvolver dashboards, análises preditivas e relatórios visuais para que gestores possam tomar decisões mais informadas, mitigar riscos e otimizar a alocação de recursos, implementando a visão descrita em `@exemplos/BDD_analises.md` e `@exemplos/bi_analysis_guide.md`.
 
@@ -119,37 +121,51 @@ A implementação seguirá rigorosamente as diretrizes de `@docs/concepts.md` e 
 
 - [x] **Estrutura Base:** Criar a rota, action (`overview_tab`), frame e a partial de layout (`_overview.html.erb`).
 - [x] **Componente `_irpa_table.html.erb`:** Mover a lógica da tabela IRPA para um componente modular em `app/views/analytics/components/`.
-- [ ] **Componente `_data_quality.html.erb` (Novo):**
-    - [ ] Criar a partial do componente para o "Monitor de Qualidade dos Dados".
-    - [ ] Implementar a lógica no `AnalyticsController#overview_tab` para buscar as métricas de qualidade.
-    - [ ] Renderizar as métricas com barras de progresso no componente, dentro de um card.
-- [ ] **Componente `_partner_analysis.html.erb` (Novo):**
-    - [ ] Criar a partial do componente para a "Análise de Empresas Parceiras".
-    - [ ] Implementar a lógica no `AnalyticsController#overview_tab` para buscar os dados das empresas.
-    - [ ] Integrar o Gráfico de Bolhas (Bubble Chart) no componente, dentro de um card.
+- [x] **Componente `_data_quality.html.erb` (Novo):**
+    - [x] Criar a partial do componente para o "Monitor de Qualidade dos Dados".
+    - [x] Implementar a lógica no `AnalyticsController#overview_tab` para buscar as métricas de qualidade.
+    - [x] Renderizar as métricas com barras de progresso no componente, dentro de um card.
+- [x] **Componente `_partner_analysis.html.erb` (Novo):**
+    - [x] Criar a partial do componente para a "Análise de Empresas Parceiras".
+    - [x] Implementar a lógica no `AnalyticsController#overview_tab` para buscar os dados das empresas.
+    - [x] Integrar o Gráfico de Bolhas (Bubble Chart) no componente, dentro de um card.
 - [ ] **Estilo:** Aplicar o layout de colunas (`col-md-8` / `col-md-4`) e o estilo de "card" do mockup na partial de layout `_overview.html.erb`.
 
 ##### **Aba "Análise de Equipes" (`team_performance_tab`)**
 
-- [ ] **Estrutura Base:** Criar a action `team_performance_tab` e a partial de layout `tabs/_team_performance.html.erb`.
-- [ ] **Refatorar Frame:** Atualizar `tabs/_team_performance_frame.html.erb` para carregar a nova rota.
-- [ ] **Componente `_team_radar_chart.html.erb` (Novo):**
-    - [ ] Mover a lógica do Gráfico de Radar da antiga partial de widget para este novo componente.
-- [ ] **Componente `_team_ranking_table.html.erb` (Novo):**
-    - [ ] Mover a lógica da Tabela de Ranking para este novo componente.
-- [ ] **Layout da Aba:** Renderizar os componentes de gráfico e tabela em uma estrutura de colunas (`col-md-7` / `col-md-5`) com cards, conforme o mockup.
-- [ ] **Cleanup:** Remover a action `team_performance` e a view `widgets/_team_performance.html.erb`.
+- [x] **Estrutura Base:** Criar a action `team_performance_tab` e a partial de layout `tabs/_team_performance.html.erb`.
+- [x] **Refatorar Frame:** Atualizar `tabs/_team_performance_frame.html.erb` para carregar a nova rota.
+- [x] **Componente `_team_radar_chart.html.erb` (Novo):**
+    - [x] Mover a lógica do Gráfico de Radar da antiga partial de widget para este novo componente.
+- [x] **Componente `_team_ranking_table.html.erb` (Novo):**
+    - [x] Mover a lógica da Tabela de Ranking para este novo componente.
+- [x] **Layout da Aba:** Renderizar os componentes de gráfico e tabela em uma estrutura de colunas (`col-md-7` / `col-md-5`) com cards, conforme o mockup.
+- [x] **Cleanup:** Remover a action `team_performance` e a view `widgets/_team_performance.html.erb`.
 
 ##### **Aba "Carga de Trabalho" (`workload_tab`)**
 
-- [ ] **Estrutura Base:** Criar a action `workload_tab` e a partial de layout `tabs/_workload.html.erb`.
-- [ ] **Refatorar Frame:** Atualizar `tabs/_workload_frame.html.erb` para carregar a nova rota.
-- [ ] **Componente `_workload_heatmap.html.erb` (Novo):**
-    - [ ] Mover a lógica da tabela de Mapa de Calor para este novo componente.
-- [ ] **Componente `_workload_filters.html.erb` (Novo):**
-    - [ ] Criar um componente dedicado para os filtros avançados (nome, alocação, período).
-- [ ] **Layout da Aba:** Renderizar os filtros e o heatmap dentro de um único card, conforme o mockup.
-- [ ] **Cleanup:** Remover a action `workload` e a view `widgets/_workload.html.erb`.
+- [x] **Estrutura Base:** Criar a action `workload_tab` e a partial de layout `tabs/_workload.html.erb`.
+- [x] **Refatorar Frame:** Atualizar `tabs/_workload_frame.html.erb` para carregar a nova rota.
+- [x] **Componente `_workload_heatmap.html.erb` (Novo):**
+    - [x] Mover a lógica da tabela de Mapa de Calor para este novo componente.
+- [x] **Componente `_workload_filters.html.erb` (Novo):**
+    - [x] Criar um componente dedicado para os filtros avançados (nome, alocação, período).
+- [x] **Layout da Aba:** Renderizar os filtros e o heatmap dentro de um único card, conforme o mockup.
+- [x] **Cleanup:** Remover a action `workload` e a view `widgets/_workload.html.erb`.
+
+---
+
+### Fase 3.2: Alinhamento Visual do Dashboard
+
+**Objetivo:** Substituir o estilo padrão do Redmine pela identidade visual moderna (Bootstrap 5) definida no `mockup_Analises.html`. O foco é alinhar componentes como tabelas, cards e badges para criar uma experiência de usuário mais limpa e profissional.
+
+- [x] **Componentes Gerais:**
+    - [x] Substituir `<div class="box">` por `<div class="card">` com os cabeçalhos (`card-header`) e corpos (`card-body`) corretos.
+    - [x] Substituir `<table class="list">` por `<table class="table table-hover">` para um visual mais limpo.
+- [x] **Tabela de Ranking:**
+    - [x] Aplicar badges com cores (`bg-success`, `bg-warning`) para o score e a posição no ranking, conforme o mockup.
+- [x] **Mapa de Calor:**
+    - [x] Criar classes CSS específicas (`workload-low`, `workload-medium`, `workload-high`, `workload-overload`) para as células do heatmap, replicando a paleta de cores do mockup.
 
 ---
 

@@ -1,5 +1,7 @@
 <div class="card">
-  <div class="card-header"><h4>Ranking de Equipes</h4></div>
+  <div class="card-header">
+    <h5 class="mb-0">Ranking de Equipes</h5>
+  </div>
   <div class="card-body p-0">
     <div class="table-responsive">
       <table class="table table-hover mb-0">
@@ -14,11 +16,11 @@
         <tbody>
           <% scorecard_data.each_with_index do |data, index| %>
             <tr>
-              <td style="width: 15%; text-align: center;"><span class="badge badge-<%= index + 1 %>"><%= index + 1 %>º</span></td>
+              <td style="width: 15%; text-align: center;"><span class="badge bg-primary"><%= index + 1 %>º</span></td>
               <td>
-                                <%= link_to data[:group_name], url_for(controller: 'analytics', action: 'team_details', id: data[:group_id]), data: { turbo_frame: "team_details_card" } %>
+                <%= link_to data[:group_name], url_for(controller: 'analytics', action: 'team_details', id: data[:group_id]), data: { turbo_frame: "team_details_card" } %>
               </td>
-              <td><span class="badge badge-success"><%= data[:overall_score] %></span></td>
+              <td><span class="badge bg-success"><%= data[:overall_score] %></span></td>
               <td><%= data[:avg_risk_score] %>%</td>
             </tr>
           <% end %>
