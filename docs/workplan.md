@@ -196,6 +196,7 @@ A implementação seguirá rigorosamente as diretrizes de `@docs/concepts.md` e 
 - [x] **Refatorar Análise de Parceiros (`PartnerAnalysisQuery`):**
     - [x] Substituir o cálculo de turnover por uma métrica real baseada nos eventos de criação e destruição de `ContactEmployment`.
     - [x] Habilitar a análise temporal com filtros de data na interface.
+    - [x] Refatorar a query para usar o novo serviço `HistoricalStateQuery`, simplificando o código.
 - [x] **Refatorar Painel de Performance da Equipe (`TeamScorecardQuery`):**
     - [x] Substituir o cálculo de coesão (ICE) por uma métrica real baseada na duração da permanência dos membros nos grupos.
 - [x] **Aprimorar Análise de Risco (`IrpaCalculator`):**
