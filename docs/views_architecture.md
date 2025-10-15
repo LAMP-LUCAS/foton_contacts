@@ -59,6 +59,74 @@ graph TD
 
 ---
 
+## 5. Padrão de Arquitetura para Modais
+
+Para garantir consistência e robustez, todos os modais do plugin (seja para CRUD, análise ou qualquer outra finalidade) devem seguir um fluxo de 4 passos baseado em Turbo Frames e Turbo Streams. Este padrão centraliza a lógica no servidor e proporciona uma experiência de usuário fluida.
+
+1.  **Passo 1: O Receptáculo (A View Principal)**
+    -   Qualquer página que precise abrir um modal **deve** conter um `turbo_frame_tag` global, vazio e com `id="modal"`.
+    -   Este frame funciona como um "receptáculo" que será preenchido com o conteúdo do modal.
+    -   **Exemplo (`app/views/analytics/index.html.erb`):**
+        ```erb
+        <%# ... conteúdo da página ... %>
+        <%= turbo_frame_tag "modal", data: { controller: "modal" } %>
+        ```
+
+2.  **Passo 2: O Gatilho (O Link de Abertura)**
+    -   O link que aciona o modal (ex: "Editar Contato", "Ver Análise") **deve** apontar para a rota do controller que gera o conteúdo do modal.
+    -   Ele **deve** incluir o atributo `data: { turbo_frame: "modal" }` para instruir o Turbo a carregar a resposta dentro do receptáculo do Passo 1.
+    -   **Exemplo (`_irpa_table.html.erb`):**
+        ```erb
+        <%= link_to "Ver Análise", analytics_contact_details_path(id: contact.id), data: { turbo_frame: "modal" } %>
+        ```
+
+3.  **Passo 3: O Conteúdo (A Action e a Partial do Modal)**
+    -   A `action` do controller (ex: `analytics#contact_details`) busca os dados necessários.
+    -   Ela renderiza uma `partial` que contém o HTML do modal.
+    -   **Regra de Ouro:** O conteúdo desta partial **deve** ser envolvido por um `turbo_frame_tag` com o **mesmo ID "modal"**.
+    -   **Exemplo (`_details_modal.html.erb`):**
+        ```erb
+        <%= turbo_frame_tag "modal" do %>
+          <div class="modal-content">
+            <%# ... cabeçalho, corpo e conteúdo do modal ... %>
+          </div>
+        <% end %>
+        ```
+
+4.  **Passo 4: O Fechamento (Padrão Validado via Turbo Stream)**
+    -   O botão ou link de fechar dentro do modal **deve** ser um `link_to` que aponta para uma rota dedicada e genérica, como `close_modal_contacts_path`.
+    -   Este link **deve** usar o método `POST` via `data: { turbo_method: :post }`.
+    -   A `action` do controller para esta rota (ex: `ContactsController#close_modal`) **deve** responder com um `turbo_stream` que remove o frame do modal do DOM.
+    -   **Exemplo de Link (`_details_modal.html.erb`):**
+        ```erb
+        <%= link_to "&#10006;".html_safe, close_modal_contacts_path, class: "close", data: { turbo_method: :post } %>
+        ```
+    -   **Exemplo de Action (`contacts_controller.rb`):**
+        ```ruby
+        def close_modal
+          render turbo_stream: turbo_stream.remove("modal")
+        end
+        ```
+
+Este fluxo garante que o modal seja completamente removido da página, incluindo o backdrop escuro, evitando os bugs de "modal preso".
+
+```mermaid
+graph TD
+    subgraph "Ciclo de Vida do Modal"
+        A[Página com <turbo_frame id='modal'>] --> B(Usuário clica em <br/> `link_to ... data-turbo-frame='modal'`);
+        B --> C{Req GET para<br/>`contacts#edit`};
+        C --> D[Controller renderiza<br/>`edit.html.erb`];
+        D --> E[Resposta: `<turbo_frame id='modal'>...conteúdo...</turbo_frame>`];
+        E --> F[Modal aparece na tela];
+        F --> G(Usuário clica em <br/>`link_to close_modal_path, method: :post`);
+        G --> H{Req POST para<br/>`contacts#close_modal`};
+        H --> I[Controller renderiza<br/>`turbo_stream.remove("modal")`];
+        I --> J[Modal desaparece da tela];
+    end
+```
+
+---
+
 ## 5. Arquitetura do Dashboard de BI (Monolito-Modular)
 
 O Dashboard de BI utiliza uma arquitetura de três estágios para componentização e lazy-loading.

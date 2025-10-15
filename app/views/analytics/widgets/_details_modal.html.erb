@@ -2,7 +2,8 @@
   <div class="modal-content box">
     <div class="modal-header">
       <h3>Análise de Risco: <%= @contact.name %></h3>
-      <%= link_to "x", "#", class: "close", data: { action: "click->modal#close" } %>
+      <%# CORREÇÃO: Usa a rota e o método corretos para fechar o modal via Turbo Stream %>
+      <%= link_to "&#10006;".html_safe, close_modal_contacts_path, class: "close", data: { turbo_method: :post } %>
     </div>
     <div class="modal-body">
       <h4>Score IRPA: <span style="color: red;"><%= @irpa_data[:risk_score] %>%</span></h4>

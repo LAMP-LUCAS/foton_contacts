@@ -8,6 +8,7 @@
       <li><b>Dados de Saída:</b> Você verá uma tabela de contatos ordenada por risco, métricas de qualidade dos dados e um gráfico de bolhas para comparar empresas parceiras.</li>
     </ul>
   </details>
+
 <%= turbo_frame_tag "overview_tab_content", src: url_for(controller: 'analytics', action: 'overview_tab'), loading: :lazy do %>
   <p><%= l(:label_loading) %>...</p>
 <% end %>
