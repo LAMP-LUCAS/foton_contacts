@@ -1,3 +1,14 @@
+<details class="box"> 
+    <summary class="title">Sobre a Performance da Equipe</summary>
+    <p>Esta aba permite comparar a performance de diferentes equipes (grupos) com base em métricas agregadas de risco, qualidade e coesão, ajudando a identificar os times mais eficientes e a alocar projetos de forma mais inteligente.</p>
+    <ul>
+      <li><b>O que é analisado:</b> A performance coletiva de cada grupo, considerando o risco individual dos membros, a pontualidade agregada das entregas e a estabilidade da equipe.</li>
+      <li><b>Dados de Entrada:</b> Dados do `TeamScorecardQuery`, que por sua vez usa o histórico de tarefas (issues), os vínculos de membros aos grupos (`ContactGroupMembership`) e os dados de `Journal` para calcular a coesão.</li>
+      <li><b>Cálculos:</b> O sistema calcula o <strong>Score de Risco Médio (IRPA Médio)</strong>, a <strong>Taxa de Atraso Agregada (TAA)</strong> e o <strong>Índice de Coesão da Equipa (ICE)</strong>. Estes indicadores são combinados em um <strong>Score Geral</strong> que classifica a performance de cada equipe.</li>
+      <li><b>Dados de Saída:</b> Um <strong>Gráfico de Radar</strong> para comparação visual multidimensional e uma <strong>Tabela de Ranking</strong> que ordena as equipes pelo seu Score Geral.</li>
+    </ul>
+</details>
+
 <%# ESTÁGIO 1: Frame da Aba %>
 <%# Este frame carrega todo o conteúdo da aba "Análise de Equipes" de forma assíncrona %>
 <%= turbo_frame_tag "team_performance_tab_content", src: analytics_team_performance_tab_path, loading: :lazy do %>
