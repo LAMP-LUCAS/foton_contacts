@@ -75,6 +75,7 @@ A implementação seguirá rigorosamente as diretrizes de `@docs/concepts.md` e 
         -   [ ] Criar `Service/Query Objects` para cada análise principal descrita no `bi_analysis_guide.md`:
             -   `Analytics::IrpaCalculator` para o **Índice de Risco Preditivo de Alocação (IRPA)**.
             -   `Analytics::TeamScorecardQuery` para o **Painel de Performance da Equipa**.
+                - [x] Refatorar o cálculo do Índice de Coesão (ICE) para usar o histórico do `Journal`.
             -   [x] `Analytics::WorkloadQuery` para o **Mapa de Calor da Carga de Trabalho**.
             -   `Analytics::DataQualityMonitor` para a **Saúde dos Dados**.
     -   [ ] **1.3. Configuração de Carga Horária:** Adicionar os campos para configuração da carga horária global e por contato, conforme especificado no guia de BI.
@@ -169,22 +170,40 @@ A implementação seguirá rigorosamente as diretrizes de `@docs/concepts.md` e 
 
 ---
 
-### Fase 3.3: Fundamentação Histórica para BI com Journaling Avançado
+### ✅ Fase 3.3: Fundamentação Histórica para BI com Journaling Avançado (Concluída)
 
 **Objetivo:** Habilitar análises de BI baseadas em tendências e na evolução dos dados ao longo do tempo. Para isso, é necessário estender o sistema de journaling para capturar não apenas as alterações nos contatos, mas também os eventos de criação e destruição de relacionamentos-chave.
 
-- [ ] **1. Evoluir o `ActsAsJournalizedConcern`:**
-    - [ ] Adicionar suporte para callbacks de `after_create` e `after_destroy`.
-    - [ ] Renomear o callback de `after_save` para `create_update_journal_entry` para maior clareza.
-    - [ ] Implementar os novos métodos `create_creation_journal_entry` e `create_destruction_journal_entry` para registrar esses eventos no histórico com uma nota clara (ex: "Created", "Destroyed").
+- [x] **1. Evoluir o `ActsAsJournalizedConcern`:**
+    - [x] Adicionar suporte para callbacks de `after_create` e `after_destroy`.
+    - [x] Renomear o callback de `after_save` para `create_update_journal_entry` para maior clareza.
+    - [x] Implementar os novos métodos `create_creation_journal_entry` e `create_destruction_journal_entry` para registrar esses eventos no histórico com uma nota clara (ex: "Created", "Destroyed").
 
-- [ ] **2. Habilitar Journaling para Vínculos Empregatícios:**
-    - [ ] Incluir o `ActsAsJournalizedConcern` no modelo `ContactEmployment`.
-    - [ ] Configurar o `acts_as_journalized` para monitorar (`watch`) as alterações nos campos `start_date`, `end_date` e `position`.
+- [x] **2. Habilitar Journaling para Vínculos Empregatícios:**
+    - [x] Incluir o `ActsAsJournalizedConcern` no modelo `ContactEmployment`.
+    - [x] Configurar o `acts_as_journalized` para monitorar (`watch`) as alterações nos campos `start_date`, `end_date` e `position`.
 
-- [ ] **3. Habilitar Journaling para Grupos:**
-    - [ ] Incluir o `ActsAsJournalizedConcern` no modelo `ContactGroupMembership`.
-    - [ ] Configurar o `acts_as_journalized` sem a opção `watch`, pois o interesse principal é registrar a entrada e saída de membros (eventos de criação e destruição).
+- [x] **3. Habilitar Journaling para Grupos:**
+    - [x] Incluir o `ActsAsJournalizedConcern` no modelo `ContactGroupMembership`.
+    - [x] Configurar o `acts_as_journalized` sem a opção `watch`, pois o interesse principal é registrar a entrada e saída de membros (eventos de criação e destruição).
+
+---
+
+### Fase 3.4: Aplicação do Journaling nas Análises de BI
+
+**Objetivo:** Utilizar a base de journaling histórico para aprimorar as métricas de BI existentes, tornando-as mais precisas e permitindo análises de tendências ao longo do tempo.
+
+- [x] **Refatorar Análise de Parceiros (`PartnerAnalysisQuery`):**
+    - [x] Substituir o cálculo de turnover por uma métrica real baseada nos eventos de criação e destruição de `ContactEmployment`.
+    - [x] Habilitar a análise temporal com filtros de data na interface.
+- [x] **Refatorar Painel de Performance da Equipe (`TeamScorecardQuery`):**
+    - [x] Substituir o cálculo de coesão (ICE) por uma métrica real baseada na duração da permanência dos membros nos grupos.
+- [x] **Aprimorar Análise de Risco (`IrpaCalculator`):**
+    - [x] Criar uma nova métrica de "Instabilidade do Contato" baseada na frequência de alterações de status ou projeto no `Journal`.
+    - [x] Exibir o "Fator de Instabilidade" no modal de detalhes do contato, com visualização em barra de progresso.
+    - [ ] Habilitar a análise da evolução do `risk_score` de um contato ao longo do tempo.
+- [ ] **Criar Serviço de Snapshot Histórico (`Analytics::HistoricalStateQuery`):**
+    - [ ] Desenvolver um serviço que possa reconstruir o estado de um conjunto de dados em uma data específica no passado, permitindo análises "point-in-time".
 
 ---
 
@@ -219,6 +238,11 @@ A implementação seguirá rigorosamente as diretrizes de `@docs/concepts.md` e 
 ---
 
 ## 🐞 Backlog de Bugs
+
+### Erro de JavaScript intermitente no Dashboard de BI
+*   **Problema:** Um erro `Uncaught TypeError: Cannot read properties of undefined (reading 'start')` aparece no DevTools durante a navegação via Turbo Drive nas abas do dashboard de BI. O erro não parece quebrar a funcionalidade visível, mas polui o console.
+*   **Comportamento:** O erro não ocorre num recarregamento completo da página (Ctrl+R), apenas em navegações internas, o que aponta para um problema no ciclo de vida do Turbo e na inicialização de scripts.
+*   **Próxima Ação / Hipótese:** Investigar qual script (provavelmente um script global ou relacionado com gráficos) está a ser executado fora do seu contexto esperado durante as visitas do Turbo. A solução passará por adicionar uma "cláusula de guarda" para garantir que o script só corra quando os seus elementos alvo estiverem presentes na página.
 
 ### Botão de Excluir Vínculo no Modal de Edição Não Funciona
 *   **Problema:** No modal de edição de um contato, o link para remover um vínculo empregatício não funciona como esperado.

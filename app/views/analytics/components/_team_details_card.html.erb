@@ -1,28 +1,36 @@
 <%= turbo_frame_tag "team_details_card" do %>
-  <div class="card mt-4">
-    <div class="card-header">
-      <h5 class="mb-0">Detalhes da Equipe: <%= @scorecard_data[:group_name] %></h5>
+  <% if @scorecard_data.present? %>
+    <div class="card mt-4">
+      <div class="card-header">
+        <h5 class="mb-0">Detalhes da Equipe: <%= @scorecard_data[:group_name] %></h5>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <strong>Risco Médio (IRPA):</strong> <%= @scorecard_data[:avg_risk_score] %>%
+          <div class="progress mt-1">
+            <div class="progress-bar bg-danger" style="width: <%= @scorecard_data[:avg_risk_score] %>%"></div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <strong>Taxa de Atraso Agregada:</strong> <%= @scorecard_data[:aggregated_delay_rate] %>%
+          <div class="progress mt-1">
+            <div class="progress-bar bg-warning" style="width: <%= @scorecard_data[:aggregated_delay_rate] %>%"></div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <strong>Coesão da Equipe:</strong> <%= @scorecard_data[:cohesion_index_months] %> meses
+          <% cohesion_percentage = (@scorecard_data[:cohesion_index_months] / 12.0).clamp(0, 1) * 100 %>
+          <div class="progress mt-1">
+            <div class="progress-bar bg-info" style="width: <%= cohesion_percentage %>%"></div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="card-body">
-      <div class="mb-3">
-        <strong>Risco Médio (IRPA):</strong> <%= @scorecard_data[:avg_risk_score] %>%
-        <div class="progress mt-1">
-          <div class="progress-bar bg-danger" style="width: <%= @scorecard_data[:avg_risk_score] %>%"></div>
-        </div>
-      </div>
-      <div class="mb-3">
-        <strong>Taxa de Atraso Agregada:</strong> <%= @scorecard_data[:aggregated_delay_rate] %>%
-        <div class="progress mt-1">
-          <div class="progress-bar bg-warning" style="width: <%= @scorecard_data[:aggregated_delay_rate] %>%"></div>
-        </div>
-      </div>
-      <div class="mb-3">
-        <strong>Coesão da Equipe:</strong> <%= @scorecard_data[:cohesion_index_months] %> meses
-        <% cohesion_percentage = (@scorecard_data[:cohesion_index_months] / 12.0).clamp(0, 1) * 100 %>
-        <div class="progress mt-1">
-          <div class="progress-bar bg-info" style="width: <%= cohesion_percentage %>%"></div>
-        </div>
+  <% else %>
+    <div class="card mt-4">
+      <div class="card-body nodata">
+        <%= l(:label_error_loading_data) %>
       </div>
     </div>
-  </div>
+  <% end %>
 <% end %>

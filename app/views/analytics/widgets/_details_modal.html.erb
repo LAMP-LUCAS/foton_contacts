@@ -2,17 +2,42 @@
   <div class="modal-content box">
     <div class="modal-header">
       <h3>Análise de Risco: <%= @contact.name %></h3>
-      <%# CORREÇÃO: Usa a rota e o método corretos para fechar o modal via Turbo Stream %>
       <%= link_to "&#10006;".html_safe, close_modal_contacts_path, class: "close", data: { turbo_method: :post } %>
     </div>
     <div class="modal-body">
-      <h4>Score IRPA: <span style="color: red;"><%= @irpa_data[:risk_score] %>%</span></h4>
+      <h4>Score IRPA: <span class="risk-high"><%= number_with_precision(@irpa_data[:risk_score], precision: 1) %>%</span></h4>
       <hr />
-      <p><strong>Taxa de Atraso Histórica:</strong> <%= @irpa_data[:tah_percent] %>%</p>
-      <p><strong>Índice de Retrabalho:</strong> <%= @irpa_data[:ir_percent] %>%</p>
-      <p><strong>Fator de Criticidade Ponderado (médio):</strong> <%= @irpa_data[:fcp_avg] %></p>
+
+      <div class="mb-3">
+        <strong>Taxa de Atraso Histórica (TAH):</strong> <%= number_with_precision(@irpa_data[:tah_percent], precision: 1) %>%
+        <div class="progress mt-1">
+          <div class="progress-bar bg-danger" style="width: <%= @irpa_data[:tah_percent] %>%"></div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <strong>Índice de Retrabalho (IR):</strong> <%= number_with_precision(@irpa_data[:ir_percent], precision: 1) %>%
+        <div class="progress mt-1">
+          <div class="progress-bar bg-danger" style="width: <%= @irpa_data[:ir_percent] %>%"></div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <strong>Fator de Instabilidade:</strong> <%= number_with_precision(@irpa_data[:instability_factor], precision: 1) %>%
+        <div class="progress mt-1">
+          <div class="progress-bar bg-warning" style="width: <%= @irpa_data[:instability_factor] %>%"></div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <strong>Fator de Criticidade Ponderado (FCP):</strong> <%= number_with_precision(@irpa_data[:fcp_avg], precision: 2) %>
+        <% fcp_percentage = (@irpa_data[:fcp_avg] / 5.0).clamp(0, 1) * 100 # Normaliza assumindo que a prioridade máxima tem posição ~5 %>
+        <div class="progress mt-1">
+          <div class="progress-bar bg-info" style="width: <%= fcp_percentage %>%"></div>
+        </div>
+      </div>
       
-      <h4>Histórico Profissional</h4>
+      <h4 class="mt-4">Histórico Profissional</h4>
       <% if @contact.employments_as_person.any? %>
         <ul>
           <% @contact.employments_as_person.each do |employment| %>
