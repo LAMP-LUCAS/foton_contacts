@@ -3,29 +3,32 @@ module Analytics
     # Service object to calculate the Predictive Allocation Risk Index (IRPA)
     # Formula: (TAH * 0.4) + (IR * 0.3) + (FCP * 0.2) + (Instability * 0.1)
 
-    def self.calculate_for_contact(contact)
-      new(contact).calculate
+    def self.calculate_for_contact(contact, date = Date.today)
+      new(contact, date).calculate
     end
 
-    def self.calculate_for_collection(contacts)
-      contacts.map { |contact| new(contact).calculate }
+    def self.calculate_for_collection(contacts, date = Date.today)
+      contacts.map { |contact| new(contact, date).calculate }
     end
 
-    def initialize(contact)
+    def initialize(contact, date = Date.today)
       @contact = contact
-      @issues = @contact.issues.includes(:status, :tracker, :priority)
+      @date = date
+      # Issues that were active at some point before the target date
+      @issues = @contact.issues.where("issues.created_on <= ?", @date).includes(:status, :tracker, :priority)
     end
 
     def calculate
-      closed_issues = @issues.select { |i| i.status.is_closed? }
-      open_issues = @issues.reject { |i| i.status.is_closed? }
+      # Issues closed on or before the target date
+      closed_issues = @issues.select { |i| i.status.is_closed? && i.closed_on && i.closed_on.to_date <= @date }
+      # Issues open on the target date
+      open_issues = @issues.reject { |i| i.status.is_closed? && i.closed_on && i.closed_on.to_date <= @date }
 
       tah = calculate_tah(closed_issues)
       ir = calculate_ir(closed_issues)
       fcp = calculate_fcp(open_issues)
       instability = calculate_instability_factor
 
-      # Rebalanced formula to include the new instability factor
       risk_score = (tah * 0.4) + (ir * 0.3) + (fcp * 0.2) + (instability * 0.1)
 
       {
@@ -41,7 +44,6 @@ module Analytics
 
     private
 
-    # Taxa de Atraso Histórica (TAH)
     def calculate_tah(closed_issues)
       return 0 if closed_issues.empty?
 
@@ -49,7 +51,6 @@ module Analytics
       (late_issues_count.to_f / closed_issues.count) * 100
     end
 
-    # Índice de Retrabalho (IR)
     def calculate_ir(closed_issues)
       return 0 if closed_issues.empty?
 
@@ -58,7 +59,6 @@ module Analytics
       (rework_issues_count.to_f / closed_issues.count) * 100
     end
 
-    # Fator de Criticidade Ponderado (FCP)
     def calculate_fcp(open_issues)
       return 0 if open_issues.empty?
 
@@ -66,17 +66,14 @@ module Analytics
       (total_priority_position.to_f / open_issues.count)
     end
 
-    # Fator de Instabilidade do Contato
     def calculate_instability_factor
-      # Counts how many times the contact's status or project has changed in the last 6 months.
+      # Counts changes in the 6 months prior to the target date.
       change_count = @contact.journals
-                              .where("created_on >= ?", 6.months.ago)
+                              .where(created_on: (@date - 6.months)..@date)
                               .joins(:details)
                               .where(journal_details: { prop_key: ['status', 'project_id'] })
                               .count
 
-      # Normalizes the factor: each change adds 20 points, capped at 100.
-      # This means 5 or more changes in 6 months result in maximum instability.
       [change_count * 20, 100].min.to_f
     end
   end

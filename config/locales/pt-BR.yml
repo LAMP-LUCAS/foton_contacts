@@ -162,3 +162,12 @@ pt-BR:
   label_employee: "Colaborador"
 
   label_employment_edit: "Editar Vínculo"
+
+  # Journal descriptions
+  label_foton_journal_employment_created: "Iniciou vínculo como \"%{position}\" na %{company}"
+  label_foton_journal_employment_destroyed: "Encerrou vínculo com %{company}"
+  label_foton_journal_employment_updated: "Vínculo atualizado: %{field} alterado de '%{old}' para '%{new}'"
+  label_foton_journal_group_added: "Adicionado ao grupo: %{group}"
+  label_foton_journal_group_removed: "Removido do grupo: %{group}"
+  label_foton_journal_group_role_updated: "Função no grupo %{group} alterada de '%{old}' para '%{new}'"
+  label_foton_journal_issue_role_updated: "Função na tarefa %{issue} alterada de '%{old}' para '%{new}'"

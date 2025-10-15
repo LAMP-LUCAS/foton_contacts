@@ -39,4 +39,53 @@ module ContactsHelper
     "#{group.name}#{role_text}"
   end
 
+  def render_foton_journal_entry(journal)
+    content = []
+    
+    # Eager load journalized object if not already loaded
+    journalized = journal.journalized
+    return "" unless journalized
+
+    case journal.journalized_type
+    when 'Contact'
+      journal.details.each do |detail|
+        content << show_detail(detail, true)
+      end
+    when 'ContactEmployment'
+      if journal.notes == 'Created'
+        content << l(:label_foton_journal_employment_created, position: journalized.position, company: link_to(journalized.company.name, journalized.company))
+      elsif journal.notes == 'Destroyed'
+        content << l(:label_foton_journal_employment_destroyed, company: link_to(journalized.company.name, journalized.company))
+      else
+        journal.details.each do |detail|
+          content << l(:label_foton_journal_employment_updated, 
+                       field: l("field_#{detail.prop_key}".to_sym), 
+                       old: detail.old_value, 
+                       new: detail.value)
+        end
+      end
+    when 'ContactGroupMembership'
+      if journal.notes == 'Created'
+        content << l(:label_foton_journal_group_added, group: link_to(journalized.contact_group.name, journalized.contact_group))
+      elsif journal.notes == 'Destroyed'
+        content << l(:label_foton_journal_group_removed, group: link_to(journalized.contact_group.name, journalized.contact_group))
+      else # Role changed
+        journal.details.each do |detail|
+          content << l(:label_foton_journal_group_role_updated, 
+                       group: link_to(journalized.contact_group.name, journalized.contact_group),
+                       old: detail.old_value, 
+                       new: detail.value)
+        end
+      end
+    when 'ContactIssueLink'
+      journal.details.each do |detail|
+        content << l(:label_foton_journal_issue_role_updated, 
+                     issue: link_to("##{journalized.issue.id}", journalized.issue),
+                     old: detail.old_value, 
+                     new: detail.value)
+      end
+    end
+    
+    content.map { |c| "<li>#{c}</li>" }.join.html_safe
+  end
 end

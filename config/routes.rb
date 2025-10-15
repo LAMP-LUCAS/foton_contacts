@@ -62,6 +62,7 @@ scope '/analytics', as: 'analytics' do
   get 'contact_details/:id', to: 'analytics#contact_details', as: :contact_details
   get 'dynamic_dashboard', to: 'analytics#dynamic_dashboard', as: :dynamic_dashboard
   get 'team_details/:id', to: 'analytics#team_details', as: :team_details
+  get 'irpa_trend/:contact_id', to: 'analytics#irpa_trend', as: :irpa_trend
 end
 
 # Configurações do plugin

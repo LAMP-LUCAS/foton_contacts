@@ -47,6 +47,10 @@
       <% else %>
         <p class="nodata">Nenhum histórico profissional cadastrado.</p>
       <% end %>
+
+      <%= turbo_frame_tag "irpa_trend_chart", src: analytics_irpa_trend_path(contact_id: @contact.id) do %>
+        <p><%= l(:label_loading) %>...</p>
+      <% end %>
     </div>
   </div>
 <% end %>

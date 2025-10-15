@@ -1,6 +1,7 @@
 require 'redmine'
 require_relative 'lib/hooks/views_layouts_hook'
 require_relative 'lib/acts_as_journalized_concern'
+require_relative 'lib/journalizable_dummies_concern'
 
 
 # require_dependency 'foton_contacts/hooks'

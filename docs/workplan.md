@@ -203,8 +203,8 @@ A implementação seguirá rigorosamente as diretrizes de `@docs/concepts.md` e 
     - [x] Criar uma nova métrica de "Instabilidade do Contato" baseada na frequência de alterações de status ou projeto no `Journal`.
     - [x] Exibir o "Fator de Instabilidade" no modal de detalhes do contato, com visualização em barra de progresso.
     - [ ] Habilitar a análise da evolução do `risk_score` de um contato ao longo do tempo.
-- [ ] **Criar Serviço de Snapshot Histórico (`Analytics::HistoricalStateQuery`):**
-    - [ ] Desenvolver um serviço que possa reconstruir o estado de um conjunto de dados em uma data específica no passado, permitindo análises "point-in-time".
+- [x] **Criar Serviço de Snapshot Histórico (`Analytics::HistoricalStateQuery`):**
+    - [x] Desenvolver um serviço que possa reconstruir o estado de um conjunto de dados em uma data específica no passado, permitindo análises "point-in-time".
 
 ---
 

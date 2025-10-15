@@ -61,14 +61,26 @@ A interface foi completamente modernizada com **Hotwire (Turbo + Stimulus)** par
 
 ### Análises e Business Intelligence
 
-O plugin integra um módulo de análise para transformar dados de contatos e projetos em inteligência acionável.
+O plugin integra um módulo de análise para transformar dados de contatos e projetos em inteligência acionável, com um foco em análise histórica e preditiva.
 
-- **Dashboard de Análises:** Uma área dedicada com múltiplos painéis para visualização de dados gerenciais.
+- **Dashboard de Análises:** Uma área dedicada com múltiplos painéis (Visão Geral, Performance da Equipe, Carga de Trabalho) para visualização de dados gerenciais.
+
+- **Índice de Risco Preditivo de Alocação (IRPA):**
+  - Calcula um score de risco para cada contato, permitindo identificar proativamente possíveis gargalos.
+  - A fórmula foi aprimorada para incluir não apenas o desempenho em tarefas (atrasos, retrabalho), mas também um **Fator de Instabilidade**, que mede a frequência com que o status ou o projeto de um contato mudam, com base no seu histórico no `Journal`.
+
+- **Painel de Performance da Equipe:**
+  - Compara o desempenho de diferentes grupos através de um Gráfico de Radar e uma tabela de ranking.
+  - A métrica de **Índice de Coesão da Equipa (ICE)** foi aprimorada para usar o `Journal`, calculando a duração real da permanência de cada membro no grupo e fornecendo um dado de estabilidade muito mais preciso.
+
+- **Análise de Parceiros:**
+  - Um gráfico de bolhas na "Visão Geral" permite comparar a estabilidade e a experiência das equipes de empresas parceiras.
+  - A métrica de **Turnover** agora é calculada com precisão, usando o histórico de criação e destruição de vínculos empregatícios (`ContactEmployment`) registrados no `Journal`. A análise pode ser filtrada por período.
+
 - **Mapa de Calor de Carga de Trabalho (Workload):**
   - Visualiza a alocação percentual de cada membro da equipe por dia, semana ou mês.
   - Identifica rapidamente períodos de sobrecarga ou ociosidade.
-  - Permite filtrar a análise por projeto, focando no trabalho relevante.
-  - Oferece a opção de analisar **horas estimadas** (planejamento) ou **horas lançadas** (realidade), permitindo uma comparação direta entre o previsto e o executado.
+  - Permite filtrar a análise por projeto e alternar entre horas estimadas e lançadas.
 
 ---
 

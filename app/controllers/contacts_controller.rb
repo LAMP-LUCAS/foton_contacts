@@ -196,7 +196,24 @@ class ContactsController < ApplicationController
   end
   
   def history
-    @journals = @contact.journals.includes(:user).reorder('created_on DESC')
+    employment_ids = @contact.employments_as_person.pluck(:id)
+    if @contact.company?
+      employment_ids += @contact.employments_as_company.pluck(:id)
+    end
+    membership_ids = @contact.contact_group_memberships.pluck(:id)
+
+    # Fetch journals from all sources related to the contact
+    @journals = Journal.where(
+      "(journalized_type = :contact_type AND journalized_id = :contact_id) OR " \
+      "(journalized_type = :employment_type AND journalized_id IN (:employment_ids)) OR " \
+      "(journalized_type = :membership_type AND journalized_id IN (:membership_ids))",
+      {
+        contact_type: 'Contact', contact_id: @contact.id,
+        employment_type: 'ContactEmployment', employment_ids: employment_ids.uniq,
+        membership_type: 'ContactGroupMembership', membership_ids: membership_ids
+      }
+    ).includes(:user, :details, :journalized).reorder('created_on DESC')
+
     render partial: 'contacts/show_tabs/history', layout: false
   end
   

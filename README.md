@@ -22,12 +22,11 @@ Com uma interface moderna e reativa construída com **Hotwire**, o plugin transf
     - Vincule múltiplos contatos e grupos diretamente a qualquer tarefa do Redmine.
     - Atribua **funções** específicas aos contatos em uma tarefa (ex: "Aprovador", "Fornecedor", "Cliente").
     - Busque e adicione contatos a uma tarefa de forma rápida, sem sair da tela da tarefa.
-- **Visualização Analítica (BI):**
-    - Acesse um modal de análise para cada contato, com informações sobre carreira e projetos.
-    - Utilize o **Dashboard de Análises** para uma visão gerencial completa.
-    - **Mapa de Calor de Carga de Trabalho (Workload):** Visualize a alocação da equipe ao longo do tempo, identifique gargalos e ociosidade.
-        - Filtre a análise por projeto.
-        - Alterne a visualização entre **horas estimadas** e **horas lançadas** para comparar planejamento e realidade.
+- **Visualização Analítica e Histórica (BI):**
+    - Utilize o **Dashboard de Análises** para uma visão gerencial completa com métricas que evoluem ao longo do tempo.
+    - Identifique contatos de risco com o **Índice de Risco Preditivo (IRPA)**, agora aprimorado com um **Fator de Instabilidade** baseado no histórico de mudanças do contato.
+    - Monitore a saúde de suas parcerias com análises precisas de **turnover** e **coesão de equipe**, calculadas a partir do histórico de vínculos.
+    - Visualize a alocação da equipe com o **Mapa de Calor de Carga de Trabalho (Workload)** para otimizar a distribuição de tarefas.
 - **Importação e Exportação:** Importe contatos de arquivos CSV e exporte para vCard e CSV.
 
 Para uma lista exaustiva de todas as funcionalidades e um manual detalhado, consulte nosso **[Roadmap e Manual de Funcionalidades](docs/ROADMAP.md)**.

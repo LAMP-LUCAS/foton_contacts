@@ -35,24 +35,23 @@
 
 class ContactEmployment < ApplicationRecord
   include ActsAsJournalizedConcern
+  include JournalizableDummiesConcern
   acts_as_journalized watch: %w(position start_date end_date)
 
   belongs_to :contact, class_name: 'Contact'
   belongs_to :company, class_name: 'Contact'
 
-  #STATUSES = %w(active inactive archived).freeze
-
   validates :contact_id, presence: true
   validates :company_id, presence: true
   validates :contact_id, uniqueness: { scope: :company_id, message: "já possui um vínculo com esta empresa no mesmo período. Tente mudar o período ou a empresa." }
   validates :position, length: { maximum: 255 }, allow_blank: true
-  #validates :status, presence: true, inclusion: { in: STATUSES }
 
   validate :contact_must_be_person
   validate :company_must_be_company
-  # Escopos para facilitar consultas
+
   scope :active, -> { where(end_date: nil) }
   scope :inactive, -> { where.not(end_date: nil) }
+
   private
 
   def contact_must_be_person

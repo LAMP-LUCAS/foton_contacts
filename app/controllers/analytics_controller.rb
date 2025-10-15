@@ -93,6 +93,18 @@ class AnalyticsController < ApplicationController
     render partial: 'analytics/widgets/dynamic_dashboard'
   end
 
+  def irpa_trend
+    contact = Contact.find(params[:contact_id])
+    trend_data = {}
+    (0..5).to_a.reverse.each do |i|
+      date = i.months.ago.end_of_month
+      irpa_data = Analytics::IrpaCalculator.calculate_for_contact(contact, date)
+      trend_data[date.strftime("%b %Y")] = irpa_data[:risk_score]
+    end
+    
+    render partial: 'analytics/widgets/irpa_trend_chart', locals: { trend_data: trend_data }
+  end
+
   private
 
   def get_analytics_tabs
