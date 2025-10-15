@@ -59,11 +59,26 @@ A interface foi completamente modernizada com **Hotwire (Turbo + Stimulus)** par
 
 - **Testes de Integração:** Cobertura de testes de integração para o `ContactsController`, validando as principais ações de CRUD e filtros.
 
+### Análises e Business Intelligence
+
+O plugin integra um módulo de análise para transformar dados de contatos e projetos em inteligência acionável.
+
+- **Dashboard de Análises:** Uma área dedicada com múltiplos painéis para visualização de dados gerenciais.
+- **Mapa de Calor de Carga de Trabalho (Workload):**
+  - Visualiza a alocação percentual de cada membro da equipe por dia, semana ou mês.
+  - Identifica rapidamente períodos de sobrecarga ou ociosidade.
+  - Permite filtrar a análise por projeto, focando no trabalho relevante.
+  - Oferece a opção de analisar **horas estimadas** (planejamento) ou **horas lançadas** (realidade), permitindo uma comparação direta entre o previsto e o executado.
+
 ---
 
-## 🎯 Fase 3: Análises e Business Intelligence (Próximos Passos)
+## 🎯 Próximos Passos
 
-A próxima grande fase de desenvolvimento se concentrará em transformar os dados de contatos e seus relacionamentos em inteligência acionável. O objetivo é construir dashboards e ferramentas de análise que permitam aos usuários visualizar, explorar e extrair insights valiosos da sua rede de contatos diretamente no Redmine.
+A próxima grande fase de desenvolvimento se concentrará em expandir as ferramentas de análise para incluir:
+
+- **Índice de Risco Preditivo de Alocação (IRPA):** Uma métrica para identificar proativamente os contatos com maior risco de se tornarem gargalos.
+- **Painel de Performance da Equipe:** Gráficos e rankings para comparar a performance entre diferentes equipes ou grupos.
+- **Monitor de Qualidade dos Dados:** Ferramentas para garantir que os dados dos contatos estejam sempre completos e atualizados.
 
 ---
 

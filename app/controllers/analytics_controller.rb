@@ -1,4 +1,6 @@
 class AnalyticsController < ApplicationController
+  helper :analytics
+  helper :contacts
   helper Chartkick::Helper if Redmine::Plugin.installed?(:chartkick)
   before_action :authorize_global
 
@@ -32,7 +34,7 @@ class AnalyticsController < ApplicationController
   end
 
   def workload_results
-    @filter_params = params.permit(:period, :date, filters: [:name, :contact_type])
+    @filter_params = params.permit(:period, :date, filters: [:name, :contact_type, :project_id])
     period = @filter_params[:period]&.to_sym || :month
     date = @filter_params[:date].present? ? Date.parse(@filter_params[:date]) : Date.today
 

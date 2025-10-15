@@ -18,48 +18,166 @@
     </thead>
     <tbody>
       <% contacts.each do |contact| %>
-        <% contact_workload = workload_data.fetch(contact, {}) %>
-        
-        <%# Linha 1: Carga Total %>
-        <tr>
-          <td rowspan="2" style="vertical-align: middle;">
-            <%= link_to contact.name, contact_path(contact), data: { turbo: false } %>
-          </td>
-          <% date_range.each do |day| %>
-            <% day_data = contact_workload.fetch(day, {}) %>
-            <% total_hours = day_data.fetch(:individual, 0) + day_data.fetch(:group, 0) %>
-            <% total_percentage = workload_hours_to_percentage(total_hours, contact) %>
-            <% 
-              css_class = case total_percentage
-                        when 1..85 then 'workload-low'
-                        when 86..100 then 'workload-medium'
-                        when 101..120 then 'workload-high'
-                        when 121..Float::INFINITY then 'workload-overload'
-                        else ''
-                        end
-            %>
-            <td class="workload-cell <%= css_class %>" style="text-align: center; font-weight: bold;">
-              <%= "#{total_percentage}%" if total_percentage > 0 %>
+        <tbody data-controller="toggle">
+          <%# Linha 1: Carga Total (Clicável) %>
+          <tr class="clickable" data-action="click->toggle#toggle">
+            <td>
+              <span class="icon icon-expander"></span>
+              <%= link_to contact.name, contact_path(contact), data: { turbo: false } %>
             </td>
-          <% end %>
-        </tr>
-        
-        <%# Linha 2: Detalhe Individual vs Grupo %>
-        <tr class="workload-details-row">
-          <% date_range.each do |day| %>
-            <% day_data = contact_workload.fetch(day, {}) %>
-            <% individual_hours = day_data.fetch(:individual, 0) %>
-            <% group_hours = day_data.fetch(:group, 0) %>
-            <% total_hours = individual_hours + group_hours %>
+            <% date_range.each do |period_date| %>
+              <% 
+                # Calcular horas totais para este período (dia/semana/mês)
+                total_hours = 0.0
+                individual_hours = 0.0
+                group_hours = 0.0
+                
+                case period
+                when :week
+                  # Período diário - usar dados do dia específico
+                  day_data = workload_data.dig(contact.id, period_date.to_s) || {}
+                  individual_hours = day_data.fetch(:individual, 0)
+                  group_hours = day_data.fetch(:group, 0)
+                  total_hours = individual_hours + group_hours
+                  
+                when :month
+                  # Período semanal - somar todos os dias da semana
+                  week_start = period_date
+                  week_end = period_date.end_of_week
+                  (week_start..week_end).each do |day|
+                    day_data = workload_data.dig(contact.id, day.to_s) || {}
+                    individual_hours += day_data.fetch(:individual, 0)
+                    group_hours += day_data.fetch(:group, 0)
+                  end
+                  total_hours = individual_hours + group_hours
+                  
+                when :year
+                  # Período mensal - somar todos os dias do mês
+                  month_start = period_date
+                  month_end = period_date.end_of_month
+                  (month_start..month_end).each do |day|
+                    day_data = workload_data.dig(contact.id, day.to_s) || {}
+                    individual_hours += day_data.fetch(:individual, 0)
+                    group_hours += day_data.fetch(:group, 0)
+                  end
+                  total_hours = individual_hours + group_hours
+                end
 
-            <td style="text-align: center; font-size: 0.8em;">
-              <% if total_hours > 0 %>
-                <div>I: <%= workload_hours_to_percentage(individual_hours, contact) %>%</div>
-                <div>G: <%= workload_hours_to_percentage(group_hours, contact) %>%</div>
-              <% end %>
-            </td>
-          <% end %>
-        </tr>
+                # Calcular percentual baseado no período
+                total_percentage = case period
+                                  when :week
+                                    workload_hours_to_percentage(total_hours, contact)
+                                  when :month
+                                    available_hours = contact.available_hours_per_day.to_f > 0 ? contact.available_hours_per_day.to_f : 8.0
+                                    weekly_available = available_hours * 5 # 5 dias úteis por semana
+                                    weekly_available > 0 ? ((total_hours / weekly_available) * 100).round : 0
+                                  when :year
+                                    available_hours = contact.available_hours_per_day.to_f > 0 ? contact.available_hours_per_day.to_f : 8.0
+                                    num_working_days = working_days_in_month(period_date)
+                                    monthly_available = available_hours * num_working_days
+                                    monthly_available > 0 ? ((total_hours / monthly_available) * 100).round : 0
+                                  else
+                                    0
+                                  end
+
+                css_class = case total_percentage
+                           when 1..85 then 'workload-low'
+                           when 86..100 then 'workload-medium'
+                           when 101..120 then 'workload-high'
+                           when 121..Float::INFINITY then 'workload-overload'
+                           else ''
+                           end
+              %>
+              <td class="workload-cell <%= css_class %>" style="text-align: center; font-weight: bold;">
+                <% if total_percentage > 0 %>
+                  <%= "#{total_percentage}%" %>
+                  <small class="d-block" style="font-size: 0.7em; font-weight: normal;">
+                    <%= "%.1fh" % total_hours %>
+                  </small>
+                <% else %>
+                  -
+                <% end %>
+              </td>
+            <% end %>
+          </tr>
+          
+          <%# Linha 2: Detalhe Individual vs Grupo (Oculta por padrão) %>
+          <tr class="workload-details-row hidden" data-toggle-target="toggleable">
+            <td class="text-end"><em>Detalhes:</em></td>
+            <% date_range.each do |period_date| %>
+              <% 
+                individual_hours = 0.0
+                group_hours = 0.0
+                
+                case period
+                when :week
+                  day_data = workload_data.dig(contact.id, period_date.to_s) || {}
+                  individual_hours = day_data.fetch(:individual, 0)
+                  group_hours = day_data.fetch(:group, 0)
+                  
+                when :month
+                  week_start = period_date
+                  week_end = period_date.end_of_week
+                  (week_start..week_end).each do |day|
+                    day_data = workload_data.dig(contact.id, day.to_s) || {}
+                    individual_hours += day_data.fetch(:individual, 0)
+                    group_hours += day_data.fetch(:group, 0)
+                  end
+                  
+                when :year
+                  month_start = period_date
+                  month_end = period_date.end_of_month
+                  (month_start..month_end).each do |day|
+                    day_data = workload_data.dig(contact.id, day.to_s) || {}
+                    individual_hours += day_data.fetch(:individual, 0)
+                    group_hours += day_data.fetch(:group, 0)
+                  end
+                end
+
+                # Calcular percentuais individuais
+                individual_percentage = case period
+                                       when :week
+                                         workload_hours_to_percentage(individual_hours, contact)
+                                       when :month
+                                         available_hours = contact.available_hours_per_day.to_f > 0 ? contact.available_hours_per_day.to_f : 8.0
+                                         weekly_available = available_hours * 5
+                                         weekly_available > 0 ? ((individual_hours / weekly_available) * 100).round : 0
+                                       when :year
+                                         available_hours = contact.available_hours_per_day.to_f > 0 ? contact.available_hours_per_day.to_f : 8.0
+                                         num_working_days = working_days_in_month(period_date)
+                                         monthly_available = available_hours * num_working_days
+                                         monthly_available > 0 ? ((individual_hours / monthly_available) * 100).round : 0
+                                       else
+                                         0
+                                       end
+
+                group_percentage = case period
+                                  when :week
+                                    workload_hours_to_percentage(group_hours, contact)
+                                  when :month
+                                    available_hours = contact.available_hours_per_day.to_f > 0 ? contact.available_hours_per_day.to_f : 8.0
+                                    weekly_available = available_hours * 5
+                                    weekly_available > 0 ? ((group_hours / weekly_available) * 100).round : 0
+                                  when :year
+                                    available_hours = contact.available_hours_per_day.to_f > 0 ? contact.available_hours_per_day.to_f : 8.0
+                                    num_working_days = working_days_in_month(period_date)
+                                    monthly_available = available_hours * num_working_days
+                                    monthly_available > 0 ? ((group_hours / monthly_available) * 100).round : 0
+                                  else
+                                    0
+                                  end
+              %>
+              <td style="text-align: center; font-size: 0.8em;">
+                <% if (individual_hours + group_hours) > 0 %>
+                  <div>I: <%= individual_percentage %>%</div>
+                  <div>G: <%= group_percentage %>%</div>
+                <% else %>
+                  -
+                <% end %>
+              </td>
+            <% end %>
+          </tr>
+        </tbody>
       <% end %>
     </tbody>
   </table>

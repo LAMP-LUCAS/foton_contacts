@@ -1,7 +1,5 @@
 module Analytics
   class WorkloadQuery
-    # CALCULA A CARGA DE TRABALHO PARA CONTATOS, SEPARANDO CARGA INDIVIDUAL E DE GRUPO
-
     def self.calculate(filters: {}, period: :month, date: Date.today)
       new(filters: filters, period: period, date: date).calculate
     end
@@ -15,13 +13,12 @@ module Analytics
 
     def calculate
       contacts = get_filtered_contacts
-      daily_hours = calculate_daily_hours(contacts)
 
-      final_data = if @period == :week
-                     daily_hours
-                   else
-                     aggregate_workload(daily_hours)
-                   end
+      if @filters[:analysis_type] == 'spent'
+        final_data = calculate_spent_hours(contacts)
+      else
+        final_data = calculate_daily_hours(contacts)
+      end
 
       {
         contacts: contacts,
@@ -58,13 +55,18 @@ module Analytics
 
     def calculate_daily_hours(contacts)
       workload_hours = Hash.new { |h, k| h[k] = Hash.new { |h2, k2| h2[k2] = { individual: 0.0, group: 0.0 } } }
+      return {} if contacts.empty?
+
       contact_ids = contacts.map(&:id)
+      group_ids = ContactGroupMembership.where(contact_id: contact_ids).pluck(:contact_group_id).uniq
 
       issues = Issue.where.not(estimated_hours: nil)
                     .where("issues.start_date <= ? AND issues.due_date >= ?", @end_date, @start_date)
                     .joins("LEFT JOIN contact_issue_links ON contact_issue_links.issue_id = issues.id")
-                    .where("contact_issue_links.contact_id IN (?)", contact_ids)
+                    .where("contact_issue_links.contact_id IN (?) OR contact_issue_links.contact_group_id IN (?)", contact_ids, group_ids)
                     .distinct.includes(:contacts, :contact_groups)
+
+      issues = issues.where(project_id: @filters[:project_id]) if @filters[:project_id].present?
 
       issues.each do |issue|
         distribute_hours_for_issue(issue, contacts, workload_hours)
@@ -73,53 +75,58 @@ module Analytics
       workload_hours
     end
 
-    def distribute_hours_for_issue(issue, contacts, workload_hours)
-      working_days = (issue.start_date..issue.due_date).count { |d| is_working_day?(d) }
-      return if working_days.zero?
-      hours_per_day = issue.estimated_hours.to_f / working_days
+    def calculate_spent_hours(contacts)
+      workload_hours = Hash.new { |h, k| h[k] = Hash.new { |h2, k2| h2[k2] = { individual: 0.0, group: 0.0 } } }
+      return {} if contacts.empty?
 
+      contact_user_map = contacts.where.not(user_id: nil).pluck(:id, :user_id).to_h
+      user_ids = contact_user_map.values
+      return {} if user_ids.empty?
+
+      time_entries = TimeEntry.where(user_id: user_ids)
+                              .where(spent_on: @start_date..@end_date)
+
+      if @filters[:project_id].present?
+        project_ids = [@filters[:project_id]] + Project.find(@filters[:project_id]).descendants.pluck(:id)
+        time_entries = time_entries.where(project_id: project_ids)
+      end
+
+      user_contact_map = contact_user_map.invert
+
+      time_entries.group(:spent_on, :user_id).sum(:hours).each do |(spent_on, user_id), hours|
+        contact_id = user_contact_map[user_id]
+        if contact_id
+          workload_hours[contact_id][spent_on.to_s][:individual] += hours.to_f
+        end
+      end
+
+      workload_hours
+    end
+
+    def distribute_hours_for_issue(issue, contacts, workload_hours)
+      # Calcular dias úteis totais da issue
+      total_working_days = (issue.start_date..issue.due_date).count { |d| is_working_day?(d) }
+      return if total_working_days.zero?
+      
+      hours_per_day = issue.estimated_hours.to_f / total_working_days
+
+      direct_contacts_in_issue = issue.contacts.where(id: contacts.map(&:id))
+
+      # Distribuir horas apenas pelos dias dentro do período visível
       (issue.start_date..issue.due_date).each do |day|
         next unless day.between?(@start_date, @end_date) && is_working_day?(day)
 
-        direct_contacts_in_issue = issue.contacts.where(id: contacts.map(&:id))
-        
-        contacts.each do |contact|
-          is_direct = direct_contacts_in_issue.include?(contact)
-          is_in_group = contact.contact_groups.any? { |cg| issue.contact_groups.include?(cg) }
+        direct_contacts_in_issue.each do |contact|
+          workload_hours[contact.id][day.to_s][:individual] += hours_per_day
+        end
 
-          if is_direct
-            workload_hours[contact][day][:individual] += hours_per_day
-          elsif is_in_group
-            workload_hours[contact][day][:group] += hours_per_day
+        issue.contact_groups.each do |group|
+          group.contacts.where(id: contacts.map(&:id)).each do |contact|
+            next if direct_contacts_in_issue.include?(contact)
+            workload_hours[contact.id][day.to_s][:group] += hours_per_day
           end
         end
       end
-    end
-
-    def aggregate_workload(daily_workload)
-      agg_data = Hash.new { |h, k| h[k] = Hash.new { |h2, k2| h2[k2] = { individual: 0.0, group: 0.0, count: 0 } } }
-
-      daily_workload.each do |contact, days|
-        days.each do |day, loads|
-          agg_key = (@period == :month) ? day.beginning_of_week : day.beginning_of_month
-          next unless @date_range.include?(agg_key)
-
-          agg_data[contact][agg_key][:individual] += loads[:individual]
-          agg_data[contact][agg_key][:group] += loads[:group]
-          agg_data[contact][agg_key][:count] += 1 if (loads[:individual] + loads[:group]) > 0
-        end
-      end
-
-      agg_data.each do |contact, periods|
-        periods.each do |period_key, data|
-          count = data[:count].to_f
-          if count > 0
-            data[:individual] = (data[:individual] / count)
-            data[:group] = (data[:group] / count)
-          end
-        end
-      end
-      agg_data
     end
 
     def is_working_day?(date)

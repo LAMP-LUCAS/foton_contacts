@@ -75,7 +75,7 @@ A implementação seguirá rigorosamente as diretrizes de `@docs/concepts.md` e 
         -   [ ] Criar `Service/Query Objects` para cada análise principal descrita no `bi_analysis_guide.md`:
             -   `Analytics::IrpaCalculator` para o **Índice de Risco Preditivo de Alocação (IRPA)**.
             -   `Analytics::TeamScorecardQuery` para o **Painel de Performance da Equipa**.
-            -   `Analytics::WorkloadQuery` para o **Mapa de Calor da Carga de Trabalho**.
+            -   [x] `Analytics::WorkloadQuery` para o **Mapa de Calor da Carga de Trabalho**.
             -   `Analytics::DataQualityMonitor` para a **Saúde dos Dados**.
     -   [ ] **1.3. Configuração de Carga Horária:** Adicionar os campos para configuração da carga horária global e por contato, conforme especificado no guia de BI.
 
@@ -96,8 +96,8 @@ A implementação seguirá rigorosamente as diretrizes de `@docs/concepts.md` e 
     -   [ ] **4.3. Ranking de Equipes:** Exibir a tabela de "Ranking de Equipes" ao lado do gráfico.
 
 5.  **Mapa de Carga de Trabalho e Alerta Proativo (Cenário BDD 5)**
-    -   [ ] **5.1. View do Mapa de Calor:** Criar a view para a aba "Carga de Trabalho", que renderizará o heatmap. A UI permitirá filtrar por período (semana, mês) e por contatos.
-    -   [ ] **5.2. Lógica do Heatmap:** O backend, usando a `WorkloadQuery`, calculará a matriz de `[contato, dia]` com a porcentagem de alocação, que será usada para colorir as células da tabela.
+    -   [x] **5.1. View do Mapa de Calor:** A view para a aba "Carga de Trabalho" renderiza o heatmap. A UI permite filtrar por período, projeto, e alternar entre horas estimadas e lançadas.
+    -   [x] **5.2. Lógica do Heatmap:** O backend, usando a `WorkloadQuery`, calcula a matriz de `[contato, dia]` com a porcentagem de alocação, que é usada para colorir as células da tabela.
     -   [ ] **5.3. Implementar Alerta de Sobrecarga (Real-Time):**
         -   [ ] **Backend:** Criar o endpoint `POST /contacts/check_workload` que recebe `contact_id`, `start_date`, `due_date`, `estimated_hours` e retorna um status de `ok` ou `overload`.
         -   [ ] **Frontend:** Na página da issue, um controller Stimulus interceptará a adição de um contato. Antes de salvar, ele fará um `fetch` para o endpoint `check_workload`. Se a resposta for `overload`, ele exibirá um `window.confirm()` com o alerta, permitindo que o gestor decida se continua ou não.
@@ -149,7 +149,7 @@ A implementação seguirá rigorosamente as diretrizes de `@docs/concepts.md` e 
 - [x] **Componente `_workload_heatmap.html.erb` (Novo):**
     - [x] Mover a lógica da tabela de Mapa de Calor para este novo componente.
 - [x] **Componente `_workload_filters.html.erb` (Novo):**
-    - [x] Criar um componente dedicado para os filtros avançados (nome, alocação, período).
+    - [x] Criar um componente dedicado para os filtros avançados (nome, projeto, tipo de análise, período).
 - [x] **Layout da Aba:** Renderizar os filtros e o heatmap dentro de um único card, conforme o mockup.
 - [x] **Cleanup:** Remover a action `workload` e a view `widgets/_workload.html.erb`.
 

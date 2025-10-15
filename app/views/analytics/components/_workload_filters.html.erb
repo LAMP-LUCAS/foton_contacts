@@ -6,13 +6,21 @@
     <div class="card-header"><h5>Filtros</h5></div>
     <div class="card-body">
       <div class="row g-3 align-items-end">
-        <div class="col-md-3">
+        <div class="col-md-2">
           <label for="filters_name" class="form-label">Nome</label>
           <%= text_field_tag 'filters[name]', filter_params.dig(:filters, :name), class: 'form-control' %>
         </div>
-        <div class="col-md-3">
-          <label for="filters_contact_type" class="form-label">Tipo</label>
-          <%= select_tag 'filters[contact_type]', options_for_select([['Todos', ''], ['Pessoa', 'person']], filter_params.dig(:filters, :contact_type)), class: 'form-select' %>
+        <div class="col-md-2">
+          <label for="filters_project_id" class="form-label">Projeto</label>
+          <%= select_tag 'filters[project_id]', 
+                         options_for_select([['Todos os Projetos', '']] + project_tree_array(Project.all), filter_params.dig(:filters, :project_id)),
+                         class: 'form-select' %>
+        </div>
+        <div class="col-md-2">
+          <label for="analysis_type" class="form-label">Análise</label>
+          <%= select_tag 'filters[analysis_type]', 
+                         options_for_select([['Horas Estimadas', 'estimated'], ['Horas Lançadas', 'spent']], filter_params.dig(:filters, :analysis_type)),
+                         class: 'form-select' %>
         </div>
         <div class="col-md-2">
           <label for="period" class="form-label">Período</label>
