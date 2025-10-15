@@ -169,6 +169,25 @@ A implementação seguirá rigorosamente as diretrizes de `@docs/concepts.md` e 
 
 ---
 
+### Fase 3.3: Fundamentação Histórica para BI com Journaling Avançado
+
+**Objetivo:** Habilitar análises de BI baseadas em tendências e na evolução dos dados ao longo do tempo. Para isso, é necessário estender o sistema de journaling para capturar não apenas as alterações nos contatos, mas também os eventos de criação e destruição de relacionamentos-chave.
+
+- [ ] **1. Evoluir o `ActsAsJournalizedConcern`:**
+    - [ ] Adicionar suporte para callbacks de `after_create` e `after_destroy`.
+    - [ ] Renomear o callback de `after_save` para `create_update_journal_entry` para maior clareza.
+    - [ ] Implementar os novos métodos `create_creation_journal_entry` e `create_destruction_journal_entry` para registrar esses eventos no histórico com uma nota clara (ex: "Created", "Destroyed").
+
+- [ ] **2. Habilitar Journaling para Vínculos Empregatícios:**
+    - [ ] Incluir o `ActsAsJournalizedConcern` no modelo `ContactEmployment`.
+    - [ ] Configurar o `acts_as_journalized` para monitorar (`watch`) as alterações nos campos `start_date`, `end_date` e `position`.
+
+- [ ] **3. Habilitar Journaling para Grupos:**
+    - [ ] Incluir o `ActsAsJournalizedConcern` no modelo `ContactGroupMembership`.
+    - [ ] Configurar o `acts_as_journalized` sem a opção `watch`, pois o interesse principal é registrar a entrada e saída de membros (eventos de criação e destruição).
+
+---
+
 ### 🧪 Testes e Validações (Pendente)
 
 **Objetivo:** Aumentar a robustez e a confiabilidade do plugin.

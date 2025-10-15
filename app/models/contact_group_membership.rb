@@ -27,6 +27,8 @@
 
 class ContactGroupMembership < ActiveRecord::Base
   include Redmine::SafeAttributes
+  include ActsAsJournalizedConcern
+  acts_as_journalized
   
   belongs_to :contact
   belongs_to :contact_group

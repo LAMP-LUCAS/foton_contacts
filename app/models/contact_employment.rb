@@ -34,6 +34,9 @@
 '''
 
 class ContactEmployment < ApplicationRecord
+  include ActsAsJournalizedConcern
+  acts_as_journalized watch: %w(position start_date end_date)
+
   belongs_to :contact, class_name: 'Contact'
   belongs_to :company, class_name: 'Contact'
 
