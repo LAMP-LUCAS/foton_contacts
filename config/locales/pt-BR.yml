@@ -19,6 +19,8 @@ pt-BR:
   label_foton_contacts_no_issues_for_group: "Não existem tarefas vinculadas a este Grupo"
   label_foton_contacts_search_contact: "Buscar Contato"
   label_foton_contacts_search_group: "Buscar Grupo"
+  label_no_data_for_period: "Sem dados para o período selecionado"
+  label_error_loading_data: "Erro ao carregar os dados"
   
   label_member_count: "Quantidade de Membros"
   label_contact_group_plural: "Grupos"

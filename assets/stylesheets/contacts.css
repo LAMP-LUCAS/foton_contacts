@@ -194,3 +194,67 @@ body:has(turbo-frame[id="modal"]:not(:empty))::before {
 .workload-medium { background-color: #fff3cd; } /* Amarelo */
 .workload-high { background-color: #f8d7da; } /* Vermelho claro */
 .workload-overload { background-color: #dc3545; color: white; } /* Vermelho */
+
+/* BI Dashboard Styles from Mockup */
+.card {
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    border: none;
+    margin-bottom: 20px;
+}
+
+.card-header {
+    background-color: white;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    font-weight: 600;
+}
+
+.metric-card {
+    text-align: center;
+    padding: 15px;
+}
+
+.metric-value {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 10px 0;
+}
+
+.metric-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.risk-high {
+    color: #e74c3c;
+}
+
+.risk-medium {
+    color: #f39c12;
+}
+
+.risk-low {
+    color: #27ae60;
+}
+
+.badge-risk {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+}
+
+.kpi-card {
+    border-left: 4px solid #3498db;
+    padding-left: 15px;
+}
+
+.kpi-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.kpi-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+

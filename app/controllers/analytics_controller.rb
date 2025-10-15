@@ -14,9 +14,23 @@ class AnalyticsController < ApplicationController
     @irpa_data.sort_by! { |h| -h[:risk_score] }
 
     @quality_data = Analytics::DataQualityQuery.calculate
-    @partner_data = Analytics::PartnerAnalysisQuery.calculate
+    # @partner_data é agora carregado de forma assíncrona
 
-    render partial: 'analytics/tabs/overview', locals: { irpa_data: @irpa_data, quality_data: @quality_data, partner_data: @partner_data }
+    render partial: 'analytics/tabs/overview', locals: { irpa_data: @irpa_data, quality_data: @quality_data }
+  end
+
+  def partner_analysis_widget
+    # Se os parâmetros não estiverem presentes (carga inicial), start_date será nil, resultando em uma análise completa.
+    @start_date = params[:start_date].present? ? Date.parse(params[:start_date]) : nil
+    @end_date = params[:end_date].present? ? Date.parse(params[:end_date]) : Date.today
+
+    @partner_data = Analytics::PartnerAnalysisQuery.calculate(start_date: @start_date, end_date: @end_date)
+    
+    render partial: 'analytics/components/partner_analysis', locals: { partner_data: @partner_data, start_date: @start_date, end_date: @end_date }
+  rescue ArgumentError
+    # Lida com datas inválidas, renderizando o componente com estado de erro
+    flash.now[:error] = "Formato de data inválido."
+    render partial: 'analytics/components/partner_analysis', locals: { partner_data: [], start_date: nil, end_date: Date.today, error: true }
   end
 
   def team_performance_tab
