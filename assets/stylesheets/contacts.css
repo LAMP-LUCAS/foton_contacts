@@ -390,3 +390,16 @@ body:has(turbo-frame[id="modal"]:not(:empty))::before {
   margin-top: 20px;
   border-radius: 0 8px 8px 0;
 }
+
+/* Overload Warning Styles */
+.contact-issue-card.overloaded {
+  border-left: 3px solid var(--danger-color);
+  background-color: #fbe9e7;
+}
+
+.overload-indicator {
+  color: var(--danger-color);
+  font-weight: bold;
+  margin-right: 6px;
+  font-size: 1.2em;
+}
