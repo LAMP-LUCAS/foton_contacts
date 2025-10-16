@@ -1,33 +1,33 @@
-<turbo-frame id="modal" data-controller="analytics-tabs">
-  <div class="modal-header">
-    <h3><%= l(:label_contact_analytics) %>: <%= contact.name %></h3>
-    <button type="button" class="close" data-action="turbo-frame#close" aria-label="<%= l(:button_close) %>">
-      <span aria-hidden="true">&times;</span>
-    </button>
+<%= turbo_frame_tag "modal" do %>
+  <div data-controller="analytics-tabs">
+    <div class="modal-header">
+      <h3><%= l(:label_contact_analytics) %>: <%= contact.name %></h3>
+      <%= link_to "&#10006;".html_safe, close_modal_contacts_path, class: "close", "aria-label": l(:button_close), data: { "turbo-method": :post } %>
+    </div>
+
+    <div class="modal-body">
+      <div class="tabs">
+        <ul>
+          <li>
+            <a href="#details" class="selected" data-analytics-tabs-target="tab" data-action="click->analytics-tabs#showTab"><%= l(:label_details) %></a>
+          </li>
+          <li>
+            <a href="#dashboard" data-analytics-tabs-target="tab" data-action="click->analytics-tabs#showTab"><%= l(:label_dashboard) %></a>
+          </li>
+        </ul>
+      </div>
+
+      <div id="details" class="tab-content" data-analytics-tabs-target="content">
+        <%= render partial: 'contacts/analysis/details', locals: { contact: contact } %>
+      </div>
+
+      <div id="dashboard" class="tab-content" style="display:none;" data-analytics-tabs-target="content">
+        <% if contact.person? %>
+          <%= render partial: 'contacts/analysis/person_dashboard', locals: { contact: contact, tasks_count: @tasks_count, groups_count: @groups_count, companies_count: @companies_count } %>
+        <% elsif contact.company? %>
+          <%= render partial: 'contacts/analysis/company_dashboard', locals: { contact: contact, linked_contacts_count: @linked_contacts_count, turnover_count: @turnover_count } %>
+        <% end %>
+      </div>
+    </div>
   </div>
-
-  <div class="modal-body">
-    <div class="tabs">
-      <ul>
-        <li>
-          <a href="#details" class="selected" data-analytics-tabs-target="tab" data-action="click->analytics-tabs#showTab"><%= l(:label_details) %></a>
-        </li>
-        <li>
-          <a href="#dashboard" data-analytics-tabs-target="tab" data-action="click->analytics-tabs#showTab"><%= l(:label_dashboard) %></a>
-        </li>
-      </ul>
-    </div>
-
-    <div id="details" class="tab-content" data-analytics-tabs-target="content">
-      <%= render partial: 'contacts/analysis/details', locals: { contact: contact } %>
-    </div>
-
-    <div id="dashboard" class="tab-content" style="display:none;" data-analytics-tabs-target="content">
-      <% if contact.person? %>
-        <%= render partial: 'contacts/analysis/person_dashboard', locals: { contact: contact, tasks_count: @tasks_count, groups_count: @groups_count, companies_count: @companies_count } %>
-      <% elsif contact.company? %>
-        <%= render partial: 'contacts/analysis/company_dashboard', locals: { contact: contact, linked_contacts_count: @linked_contacts_count, turnover_count: @turnover_count } %>
-      <% end %>
-    </div>
-  </div>
-</turbo-frame>
+<% end %>
