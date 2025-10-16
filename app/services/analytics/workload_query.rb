@@ -40,6 +40,10 @@ module Analytics
         @start_date = @date.beginning_of_year
         @end_date = @date.end_of_year
         @date_range = (@start_date..@end_date).map(&:beginning_of_month).uniq
+      when :custom
+        @start_date = @date
+        @end_date = @filters[:end_date]
+        @date_range = (@start_date..@end_date).to_a
       else # :month
         @start_date = @date.beginning_of_month
         @end_date = @date.end_of_month

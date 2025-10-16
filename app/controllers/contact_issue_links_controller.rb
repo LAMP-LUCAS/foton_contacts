@@ -8,6 +8,25 @@ class ContactIssueLinksController < ApplicationController
     @contact_issue_link = @issue.contact_issue_links.build(contact_issue_link_params)
 
     if @contact_issue_link.save
+      # Perform workload check after successful link creation
+      if @contact_issue_link.contact_id.present?
+        contact = @contact_issue_link.contact
+        issue = @contact_issue_link.issue
+        
+        check_result = Analytics::WorkloadCheckerService.call(
+          contact_id: contact.id,
+          issue_start_date: issue.start_date,
+          issue_due_date: issue.due_date,
+          issue_estimated_hours: issue.estimated_hours
+        )
+
+        if check_result[:status] == 'overload'
+          flash[:warning] = check_result[:message]
+        elsif check_result[:status] == 'error'
+          flash[:error] = check_result[:message]
+        end
+      end
+
       links_to_render = [@contact_issue_link]
 
       # Propagate role to group members if a group is linked with a role

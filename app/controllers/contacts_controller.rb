@@ -17,6 +17,7 @@ class ContactsController < ApplicationController
   helper Chartkick::Helper if Redmine::Plugin.installed?(:chartkick)
   
   def index
+    @quality_data = Analytics::DataQualityQuery.calculate
     @filter_params = params.permit(:search, :contact_type, :status)
 
     sort_init 'name', 'asc'
@@ -355,33 +356,6 @@ class ContactsController < ApplicationController
     respond_to do |format|
       format.turbo_stream { render turbo_stream: turbo_stream.remove("modal") }
       format.html { redirect_to contacts_path }
-    end
-  end
-
-  def check_workload
-    contact = Contact.find(params[:contact_id])
-    start_date = Date.parse(params[:start_date])
-    due_date = Date.parse(params[:due_date])
-    estimated_hours = params[:estimated_hours].to_f
-
-    # Lógica simplificada para verificação: checa a carga no período da nova tarefa
-    workload_data = Analytics::WorkloadQuery.calculate_for_period(start_date, due_date)
-    daily_hours = estimated_hours / ((due_date - start_date).to_i + 1)
-
-    overloaded = false
-    (start_date..due_date).each do |day|
-      current_load_hours = workload_data.dig(contact, day).to_f / 100 * (contact.available_hours_per_day || 8)
-      total_hours = current_load_hours + daily_hours
-      if total_hours > (contact.available_hours_per_day || 8)
-        overloaded = true
-        break
-      end
-    end
-
-    if overloaded
-      render json: { status: 'overload', message: l(:warning_contact_overload) }
-    else
-      render json: { status: 'ok' }
     end
   end
   
