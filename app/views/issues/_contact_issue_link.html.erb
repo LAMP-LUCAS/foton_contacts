@@ -1,7 +1,14 @@
 <%# app/views/issues/_contact_issue_link.html.erb %>
+<% workload_status ||= nil %>
+<% is_overloaded = workload_status && workload_status[:status] == 'overload' %>
+
 <%= turbo_frame_tag contact_issue_link do %>
-  <div class="contact-issue-card">
+  <div class="contact-issue-card <%= 'overloaded' if is_overloaded %>"
+       <% if is_overloaded %>title="<%= h(workload_status[:message]) %>"<% end %>>
     <div class="contact-info">
+      <% if is_overloaded %>
+        <span class="overload-indicator">*</span>
+      <% end %>
       <span class="icon icon-<%= contact_issue_link.contact_id.present? ? 'user' : 'group' %>"></span>
       <% if contact = contact_issue_link.linked_object %>
         <%= link_to contact.name, contact, target: "_blank", data: { turbo: false }, class: "contact-name" %>
