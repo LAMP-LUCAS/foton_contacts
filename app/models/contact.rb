@@ -72,6 +72,8 @@ class Contact < ActiveRecord::Base
                 type: 'contact',
                 url: Proc.new { |o| { controller: 'contacts', action: 'show', id: o.id } }
   
+  attr_accessor :available_hours_per_day # Temporarily add accessor for form handling
+
   belongs_to :author, class_name: 'User'
   belongs_to :project, optional: true
   belongs_to :user, optional: true

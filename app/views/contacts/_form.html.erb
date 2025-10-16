@@ -44,6 +44,12 @@
     <br><span class="description"><%= l(:text_status_description) %></span>
   </p>
 
+  <p class="person-only">
+    <%= f.label :available_hours_per_day %>
+    <%= f.number_field :available_hours_per_day, min: 0, max: 24, step: 0.5, placeholder: Setting.plugin_foton_contacts[:default_workload_hours] %>
+    <br><span class="description"><%= l(:text_available_hours_per_day_info) %></span>
+  </p>
+
   <p>
     <%= f.label :project_id, l(:field_project) %>
     <%= f.select :project_id,
