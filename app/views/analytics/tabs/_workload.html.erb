@@ -1,0 +1,12 @@
+<%# A resposta para a requisição do frame da aba DEVE conter um frame com o mesmo ID %>
+<%= turbo_frame_tag "workload_tab_content" do %>
+
+  <%# 1. O formulário de filtros. %>
+  <%= render partial: 'analytics/components/workload_filters', locals: { filter_params: filter_params } %>
+
+  <%# 2. O Turbo Frame para os resultados, que carrega os dados iniciais. %>
+  <%= turbo_frame_tag "workload_results", src: analytics_workload_results_path(params.permit(:filters, :period, :date)) do %>
+    <p><%= l(:label_loading) %>...</p>
+  <% end %>
+
+<% end %>

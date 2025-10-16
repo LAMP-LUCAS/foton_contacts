@@ -1,3 +1,5 @@
+//= require chartkick
+
 //= require controllers/contact_search_controller
 //= require controllers/tom_select_controller
 //= require controllers/analytics_tabs_controller
@@ -35,7 +37,7 @@ document.addEventListener("turbo:load", function() {
   if (window.ShowTabsController && !application.router.modulesByIdentifier.has("show-tabs")) {
     application.register("show-tabs", window.ShowTabsController);
   }
-  if (window.InlineEditController && !application.router.modulesByIdentifier.has("inline-edit")) {
-    application.register("inline-edit", window.InlineEditController);
+  if (window.WorkloadAlertController && !application.router.modulesByIdentifier.has("workload-alert")) {
+    application.register("workload-alert", window.WorkloadAlertController);
   }
 });

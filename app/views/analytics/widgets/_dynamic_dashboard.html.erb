@@ -1,0 +1,38 @@
+<%= turbo_frame_tag "dynamic_dashboard" do %>
+  <div class="card dashboard-dynamic mt-4">
+    <div class="card-body">
+      <h5><i class="bi bi-speedometer2"></i> Dashboard Dinâmico (<%= @filtered_contacts.count %>)</h5>
+      <p class="text-muted">Métricas atualizadas com base nos filtros aplicados</p>
+      
+      <div class="row mt-3">
+        <div class="col-md-4">
+          <div class="card text-center">
+            <div class="card-body">
+              <h3 class="risk-high"><%= @average_risk_score %>%</h3>
+              <p class="mb-0">Score de Risco Médio</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-8">
+          <div class="card">
+            <div class="card-body">
+              <h6 class="card-title">Contatos com Maior Risco</h6>
+              <% if @irpa_data.any? %>
+                <ul class="list-group list-group-flush">
+                  <% @irpa_data.sort_by { |h| -h[:risk_score] }.first(3).each do |data| %>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <%= data[:contact_name] %>
+                      <span class="badge bg-danger rounded-pill"><%= data[:risk_score] %>%</span>
+                    </li>
+                  <% end %>
+                </ul>
+              <% else %>
+                <p class="text-muted">Nenhum dado para exibir.</p>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

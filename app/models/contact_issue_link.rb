@@ -1,5 +1,8 @@
 class ContactIssueLink < ActiveRecord::Base
   include Redmine::SafeAttributes
+  include ActsAsJournalizedConcern
+  include JournalizableDummiesConcern
+  acts_as_journalized watch: ['role']
 
   belongs_to :issue
   belongs_to :contact, optional: true

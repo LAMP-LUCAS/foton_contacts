@@ -1,3 +1,44 @@
+/* COPIA DO CSS DO MOCKUP */
+
+:root {
+  --primary-color: #2c3e50;
+  --secondary-color: #3498db;
+  --success-color: #27ae60;
+  --warning-color: #f39c12;
+  --danger-color: #e74c3c;
+  --light-color: #ecf0f1;
+  --dark-color: #34495e;
+}
+
+body {
+  background-color: transparent!;/* #f8f9fa; */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar-redmine {
+  background-color: var(--primary-color);
+}
+
+.sidebar {
+  background-color: var(--dark-color);
+  color: white;
+  min-height: calc(100vh - 56px);
+}
+
+.sidebar .nav-link {
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0.75rem 1rem;
+}
+
+.sidebar .nav-link:hover, .sidebar .nav-link.active {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+
+
+/* ====================== */
+
 /* Tab Content */
 .tab-content {
   display: none;
@@ -187,4 +228,178 @@ body:has(turbo-frame[id="modal"]:not(:empty))::before {
   display: inline-block;
   width: 16px;
   height: 16px;
+}
+
+
+
+.workload-low { background-color: #d4edda; } /* Verde claro */
+.workload-medium { background-color: #fff3cd; } /* Amarelo */
+.workload-high { background-color: #f8d7da; } /* Vermelho claro */
+.workload-overload { background-color: #dc3545; color: white; } /* Vermelho */
+
+/* BI Dashboard Layout Styles */
+.analytics-grid-2-cols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.analytics-grid-3-cols {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.analytics-grid-layout-2-1 {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+.analytics-grid-layout-7-5 {
+  display: grid;
+  grid-template-columns: 7fr 5fr;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .analytics-grid-layout-2-1,
+  .analytics-grid-layout-7-5,
+  .analytics-grid-2-cols,
+  .analytics-grid-3-cols {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  border: none;
+  margin-bottom: 20px;
+}
+
+.card-header {
+  background-color: white;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  font-weight: 600;
+}
+
+.metric-card {
+  text-align: center;
+  padding: 15px;
+}
+
+.metric-value {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 10px 0;
+}
+
+.metric-label {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.risk-high {
+  color: var(--danger-color);
+}
+
+.risk-medium {
+  color: var(--warning-color);
+}
+
+.risk-low {
+  color: var(--success-color);
+}
+
+.heatmap-cell {
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  display: inline-block;
+  margin: 2px;
+  text-align: center;
+  line-height: 30px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.heatmap-0 { background-color: #e8f5e9; }
+.heatmap-1 { background-color: #c8e6c9; }
+.heatmap-2 { background-color: #a5d6a7; }
+.heatmap-3 { background-color: #81c784; }
+.heatmap-4 { background-color: #66bb6a; }
+.heatmap-5 { background-color: #4caf50; }
+.heatmap-6 { background-color: #43a047; }
+.heatmap-7 { background-color: #388e3c; }
+.heatmap-8 { background-color: #2e7d32; }
+.heatmap-9 { background-color: #1b5e20; color: white; }
+
+.workload-overload {
+  background-color: var(--danger-color) !important;
+  color: white;
+}
+
+.tab-content {
+  background-color: white;
+  border-radius: 0 0 8px 8px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.table th {
+  border-top: none;
+  font-weight: 600;
+  color: var(--dark-color);
+}
+
+.badge-risk {
+  font-size: 0.75rem;
+  padding: 4px 8px;
+}
+
+.modal-xl {
+  max-width: 95%;
+}
+
+.kpi-card {
+  border-left: 4px solid var(--secondary-color);
+  padding-left: 15px;
+}
+
+.kpi-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.kpi-label {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.nav-tabs .nav-link.active {
+  font-weight: 600;
+  border-bottom: 3px solid var(--secondary-color);
+}
+
+.dashboard-dynamic {
+  background-color: #f1f8ff;
+  border-left: 4px solid var(--secondary-color);
+  padding: 15px;
+  margin-top: 20px;
+  border-radius: 0 8px 8px 0;
+}
+
+/* Overload Warning Styles */
+.contact-issue-card.overloaded {
+  border-left: 3px solid var(--danger-color);
+  background-color: #fbe9e7;
+}
+
+.overload-indicator {
+  color: var(--danger-color);
+  font-weight: bold;
+  margin-right: 6px;
+  font-size: 1.2em;
 }

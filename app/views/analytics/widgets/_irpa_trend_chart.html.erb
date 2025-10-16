@@ -1,0 +1,12 @@
+<%= turbo_frame_tag "irpa_trend_chart" do %>
+  <div class="card mt-4">
+    <div class="card-header">
+      <h5 class="mb-0">Evolução do Risco (IRPA) - Últimos 6 Meses</h5>
+    </div>
+    <div class="card-body">
+      <div style="height: 250px;">
+        <%= line_chart trend_data, discrete: true, ytitle: "Score IRPA" %>
+      </div>
+    </div>
+  </div>
+<% end %>

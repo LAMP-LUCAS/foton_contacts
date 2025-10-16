@@ -2,9 +2,11 @@
   <div class="contact-result">
     <span class="name"><%= contact.name %></span>
     <% if User.current.allowed_to?(:manage_contacts, issue.project) %>
-      <%= button_to l(:button_add),
-                  issue_contact_issue_links_path(issue, contact_issue_link: { contact_id: contact.id }),
-                  class: 'button-small' %>
+      <%= form_with(url: issue_contact_issue_links_path(issue, contact_issue_link: { contact_id: contact.id }), 
+                    method: :post) do %>
+        <%= hidden_field_tag 'contact_id', contact.id %>
+        <%= submit_tag l(:button_add), class: 'button-small' %>
+      <% end %>
     <% end %>
   </div>
 </li>

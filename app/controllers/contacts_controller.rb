@@ -17,6 +17,9 @@ class ContactsController < ApplicationController
   helper Chartkick::Helper if Redmine::Plugin.installed?(:chartkick)
   
   def index
+    @quality_data = Analytics::DataQualityQuery.calculate
+    @filter_params = params.permit(:search, :contact_type, :status)
+
     sort_init 'name', 'asc'
     sort_update %w(name status created_at)
 
@@ -194,22 +197,44 @@ class ContactsController < ApplicationController
   end
   
   def history
-    @journals = @contact.journals.includes(:user).reorder('created_on DESC')
+    employment_ids = @contact.employments_as_person.pluck(:id)
+    if @contact.company?
+      employment_ids += @contact.employments_as_company.pluck(:id)
+    end
+    membership_ids = @contact.contact_group_memberships.pluck(:id)
+
+    # Fetch journals from all sources related to the contact
+    @journals = Journal.where(
+      "(journalized_type = :contact_type AND journalized_id = :contact_id) OR " \
+      "(journalized_type = :employment_type AND journalized_id IN (:employment_ids)) OR " \
+      "(journalized_type = :membership_type AND journalized_id IN (:membership_ids))",
+      {
+        contact_type: 'Contact', contact_id: @contact.id,
+        employment_type: 'ContactEmployment', employment_ids: employment_ids.uniq,
+        membership_type: 'ContactGroupMembership', membership_ids: membership_ids
+      }
+    ).includes(:user, :details, :journalized).reorder('created_on DESC')
+
     render partial: 'contacts/show_tabs/history', layout: false
   end
   
   def analytics
-    # Data for person contact
     if @contact.person?
-      @tasks_count = @contact.issues.count
-      @groups_count = @contact.contact_groups.count
-      @companies_count = @contact.employments_as_person.count
-    end
+      # IRPA and KPIs
+      @irpa_data = Analytics::IrpaCalculator.calculate_for_contact(@contact)
 
-    # Data for company contact
-    if @contact.company?
+      # Career History
+      @employments = @contact.employments_as_person.includes(:company).order(start_date: :desc)
+
+      # Current Workload
+      @current_workload = @contact.issues.where.not(status: IssueStatus.where(is_closed: true)).includes(:project, :priority, :status).order(due_date: :asc)
+
+      # Recent Performance (last 5 closed issues)
+      @recent_performance_issues = @contact.issues.where(status: IssueStatus.where(is_closed: true)).order(closed_on: :desc).limit(5)
+    else
+      # Analytics for companies are not yet defined in the mockup
+      # We can add company-specific analytics here later.
       @linked_contacts_count = @contact.employees.count
-      # Simple interpretation of turnover: count of employments with an end_date
       @turnover_count = @contact.employments_as_company.where.not(end_date: nil).count
     end
 
@@ -332,11 +357,38 @@ class ContactsController < ApplicationController
   end
 
   def close_modal
-    
     respond_to do |format|
-      format.turbo_stream { render turbo_stream: turbo_stream.remove("modal") }
+      format.turbo_stream do
+        render turbo_stream: [
+          turbo_stream.remove("modal"),
+          turbo_stream.append("content", "<turbo-frame id='modal' data-controller='modal'></turbo-frame>")
+        ]
+      end
       format.html { redirect_to contacts_path }
     end
+  end
+
+  def check_workload
+    # Sanitize and parse parameters
+    contact_id = params[:contact_id]
+    start_date = Date.parse(params[:start_date]) rescue nil
+    due_date = Date.parse(params[:due_date]) rescue nil
+    estimated_hours = params[:estimated_hours].to_f
+
+    # Validate required parameters
+    if contact_id.blank? || start_date.blank? || due_date.blank?
+      return render json: { status: 'error', message: 'Parâmetros inválidos.' }, status: :bad_request
+    end
+
+    # Call the service
+    result = Analytics::WorkloadCheckerService.call(
+      contact_id: contact_id,
+      issue_start_date: start_date,
+      issue_due_date: due_date,
+      issue_estimated_hours: estimated_hours
+    )
+
+    render json: result
   end
   
   private
@@ -366,6 +418,7 @@ class ContactsController < ApplicationController
       :is_private,
       :project_id,
       :description,
+      :available_hours_per_day,
       employments_as_person_attributes: [:id, :company_id, :position, :status, :start_date, :end_date, :_destroy]
     )
   end

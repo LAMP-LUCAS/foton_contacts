@@ -8,6 +8,20 @@ class ContactIssueLinksController < ApplicationController
     @contact_issue_link = @issue.contact_issue_links.build(contact_issue_link_params)
 
     if @contact_issue_link.save
+      workload_status = nil
+      # Perform workload check after successful link creation
+      if @contact_issue_link.contact_id.present?
+        contact = @contact_issue_link.contact
+        issue = @contact_issue_link.issue
+        
+        workload_status = Analytics::WorkloadCheckerService.call(
+          contact_id: contact.id,
+          issue_start_date: issue.start_date,
+          issue_due_date: issue.due_date,
+          issue_estimated_hours: issue.estimated_hours
+        )
+      end
+
       links_to_render = [@contact_issue_link]
 
       # Propagate role to group members if a group is linked with a role
@@ -36,7 +50,7 @@ class ContactIssueLinksController < ApplicationController
             streams << turbo_stream.append(
               "issue_contact_links",
               partial: "issues/contact_issue_link",
-              locals: { contact_issue_link: link }
+              locals: { contact_issue_link: link, workload_status: workload_status }
             )
           end
 

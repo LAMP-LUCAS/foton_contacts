@@ -1,5 +1,5 @@
 <%# app/views/contacts/_new_form.html.erb %>
-<%= turbo_frame_tag "modal", data: { modal_history_action_value: "replace" } do %>
+<%= turbo_frame_tag "modal" do %>
   <div class="modal-header">
     <h3 class="title"><%= l(:label_new_contact) %></h3>
     <%= link_to "&#10006;".html_safe, close_modal_contacts_path, class: "close", data: { turbo_method: :post } %>
