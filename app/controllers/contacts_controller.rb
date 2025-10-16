@@ -219,17 +219,22 @@ class ContactsController < ApplicationController
   end
   
   def analytics
-    # Data for person contact
     if @contact.person?
-      @tasks_count = @contact.issues.count
-      @groups_count = @contact.contact_groups.count
-      @companies_count = @contact.employments_as_person.count
-    end
+      # IRPA and KPIs
+      @irpa_data = Analytics::IrpaCalculator.calculate_for_contact(@contact)
 
-    # Data for company contact
-    if @contact.company?
+      # Career History
+      @employments = @contact.employments_as_person.includes(:company).order(start_date: :desc)
+
+      # Current Workload
+      @current_workload = @contact.issues.where.not(status: IssueStatus.where(is_closed: true)).includes(:project, :priority, :status).order(due_date: :asc)
+
+      # Recent Performance (last 5 closed issues)
+      @recent_performance_issues = @contact.issues.where(status: IssueStatus.where(is_closed: true)).order(closed_on: :desc).limit(5)
+    else
+      # Analytics for companies are not yet defined in the mockup
+      # We can add company-specific analytics here later.
       @linked_contacts_count = @contact.employees.count
-      # Simple interpretation of turnover: count of employments with an end_date
       @turnover_count = @contact.employments_as_company.where.not(end_date: nil).count
     end
 
