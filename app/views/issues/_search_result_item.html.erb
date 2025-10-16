@@ -3,15 +3,8 @@
     <span class="name"><%= contact.name %></span>
     <% if User.current.allowed_to?(:manage_contacts, issue.project) %>
       <%= form_with(url: issue_contact_issue_links_path(issue, contact_issue_link: { contact_id: contact.id }), 
-                    method: :post,
-                    data: {
-                      controller: "workload-alert",
-                      'workload-alert-check-url-value': check_workload_contacts_path,
-                      'workload-alert-contact-id-value': contact.id,
-                      'workload-alert-start-date-value': issue.start_date,
-                      'workload-alert-due-date-value': issue.due_date,
-                      'workload-alert-estimated-hours-value': issue.estimated_hours
-                    }) do %>
+                    method: :post) do %>
+        <%= hidden_field_tag 'contact_id', contact.id %>
         <%= submit_tag l(:button_add), class: 'button-small' %>
       <% end %>
     <% end %>
