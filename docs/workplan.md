@@ -78,7 +78,7 @@ A implementação seguirá rigorosamente as diretrizes de `@docs/concepts.md` e 
                 - [x] Refatorar o cálculo do Índice de Coesão (ICE) para usar o histórico do `Journal`.
             -   [x] `Analytics::WorkloadQuery` para o **Mapa de Calor da Carga de Trabalho**.
             -   `Analytics::DataQualityMonitor` para a **Saúde dos Dados**.
-    -   [ ] **1.3. Configuração de Carga Horária:** Adicionar os campos para configuração da carga horária global e por contato, conforme especificado no guia de BI.
+    -   [x] **1.3. Configuração de Carga Horária:** Adicionar os campos para configuração da carga horária global e por contato, conforme especificado no guia de BI.
 
 2.  **Dashboard Principal e Análise de Risco (Cenários BDD 1 e 2)**
     -   [xx] **2.1. View do Dashboard Principal:** Criar a view `app/views/analytics/index.html.erb` com uma estrutura de abas (`Visão Geral`, `Análise de Equipes`, `Carga de Trabalho`).
@@ -100,9 +100,9 @@ A implementação seguirá rigorosamente as diretrizes de `@docs/concepts.md` e 
 5.  **Mapa de Carga de Trabalho e Alerta Proativo (Cenário BDD 5)**
     -   [x] **5.1. View do Mapa de Calor:** A view para a aba "Carga de Trabalho" renderiza o heatmap. A UI permite filtrar por período, projeto, e alternar entre horas estimadas e lançadas.
     -   [x] **5.2. Lógica do Heatmap:** O backend, usando a `WorkloadQuery`, calcula a matriz de `[contato, dia]` com a porcentagem de alocação, que é usada para colorir as células da tabela.
-    -   [ ] **5.3. Implementar Alerta de Sobrecarga (Real-Time):**
-        -   [ ] **Backend:** Criar o endpoint `POST /contacts/check_workload` que recebe `contact_id`, `start_date`, `due_date`, `estimated_hours` e retorna um status de `ok` ou `overload`.
-        -   [ ] **Frontend:** Na página da issue, um controller Stimulus interceptará a adição de um contato. Antes de salvar, ele fará um `fetch` para o endpoint `check_workload`. Se a resposta for `overload`, ele exibirá um `window.confirm()` com o alerta, permitindo que o gestor decida se continua ou não.
+    -   [x] **5.3. Implementar Alerta de Sobrecarga (Real-Time):**
+        -   [x] **Backend:** Criar o endpoint `POST /contacts/check_workload` que recebe `contact_id`, `start_date`, `due_date`, `estimated_hours` e retorna um status de `ok` ou `overload`.
+        -   [x] **Frontend:** Na página da issue, um controller Stimulus interceptará a adição de um contato. Antes de salvar, ele fará um `fetch` para o endpoint `check_workload`. Se a resposta for `overload`, ele exibirá um `window.confirm()` com o alerta, permitindo que o gestor decida se continua ou não.
 
 ---
 
