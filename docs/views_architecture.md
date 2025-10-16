@@ -93,35 +93,45 @@ Para garantir consistência e robustez, todos os modais do plugin (seja para CRU
         <% end %>
         ```
 
-4.  **Passo 4: O Fechamento (Padrão Validado via Turbo Stream)**
+4.  **Passo 4: O Fechamento (Padrão de Reset Resiliente)**
     -   O botão ou link de fechar dentro do modal **deve** ser um `link_to` que aponta para uma rota dedicada e genérica, como `close_modal_contacts_path`.
     -   Este link **deve** usar o método `POST` via `data: { turbo_method: :post }`.
-    -   A `action` do controller para esta rota (ex: `ContactsController#close_modal`) **deve** responder com um `turbo_stream` que remove o frame do modal do DOM.
-    -   **Exemplo de Link (`_details_modal.html.erb`):**
+    -   A `action` do controller para esta rota (ex: `ContactsController#close_modal`) **deve** responder com **duas** `turbo_stream` actions para garantir um reset completo e resiliente do estado do modal.
+        1.  **`turbo_stream.remove("modal")`**: Remove o frame atual do DOM. Isso aciona o método `disconnect()` do controller Stimulus (`modal_controller.js`), que é responsável por limpar classes do `<body>` (ex: `modal-open`) e esconder a "casca" do modal.
+        2.  **`turbo_stream.append("content", ...)`**: Imediatamente após, anexa um novo `turbo_frame_tag("modal")` vazio de volta à página. Isso garante que o "receptáculo" esteja sempre presente para a próxima vez que o usuário quiser abrir um modal.
+    -   **Exemplo de Link (`_analytics_modal.html.erb`):**
         ```erb
-        <%= link_to "&#10006;".html_safe, close_modal_contacts_path, class: "close", data: { turbo_method: :post } %>
+        <%= link_to l(:button_close), close_modal_contacts_path, class: "btn btn-secondary", data: { "turbo-method": :post } %>
         ```
     -   **Exemplo de Action (`contacts_controller.rb`):**
         ```ruby
         def close_modal
-          render turbo_stream: turbo_stream.remove("modal")
+          respond_to do |format|
+            format.turbo_stream do
+              render turbo_stream: [
+                turbo_stream.remove("modal"),
+                turbo_stream.append("content", "<turbo-frame id='modal' data-controller='modal'></turbo-frame>")
+              ]
+            end
+            format.html { redirect_to contacts_path }
+          end
         end
         ```
 
-Este fluxo garante que o modal seja completamente removido da página, incluindo o backdrop escuro, evitando os bugs de "modal preso".
+Este fluxo de "remover e recriar" é a abordagem mais robusta, pois garante que o modal seja completamente desmontado e que a página retorne ao seu estado original, pronta para uma nova interação, eliminando bugs de "modal preso" ou falhas em aberturas subsequentes.
 
 ```mermaid
 graph TD
-    subgraph "Ciclo de Vida do Modal"
+    subgraph "Ciclo de Vida do Modal (Padrão Resiliente)"
         A[Página com <turbo_frame id='modal'>] --> B(Usuário clica em <br/> `link_to ... data-turbo-frame='modal'`);
-        B --> C{Req GET para<br/>`contacts#edit`};
-        C --> D[Controller renderiza<br/>`edit.html.erb`];
+        B --> C{Req GET para<br/>`contacts#show`};
+        C --> D[Controller renderiza<br/>`show.html.erb`];
         D --> E[Resposta: `<turbo_frame id='modal'>...conteúdo...</turbo_frame>`];
         E --> F[Modal aparece na tela];
         F --> G(Usuário clica em <br/>`link_to close_modal_path, method: :post`);
         G --> H{Req POST para<br/>`contacts#close_modal`};
-        H --> I[Controller renderiza<br/>`turbo_stream.remove("modal")`];
-        I --> J[Modal desaparece da tela];
+        H --> I[Controller renderiza<br/>`turbo_stream.remove("modal")` e<br/>`turbo_stream.append(...)`];
+        I --> J[Modal desaparece e um novo<br/>receptáculo <turbo_frame id='modal'> é criado];
     end
 ```
 

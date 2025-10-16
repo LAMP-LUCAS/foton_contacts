@@ -357,9 +357,13 @@ class ContactsController < ApplicationController
   end
 
   def close_modal
-    
     respond_to do |format|
-      format.turbo_stream { render turbo_stream: turbo_stream.remove("modal") }
+      format.turbo_stream do
+        render turbo_stream: [
+          turbo_stream.remove("modal"),
+          turbo_stream.append("content", "<turbo-frame id='modal' data-controller='modal'></turbo-frame>")
+        ]
+      end
       format.html { redirect_to contacts_path }
     end
   end
