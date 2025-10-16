@@ -19,7 +19,6 @@ resources :contacts do
     post 'import'
     get 'export'
     post 'close_modal'
-    post 'check_workload'
   end
 end
 
