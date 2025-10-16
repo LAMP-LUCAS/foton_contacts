@@ -240,6 +240,61 @@ A implementação seguirá rigorosamente as diretrizes de `@docs/concepts.md` e 
 
 ---
 
+### 🚀 Fase 5: Refatoração do Modelo de Dados (Planejada)
+
+**Objetivo:** Refatorar o modelo de dados de contatos para uma estrutura normalizada, permitindo que cada contato tenha múltiplos telefones, e-mails e endereços. Isso aumentará a flexibilidade e a robustez do plugin, alinhando-o com as melhores práticas de design de banco de dados.
+
+**Arquitetura Alvo:**
+*   **Tabela Principal `foton_contacts`:** Conterá apenas informações intrínsecas ao contato (nome, tipo, status, etc.).
+*   **Tabelas Satélite:**
+    *   `foton_contact_phones`: Armazenará uma lista de números de telefone associados a um contato.
+    *   `foton_contact_emails`: Armazenará uma lista de endereços de e-mail.
+    *   `foton_contact_addresses`: Armazenará uma lista de endereços físicos.
+*   **Camada de Abstração (Porta de Desacoplamento):** Para garantir uma migração suave e evitar quebrar o plugin, o modelo `FotonContact` terá métodos delegados temporários (ex: `phone`, `email`) que buscarão o registro primário nas novas tabelas. Isso permite que a UI seja atualizada de forma incremental, funcionando como uma porta de desacoplamento entre a nova estrutura de dados e o código legado.
+
+---
+
+#### 🗺️ Etapas Detalhadas de Implementação
+
+1.  **Criação da Nova Estrutura (Migrations)**
+    *   [ ] **1.1. Criar Migration para Novas Tabelas:** Criar um novo arquivo de migração (`db/migrate/XXX_create_foton_contact_details.rb`) para adicionar as tabelas `foton_contact_phones`, `foton_contact_emails` e `foton_contact_addresses`.
+    *   [ ] **1.2. Criar Migration para Renomear Tabela Principal:** Criar uma migração (`db/migrate/XXX_rename_contacts_to_foton_contacts.rb`) para renomear a tabela `contacts` para `foton_contacts` e atualizar suas referências em outras tabelas (`contact_group_memberships`, `contact_issue_links`, `contact_employments`).
+    *   [ ] **1.3. Criar Novos Modelos:** Criar os arquivos de modelo `app/models/foton_contact_phone.rb`, `app/models/foton_contact_email.rb`, e `app/models/foton_contact_address.rb` com suas respectivas validações e associações.
+
+2.  **Migração de Dados e Transição**
+    *   [ ] **2.1. Renomear Modelo Principal:** Renomear `app/models/contact.rb` para `app/models/foton_contact.rb` e a classe para `FotonContact`. Atualizar todas as referências no código.
+    *   [ ] **2.2. Atualizar Associações:** No novo `foton_contact.rb`, adicionar as associações `has_many` para `phones`, `emails`, e `addresses`, e configurar `accepts_nested_attributes_for`.
+    *   [ ] **2.3. Implementar Camada de Abstração:**
+        *   No modelo `FotonContact`, criar métodos delegados como `phone`, `email`, `address` que retornam o valor do registro primário (`is_primary: true`) das novas tabelas.
+        *   **Exemplo:** `def phone; phones.find_by(is_primary: true)&.number || phones.first&.number; end`.
+        *   Isso manterá a compatibilidade com as views e controllers existentes durante a refatoração.
+    *   [ ] **2.4. Criar Migration de Dados:** Criar uma migração de dados (`db/migrate/XXX_migrate_contact_data.rb`) que:
+        *   Itera sobre todos os registros da tabela `foton_contacts`.
+        *   Para cada contato, cria um novo registro em `foton_contact_phones` com o valor do campo `phone` antigo, marcando-o como primário.
+        *   Faz o mesmo para `email` e `address`.
+    *   [ ] **2.5. Criar Migration para Remover Colunas Antigas:** Após a migração de dados ser bem-sucedida e testada, criar uma migração (`db/migrate/XXX_remove_old_columns_from_foton_contacts.rb`) para remover as colunas `phone`, `email`, e `address` da tabela `foton_contacts`.
+
+3.  **Refatoração da Interface e Lógica de Negócio (Incremental)**
+    *   [ ] **3.1. Atualizar `contacts_controller.rb`:**
+        *   Modificar `strong_params` para aceitar os atributos aninhados (`phones_attributes`, `emails_attributes`, etc.).
+        *   Atualizar as actions `create` e `update`.
+    *   [ ] **3.2. Refatorar Formulários (`_form.html.erb`):**
+        *   Substituir os campos de texto simples para `phone`, `email`, e `address` por um sistema de campos aninhados (nested forms), usando Stimulus (como o `nested_form_controller.js` já existente) para adicionar/remover dinamicamente múltiplos registros.
+    *   [ ] **3.3. Refatorar Views de Exibição (`show.html.erb`, `index.html.erb`):**
+        *   Atualizar as views para iterar sobre as coleções (`@contact.phones`, `@contact.emails`) em vez de exibir um único valor. Exibir o registro primário com destaque.
+    *   [ ] **3.4. Revisar Arquivos Afetados:**
+        *   **Controllers:** `contact_employments_controller.rb`, `contact_group_memberships_controller.rb`, `contact_issue_links_controller.rb`, `analytics_controller.rb`.
+        *   **Helpers:** `contacts_helper.rb`.
+        *   **Views:** Todas as views em `app/views/contacts/`, `app/views/issues/`, `app/views/analytics/` que exibem informações de contato.
+        *   **Patches:** `lib/patches/issue_patch.rb`, `lib/patches/user_patch.rb`.
+        *   **Exportação CSV:** Atualizar o método `contacts_to_csv` para lidar com os novos dados.
+
+4.  **Atualização dos Testes**
+    *   [ ] **4.1. Atualizar Testes Existentes:** Modificar os testes unitários, funcionais e de integração para refletir o novo modelo de dados e a lógica de formulários aninhados.
+    *   [ ] **4.2. Criar Novos Testes:** Adicionar testes para as novas associações e para a lógica de múltiplos telefones/e-mails.
+
+---
+
 ### 🧪 Testes e Validações (Pendente)
 
 **Objetivo:** Aumentar a robustez e a confiabilidade do plugin.
