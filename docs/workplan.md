@@ -70,9 +70,9 @@ A implementação seguirá rigorosamente as diretrizes de `@docs/concepts.md` e 
 #### 🗺️ Etapas Detalhadas de Implementação
 
 1.  **Fundação da Arquitetura de BI (Backend)**
-    -   [ ] **1.1. Criar `AnalyticsController`:** Definir as actions principais (`index`, `team_performance`, `workload`, etc.) e as rotas correspondentes em `config/routes.rb`.
-    -   [ ] **1.2. Implementar os Cálculos de Métricas:**
-        -   [ ] Criar `Service/Query Objects` para cada análise principal descrita no `bi_analysis_guide.md`:
+    -   [x] **1.1. Criar `AnalyticsController`:** Definir as actions principais (`index`, `team_performance`, `workload`, etc.) e as rotas correspondentes em `config/routes.rb`.
+    -   [x] **1.2. Implementar os Cálculos de Métricas:**
+        -   [x] Criar `Service/Query Objects` para cada análise principal descrita no `bi_analysis_guide.md`:
             -   `Analytics::IrpaCalculator` para o **Índice de Risco Preditivo de Alocação (IRPA)**.
             -   `Analytics::TeamScorecardQuery` para o **Painel de Performance da Equipa**.
                 - [x] Refatorar o cálculo do Índice de Coesão (ICE) para usar o histórico do `Journal`.
@@ -81,20 +81,21 @@ A implementação seguirá rigorosamente as diretrizes de `@docs/concepts.md` e 
     -   [ ] **1.3. Configuração de Carga Horária:** Adicionar os campos para configuração da carga horária global e por contato, conforme especificado no guia de BI.
 
 2.  **Dashboard Principal e Análise de Risco (Cenários BDD 1 e 2)**
-    -   [ ] **2.1. View do Dashboard Principal:** Criar a view `app/views/analytics/index.html.erb` com uma estrutura de abas (`Visão Geral`, `Análise de Equipes`, `Carga de Trabalho`).
-    -   [ ] **2.2. Widgets com Lazy Loading:** Na aba "Visão Geral", criar os partials para cada widget (`_irpa_widget.html.erb`, `_data_quality_widget.html.erb`, etc.), cada um dentro de um `turbo_frame_tag` com `loading: :lazy`.
-    -   [ ] **2.3. Tabela de Risco (IRPA):** Implementar a tabela de contatos de maior risco. Cada linha terá um link para a análise detalhada.
-    -   [ ] **2.4. Modal de Análise Individual (Drill-Down):** O clique no nome de um contato na tabela de risco abrirá um modal (`_contact_analysis_modal.html.erb`) via Turbo Frame, exibindo o score IRPA, os KPIs detalhados e o histórico do contato.
+    -   [xx] **2.1. View do Dashboard Principal:** Criar a view `app/views/analytics/index.html.erb` com uma estrutura de abas (`Visão Geral`, `Análise de Equipes`, `Carga de Trabalho`).
+    -   [x] **2.2. Widgets com Lazy Loading:** Na aba "Visão Geral", criar os partials para cada widget (`_irpa_widget.html.erb`, `_data_quality_widget.html.erb`, etc.), cada um dentro de um `turbo_frame_tag` com `loading: :lazy`.
+    -   [x] **2.3. Tabela de Risco (IRPA):** Implementar a tabela de contatos de maior risco. Cada linha terá um link para a análise detalhada.
+    -   [x] **2.4. Modal de Análise Individual (Drill-Down):** O clique no nome de um contato na tabela de risco abrirá um modal (`_contact_analysis_modal.html.erb`) via Turbo Frame, exibindo o score IRPA, os KPIs detalhados e o histórico do contato.
 
 3.  **Dashboard Dinâmico na Lista de Contatos (Cenário BDD 3)**
-    -   [ ] **3.1. Modificar a View `contacts/index`:** Adicionar um `<turbo_frame_tag id="dynamic_dashboard">` abaixo da tabela de contatos.
-    -   [ ] **3.2. Criar Controller Stimulus:** Desenvolver um controller `contact-filter-observer-controller.js` que monitora os eventos de filtro da lista.
-    -   [ ] **3.3. Lógica de Atualização:** Quando os filtros forem aplicados, o controller Stimulus irá disparar uma nova requisição para o frame `dynamic_dashboard`, passando os parâmetros de filtro atuais. O backend recalculará as métricas para o subconjunto de dados e renderizará o dashboard atualizado.
+    -   [x] **3.1. Modificar a View `contacts/index` para incluir o frame do dashboard**
+    -   [ ] **3.2. Refatorar e Implementar `contact-filter-observer-controller.js`:**
+        - [ ] Refatorar o controller para usar o padrão IIFE + `window.ControllerName`.
+        - [ ] Implementar a lógica para atualizar o `src` do frame do dashboard com os parâmetros de filtro.
 
 4.  **Análise Comparativa de Equipes (Cenário BDD 4)**
-    -   [ ] **4.1. View de Análise de Equipes:** Criar a view/partial para a aba "Análise de Equipes".
-    -   [ ] **4.2. Integrar Gráfico de Radar:** Desenvolver um controller Stimulus (`chart-controller.js`) que recebe os dados do `TeamScorecardQuery` e renderiza o Gráfico de Radar para comparação visual das equipes.
-    -   [ ] **4.3. Ranking de Equipes:** Exibir a tabela de "Ranking de Equipes" ao lado do gráfico.
+    -   [x] **4.1. View de Análise de Equipes:** Criar a view/partial para a aba "Análise de Equipes".
+    -   [x] **4.2. Integrar Gráfico de Radar:** Desenvolver um controller Stimulus (`chart-controller.js`) que recebe os dados do `TeamScorecardQuery` e renderiza o Gráfico de Radar para comparação visual das equipes.
+    -   [x] **4.3. Ranking de Equipes:** Exibir a tabela de "Ranking de Equipes" ao lado do gráfico.
 
 5.  **Mapa de Carga de Trabalho e Alerta Proativo (Cenário BDD 5)**
     -   [x] **5.1. View do Mapa de Calor:** A view para a aba "Carga de Trabalho" renderiza o heatmap. A UI permite filtrar por período, projeto, e alternar entre horas estimadas e lançadas.
@@ -208,6 +209,37 @@ A implementação seguirá rigorosamente as diretrizes de `@docs/concepts.md` e 
 
 ---
 
+### 🚀 Fase 4: Refatoração e Padronização da Estilização (CSS) (Planejada)
+
+**Objetivo:** Alinhar todo o plugin com a arquitetura de estilização híbrida (Bootstrap + CSS Grid) definida no `views_architecture.md`, garantindo consistência visual, manutenibilidade e conformidade com a filosofia de autohospedagem.
+
+#### 🗺️ Etapas Detalhadas
+
+1.  **Bundling de Dependências (Autohospedagem)**
+    -   [x] **1.1. Download e Integração do Bootstrap:** Baixar os arquivos CSS e JS do Bootstrap 5 e configurá-los para serem servidos pelo asset pipeline do plugin.
+    -   [x] **1.2. Verificação e Remoção de CDNs:** Substituir todas as chamadas de CDN para o Bootstrap nos layouts e views pelos helpers de asset do Rails (`stylesheet_link_tag`, `javascript_include_tag`).
+
+2.  **Correção e Limpeza do CSS**
+    -   [x] **2.1. Auditoria de `contacts.css`:** Mapear e remover regras de CSS que conflitam com o Bootstrap, como a aplicação de `display: grid` em classes `.col-md-*`.
+    -   [x] **2.2. Implementação do Novo Grid:** Adicionar as novas classes de contêiner de grid (`.analytics-grid-container`, etc.) ao `contacts.css`, conforme especificado na arquitetura.
+
+3.  **Refatoração das Views do Dashboard de BI**
+    -   [x] **3.1. Aplicar Grid na "Visão Geral":** Refatorar a partial `_overview.html.erb` para usar a nova estrutura de `divs` com as classes de CSS Grid, posicionando os `turbo_frame`s corretamente.
+    -   [x] **3.2. Aplicar Grid na "Análise de Equipes":** Fazer o mesmo para a partial `_team_performance.html.erb`.
+    -   [x] **3.3. Teste de Responsividade:** Validar que os novos layouts de grid se ajustam corretamente para uma única coluna em telas menores.
+
+4.  **Revisão Geral de Consistência**
+    -   [ ] **4.1. Auditoria de Componentes:** Revisar os principais componentes da UI (filtros, tabelas, modais) para garantir o uso consistente das classes do Bootstrap.
+
+#### ✅ Critérios de Aceite
+
+- O plugin carrega o Bootstrap 5 exclusivamente a partir de seus próprios assets, sem requisições a CDNs.
+- O layout do Dashboard de BI é totalmente controlado pelo novo sistema de CSS Grid e é responsivo.
+- O arquivo `contacts.css` não contém mais CSS que conflita com o framework Bootstrap.
+- Todas as páginas do plugin mantêm a consistência visual.
+
+---
+
 ### 🧪 Testes e Validações (Pendente)
 
 **Objetivo:** Aumentar a robustez e a confiabilidade do plugin.
@@ -230,6 +262,11 @@ A implementação seguirá rigorosamente as diretrizes de `@docs/concepts.md` e 
 ---
 
 ## 📝 Backlog de Funcionalidades
+
+### Avaliação de Sobrecarga para Grupos de Contatos
+*   **Problema:** O alerta de sobrecarga de trabalho atualmente funciona apenas para contatos individuais. Ao adicionar um grupo a uma tarefa, não há verificação agregada da carga de trabalho dos membros do grupo.
+*   **Solução Proposta:** Estender a funcionalidade de alerta de sobrecarga para grupos. Isso exigiria uma "avaliação vertical" da carga de trabalho de todos os membros do grupo, somando suas alocações para determinar se a adição da tarefa sobrecarregaria o grupo como um todo ou membros específicos.
+*   **Implicações:** Necessitaria de alterações na lógica de `check_workload` no backend e no `workload_alert_controller.js` no frontend para lidar com a seleção de grupos e a agregação de dados.
 
 ### Refatorar Grupos de Contatos
 - **Problema:** O modelo `ContactGroup` usa flags booleanas (`is_system`, `is_private`) que poderiam ser substituídas por um enum `group_type` mais robusto.
