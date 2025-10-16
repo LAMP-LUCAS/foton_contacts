@@ -367,6 +367,29 @@ class ContactsController < ApplicationController
       format.html { redirect_to contacts_path }
     end
   end
+
+  def check_workload
+    # Sanitize and parse parameters
+    contact_id = params[:contact_id]
+    start_date = Date.parse(params[:start_date]) rescue nil
+    due_date = Date.parse(params[:due_date]) rescue nil
+    estimated_hours = params[:estimated_hours].to_f
+
+    # Validate required parameters
+    if contact_id.blank? || start_date.blank? || due_date.blank?
+      return render json: { status: 'error', message: 'Parâmetros inválidos.' }, status: :bad_request
+    end
+
+    # Call the service
+    result = Analytics::WorkloadCheckerService.call(
+      contact_id: contact_id,
+      issue_start_date: start_date,
+      issue_due_date: due_date,
+      issue_estimated_hours: estimated_hours
+    )
+
+    render json: result
+  end
   
   private
   

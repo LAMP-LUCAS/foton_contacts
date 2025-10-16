@@ -1,61 +1,59 @@
-(function() {
-  class WorkloadAlertController extends Stimulus.Controller {
-    static values = { 
-      checkUrl: String,
-      startDate: String,
-      dueDate: String,
-      estimatedHours: String
-    }
+import { Controller } from "@hotwired/stimulus"
 
-    async connect() {
-      this.element.addEventListener("submit", this.check.bind(this), { capture: true })
-    }
-
-    async check(event) {
-      if (this.element.dataset.workloadChecked) return
-
-      event.preventDefault()
-      event.stopImmediatePropagation()
-
-      const contactIdField = this.element.querySelector('select[name="contact_id"], input[name="contact_id"]');
-      const contactId = contactIdField ? contactIdField.value : null;
-
-      if (!contactId) {
-        console.error("WorkloadAlertController: Contact ID field not found or is empty.");
-        this.submitForm();
-        return;
-      }
-
-      const response = await fetch(this.checkUrlValue, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-Token': document.querySelector("[name='csrf-token']").content
-        },
-        body: JSON.stringify({
-          contact_id: contactId,
-          start_date: this.startDateValue,
-          due_date: this.dueDateValue,
-          estimated_hours: this.estimatedHoursValue
-        })
-      })
-
-      const data = await response.json()
-
-      if (data.status === 'overload') {
-        if (confirm(data.message)) {
-          this.submitForm()
-        }
-      } else {
-        this.submitForm()
-      }
-    }
-
-    submitForm() {
-      this.element.dataset.workloadChecked = "true"
-      this.element.requestSubmit()
-    }
+// Connects to data-controller="workload-alert"
+export default class extends Controller {
+  static values = {
+    checkUrl: String,
+    confirmMessage: String
   }
 
-  window.WorkloadAlertController = WorkloadAlertController;
-})();
+  check(event) {
+    event.preventDefault();
+    const form = this.element;
+    const contactId = form.querySelector("input[name='contact_id']").value;
+
+    // Get issue attributes from the main form
+    const issueStartDate = document.getElementById('issue_start_date')?.value;
+    const issueDueDate = document.getElementById('issue_due_date')?.value;
+    const issueEstimatedHours = document.getElementById('issue_estimated_hours')?.value;
+
+    // If dates are not present, we cannot check. Submit the form directly.
+    if (!issueStartDate || !issueDueDate) {
+      form.submit();
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('contact_id', contactId);
+    formData.append('start_date', issueStartDate);
+    formData.append('due_date', issueDueDate);
+    formData.append('estimated_hours', issueEstimatedHours || '0');
+
+    // Get CSRF token
+    const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
+
+    fetch(this.checkUrlValue, {
+      method: 'POST',
+      headers: {
+        'X-CSRF-Token': csrfToken,
+        'Accept': 'application/json'
+      },
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'overload') {
+        if (window.confirm(data.message)) {
+          form.submit();
+        }
+      } else {
+        form.submit();
+      }
+    })
+    .catch(error => {
+      console.error('Error checking workload:', error);
+      // In case of error, submit the form to not block the user
+      form.submit();
+    });
+  }
+}
