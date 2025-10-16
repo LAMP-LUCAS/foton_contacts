@@ -2,14 +2,14 @@
 <%= turbo_frame_tag "team_performance_tab_content" do %>
   <%# ESTÁGIO 2: Layout da Aba (Monolito) %>
   <%# Define a estrutura de colunas e renderiza os componentes (Estágio 3) %>
-  <div class="row">
+  <div class="analytics-grid-layout-7-5">
     <%# Coluna da Esquerda para o Gráfico %>
-    <div class="col-md-7">
+    <div>
       <%= render partial: "analytics/components/team_radar_chart", locals: { scorecard_data: scorecard_data } %>
     </div>
 
     <%# Coluna da Direita para a Tabela e Detalhes %>
-    <div class="col-md-5">
+    <div>
       <%= render partial: "analytics/components/team_ranking_table", locals: { scorecard_data: scorecard_data } %>
       
       <%# Frame para carregar detalhes de uma equipe ao clicar na tabela %>

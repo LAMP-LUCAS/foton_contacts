@@ -127,7 +127,7 @@ graph TD
 
 ---
 
-## 5. Arquitetura do Dashboard de BI (Monolito-Modular)
+## 6. Arquitetura do Dashboard de BI (Monolito-Modular)
 
 O Dashboard de BI utiliza uma arquitetura de três estágios para componentização e lazy-loading.
 
@@ -152,7 +152,7 @@ graph TD
 
 ---
 
-## 6. Diagnóstico de Erros Comuns (Lições Aprendidas)
+## 7. Diagnóstico de Erros Comuns (Lições Aprendidas)
 
 1.  **`Content Missing` ou `did not contain the expected <turbo-frame ...>`:** Este é o erro mais comum. A causa é sempre a mesma: um `turbo_frame_tag` fez uma requisição, mas o HTML da resposta do servidor **não continha** um `turbo_frame_tag` com o **mesmo ID**. A solução é sempre garantir essa correspondência entre a requisição e a resposta.
 
@@ -162,3 +162,57 @@ graph TD
     - **Causa C (Falha nos Helpers):** Os helpers do Rails (`line_chart`, etc.) podem não gerar o JavaScript correto para opções complexas (como gráficos de radar). A solução validada é chamar a biblioteca `Chartkick.js` diretamente via uma tag `<script>` na view.
 
 3.  **Filtro Recarrega a Página Inteira:** Acontece quando um formulário é submetido sem o atributo `data-turbo-frame`. O Turbo o trata como uma navegação normal. A solução é usar o padrão de **Target Direto** descrito na seção 4.
+
+---
+
+## 8. Arquitetura de Estilização e Layout (CSS)
+
+Para garantir consistência, manutenibilidade e desempenho, o plugin adota uma **arquitetura de estilização híbrida**.
+
+### 8.1. Tecnologias e Filosofia
+
+1.  **Bootstrap 5 (Framework Base):**
+    -   **Motivo:** Fornece uma base sólida e familiar de componentes (cards, botões, modais, formulários), um sistema de espaçamento e uma base tipográfica consistente. Acelera o desenvolvimento e reduz a necessidade de CSS customizado, alinhando-se aos princípios de **baixa curva de aprendizado e manutenção rápida**.
+    -   **Aplicação:** Deve ser usado para o scaffolding geral da página (estrutura de containers, layout principal) e para a estilização de componentes de UI padrão.
+    -   **Diretriz de Autohospedagem:** Para garantir o funcionamento em ambientes offline, o Bootstrap **deve** ser incluído no *asset pipeline* do plugin. Seus arquivos (`.css` e `.js`) devem ser armazenados localmente no diretório `assets/` e carregados via `application.css` e `application.js`. O uso de CDNs para o Bootstrap deve ser evitado em produção.
+
+2.  **CSS Grid (Layouts Complexos):**
+    -   **Motivo:** É a tecnologia nativa do navegador para a criação de layouts de duas dimensões. É a ferramenta ideal para organizar os múltiplos *widgets* e *cards* de um dashboard, como o de BI. A sintaxe é declarativa, poderosa e mais limpa do que aninhar múltiplas `div.row` e `div.col-*` do Bootstrap para o mesmo fim. Por ser nativo, **não possui dependências**, o que reforça a filosofia de autohospedagem.
+    -   **Aplicação:** Deve ser usado para orquestrar a posição dos `turbo-frame`s que compõem um dashboard ou uma grade complexa de componentes.
+
+### 8.2. Como Utilizar (Diretrizes Práticas)
+
+A regra geral é: **Bootstrap para a aparência dos "tijolos", CSS Grid para a planta baixa de como os "tijolos" são organizados.**
+
+-   **Use Bootstrap para:**
+    -   Estrutura básica da página: `container`, `row`.
+    -   Componentes: `card`, `btn`, `modal`, `form-control`.
+    -   Layouts lineares simples: `<div class="row"><div class="col-md-6">...</div><div class="col-md-6">...</div></div>`.
+
+-   **Use CSS Grid para:**
+    -   Layouts de dashboard com múltiplos cards em proporções não-lineares (ex: uma coluna de 2/3 ao lado de uma de 1/3).
+    -   **Exemplo Prático (Dashboard de BI):**
+        ```html
+        <%# 1. O contêiner com a classe de grid %>
+        <div class="analytics-grid-container two-column-layout">
+
+          <%# 2. Os itens do grid (nossos Turbo Frames) %>
+          <%= turbo_frame_tag "main_widget" do %>
+            <div class="card">...</div>
+          <% end %>
+          <%= turbo_frame_tag "sidebar_widget" do %>
+            <div class="card">...</div>
+          <% end %>
+        </div>
+        ```
+        ```css
+        /* 3. A definição do grid em contacts.css */
+        .analytics-grid-container.two-column-layout {
+          display: grid;
+          grid-template-columns: 2fr 1fr; /* Proporção 2/3 e 1/3 */
+          gap: 20px;
+        }
+        ```
+
+-   **O que NÃO fazer (Antipadrão):**
+    -   **Nunca** aplique `display: grid` diretamente a uma classe de coluna do Bootstrap (`.col-md-8`, `.col-4`, etc.). Isso gera conflitos com o sistema de Flexbox do Bootstrap e cria um comportamento imprevisível. Sempre crie um `div` contêiner separado para o seu grid.

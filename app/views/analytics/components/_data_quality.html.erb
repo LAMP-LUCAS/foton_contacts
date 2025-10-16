@@ -1,27 +1,23 @@
-<div class="card">
-  <div class="card-header"><h5>Monitor de Qualidade dos Dados</h5></div>
-  <div class="card-body">
-    <div class="mb-3">
-      <div class="d-flex justify-content-between mb-1">
-        <span>Contatos Órfãos</span>
-        <strong><%= quality_data[:orphan_contacts] %></strong>
-      </div>
+<div class="row mb-4">
+  <div class="col-md-4">
+    <div class="card metric-card">
+      <div class="metric-value risk-high"><%= quality_data[:orphan_contacts] %></div>
+      <div class="metric-label">Contatos Órfãos</div>
+      <small class="text-muted">Sem empresas vinculadas</small>
     </div>
-    <div class="mb-3">
-      <div class="d-flex justify-content-between mb-1">
-        <span>Contatos Desatualizados</span>
-        <strong><%= quality_data[:outdated_contacts_count] %></strong>
-      </div>
-      <div class="progress" style="height: 5px;">
-        <div class="progress-bar bg-warning" style="width: <%= quality_data[:outdated_contacts_percentage] %>%"></div>
-      </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card metric-card">
+      <div class="metric-value risk-medium"><%= quality_data[:unstandardized_roles_count] %></div>
+      <div class="metric-label">Funções a Padronizar</div>
+      <small class="text-muted">Variações de nomenclatura</small>
     </div>
-    <div class="mb-3">
-      <div class="d-flex justify-content-between mb-1">
-        <span>Funções a Padronizar</span>
-        <strong><%= quality_data[:unstandardized_roles_count] %></strong>
-      </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card metric-card">
+      <div class="metric-value risk-medium"><%= quality_data[:outdated_contacts_count] %></div>
+      <div class="metric-label">Contatos Desatualizados</div>
+      <small class="text-muted">Sem atualização há mais de 1 ano</small>
     </div>
-    <%# TODO: Adicionar botão "Ver Detalhes" %>
   </div>
 </div>
