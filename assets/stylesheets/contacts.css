@@ -340,6 +340,16 @@ body:has(turbo-frame[id="modal"]:not(:empty))::before {
   color: white;
 }
 
+/* 
+ * FIX: Redmine's default theme can override Bootstrap's form control heights,
+ * causing text to be vertically clipped in select boxes.
+ * Resetting the height to 'auto' allows the element to size correctly based on
+ * its font-size and padding, resolving the conflict.
+ */
+.form-select {
+  height: auto !important;
+}
+
 .tab-content {
   background-color: white;
   border-radius: 0 0 8px 8px;

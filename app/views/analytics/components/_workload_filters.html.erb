@@ -10,27 +10,27 @@
           <label for="filters_name" class="form-label">Nome</label>
           <%= text_field_tag 'filters[name]', filter_params.dig(:filters, :name), class: 'form-control' %>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-3">
           <label for="filters_project_id" class="form-label">Projeto</label>
           <%= select_tag 'filters[project_id]', 
-                         options_for_select([['Todos os Projetos', '']] + project_tree_array(Project.all), filter_params.dig(:filters, :project_id)),
+                         options_for_select([['Todos os Projetos', '']] + project_options_array, filter_params.dig(:filters, :project_id)),
                          class: 'form-select' %>
         </div>
         <div class="col-md-2">
           <label for="analysis_type" class="form-label">Análise</label>
           <%= select_tag 'filters[analysis_type]', 
                          options_for_select([['Horas Estimadas', 'estimated'], ['Horas Lançadas', 'spent']], filter_params.dig(:filters, :analysis_type)),
-                         class: 'form-select' %>
+                         class: 'form-select', prompt: 'Selecionar Análise' %>
         </div>
         <div class="col-md-2">
           <label for="period" class="form-label">Período</label>
-          <%= select_tag :period, options_for_select([['Mês', 'month'], ['Semana', 'week'], ['Ano', 'year']], filter_params[:period]), class: 'form-select' %>
+          <%= select_tag :period, options_for_select([['Mês', 'month'], ['Semana', 'week'], ['Ano', 'year']], filter_params[:period]), class: 'form-select', prompt: 'Selecionar Período' %>
         </div>
         <div class="col-md-2">
           <label for="date" class="form-label">Data Base</label>
           <%= date_field_tag :date, filter_params[:date], class: 'form-control' %>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-1">
           <%= submit_tag 'Aplicar', class: 'btn btn-primary w-100' %>
         </div>
       </div>

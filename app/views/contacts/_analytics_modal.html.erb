@@ -15,28 +15,35 @@
             <div class="col-md-8">
               <div class="card">
                 <div class="card-body">
-                  <h3 class="risk-high">IRPA: <%= @irpa_data[:risk_score] %>
-                    <span class="badge bg-danger"><%= l(:label_foton_contacts_high_risk) %></span> <%# TODO: Dynamic risk level %>
+                  <% status = irpa_status_data(@irpa_data[:risk_score]) %>
+                  <h3 class="risk-<%= status[:level] %>">IRPA: <%= number_with_precision(@irpa_data[:risk_score], precision: 1) %>
+                    <span class="badge bg-<%= status[:level] %>"><%= status[:text] %></span>
                   </h3>
                   <p class="text-muted"><%= l(:label_foton_contacts_irpa_description) %></p>
                   
                   <div class="row mt-4">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                       <div class="kpi-card">
                         <div class="kpi-value risk-high"><%= number_to_percentage(@irpa_data[:tah_percent], precision: 0) %></div>
                         <div class="kpi-label"><%= l(:label_foton_contacts_historical_delay_rate) %></div>
                       </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                       <div class="kpi-card">
                         <div class="kpi-value risk-high"><%= number_to_percentage(@irpa_data[:ir_percent], precision: 0) %></div>
                         <div class="kpi-label"><%= l(:label_foton_contacts_rework_index) %></div>
                       </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                       <div class="kpi-card">
                         <div class="kpi-value risk-medium"><%= @irpa_data[:fcp_avg].round(1) %></div>
                         <div class="kpi-label"><%= l(:label_foton_contacts_criticality_factor) %></div>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="kpi-card">
+                        <div class="kpi-value risk-medium"><%= number_with_precision(@irpa_data[:instability_factor], precision: 0) %>%</div>
+                        <div class="kpi-label"><%= l(:label_foton_contacts_instability_factor) %></div>
                       </div>
                     </div>
                   </div>
@@ -103,21 +110,7 @@
                   <h6 class="mb-0"><%= l(:label_foton_contacts_recent_project_performance) %></h6>
                 </div>
                 <div class="card-body">
-                  <%# As a first step, showing a list of recent closed issues instead of a chart %>
-                  <ul class="list-group list-group-flush">
-                    <% if @recent_performance_issues.any? %>
-                      <% @recent_performance_issues.each do |issue| %>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                          <%= link_to issue.subject, issue_path(issue) %>
-                          <span class="badge bg-<%= issue.due_date && issue.closed_on.to_date > issue.due_date ? 'danger' : 'success' %>">
-                            <%= issue.due_date && issue.closed_on.to_date > issue.due_date ? l(:label_issue_status_late) : l(:label_done) %>
-                          </span>
-                        </li>
-                      <% end %>
-                    <% else %>
-                      <li class="list-group-item"><%= l(:label_no_data) %></li>
-                    <% end %>
-                  </ul>
+                  <%= bar_chart @performance_chart_data, height: '200px', library: { scales: { y: { beginAtZero: true, max: 100 } } } %>
                 </div>
               </div>
             </div>
@@ -140,7 +133,7 @@
                           <th><%= l(:field_priority) %></th>
                           <th><%= l(:field_due_date) %></th>
                           <th><%= l(:field_status) %></th>
-                          <%# The 'Allocation' column from the mockup requires more complex logic from workload_query.rb, omitted for now. %>
+                          <th><%= l(:label_foton_contacts_allocation) %></th>
                         </tr>
                       </thead>
                       <tbody>
@@ -152,11 +145,19 @@
                               <td><%= issue.priority.name %></td>
                               <td><%= format_date(issue.due_date) %></td>
                               <td><%= issue.status.name %></td>
+                              <td>
+                                <% if @issue_allocations[issue.id] %>
+                                  <% alloc = @issue_allocations[issue.id] %>
+                                  <span class="badge bg-<%= alloc > 100 ? 'danger' : (alloc > 80 ? 'warning' : 'success') %>"><%= alloc %>%</span>
+                                <% else %>
+                                  ---
+                                <% end %>
+                              </td>
                             </tr>
                           <% end %>
                         <% else %>
                           <tr>
-                            <td colspan="5"><%= l(:label_no_issues_for_contact) %></td>
+                            <td colspan="6"><%= l(:label_no_issues_for_contact) %></td>
                           </tr>
                         <% end %>
                       </tbody>
