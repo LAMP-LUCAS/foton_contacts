@@ -1,4 +1,5 @@
 class AnalyticsController < ApplicationController
+  helper :application
   helper :analytics
   helper :contacts
   helper Chartkick::Helper if Redmine::Plugin.installed?(:chartkick)
@@ -9,7 +10,7 @@ class AnalyticsController < ApplicationController
   end
 
   def overview_tab
-    contacts = Contact.person.includes(:issues)
+    contacts = FotonContact.person.includes(:issues)
     @irpa_data = Analytics::IrpaCalculator.calculate_for_collection(contacts)
     @irpa_data.sort_by! { |h| -h[:risk_score] }
 
@@ -43,8 +44,11 @@ class AnalyticsController < ApplicationController
 
   def workload_tab
     @filter_params = params.permit(:period, :date, filters: [:name, :contact_type])
-    # A carga inicial não precisa buscar dados, pois o frame `workload_results` fará isso.
-    render partial: 'analytics/tabs/workload', locals: { filter_params: @filter_params }
+    # Prepara o array de projetos no controller.
+    @project_options_array = build_project_tree_options(Project.all)
+
+    render partial: 'analytics/tabs/workload', locals: { filter_params: @filter_params, project_options_array: @project_options_array }
+  rescue => e
   end
 
   def workload_results
@@ -67,13 +71,13 @@ class AnalyticsController < ApplicationController
   end
 
   def contact_details
-    @contact = Contact.find(params[:id])
+    @contact = FotonContact.find(params[:id])
     @irpa_data = Analytics::IrpaCalculator.calculate_for_contact(@contact)
     render partial: 'analytics/widgets/details_modal'
   end
 
   def dynamic_dashboard
-    scope = Contact.person.visible(User.current).includes(:issues)
+    scope = FotonContact.person.visible(User.current).includes(:issues)
     scope = scope.where(contact_type: params[:contact_type]) if params[:contact_type].present?
     scope = scope.where(status: params[:status]) if params[:status].present?
     if params[:search].present?
@@ -94,7 +98,7 @@ class AnalyticsController < ApplicationController
   end
 
   def irpa_trend
-    contact = Contact.find(params[:contact_id])
+    contact = FotonContact.find(params[:contact_id])
     trend_data = {}
     (0..5).to_a.reverse.each do |i|
       date = i.months.ago.end_of_month
@@ -106,6 +110,15 @@ class AnalyticsController < ApplicationController
   end
 
   private
+
+  def build_project_tree_options(projects)
+    options = []
+    Project.project_tree(projects) do |project, level|
+      name_prefix = (level > 0 ? '  ' * level + '» ' : '')
+      options << [name_prefix + project.name, project.id]
+    end
+    options
+  end
 
   def get_analytics_tabs
     tabs = []

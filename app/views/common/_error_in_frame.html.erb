@@ -1,0 +1,8 @@
+<%# Renders a turbo_frame with an error message inside %>
+<%= turbo_frame_tag frame_id do %>
+  <div class="flash error">
+    <p><strong><%= l(:error_rendering_partial_title) %></strong></p>
+    <p><%= message %></p>
+    <p class="small"><%= l(:error_rendering_partial_check_log) %></p>
+  </div>
+<% end %>
