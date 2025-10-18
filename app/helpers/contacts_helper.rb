@@ -1,6 +1,6 @@
 module ContactsHelper
   def options_for_company_contact(options = {})
-    company_scope = Contact.companies.order(:name)
+    company_scope = FotonContact.companies.order(:name)
     options_array = company_scope.map { |c| [c.name, c.id] }
     options_for_select(options_array, options[:selected])
   end
@@ -39,6 +39,33 @@ module ContactsHelper
     "#{group.name}#{role_text}"
   end
 
+  def contact_avatar(contact)
+    initials = contact.name.split.map(&:first).join.upcase.first(2)
+    # Simple color generation based on ID to keep it consistent
+    colors = %w[#1abc9c #2ecc71 #3498db #9b59b6 #34495e #f1c40f #e67e22 #e74c3c]
+    color = colors[contact.id % colors.size]
+
+    content_tag(:div, class: 'flex-shrink-0') do
+      content_tag(:div, class: 'rounded-circle d-flex align-items-center justify-content-center', style: "width: 36px; height: 36px; background-color: #{color};") do
+        content_tag(:span, initials, class: 'text-white fw-bold')
+      end
+    end
+  end
+
+  def status_badge(status)
+    color_class = case status
+                  when 'active'
+                    'bg-success'
+                  when 'inactive'
+                    'bg-secondary'
+                  when 'discontinued'
+                    'bg-danger'
+                  else
+                    'bg-light text-dark'
+                  end
+    content_tag(:span, l("label_#{status}"), class: "badge #{color_class}")
+  end
+
   def render_foton_journal_entry(journal)
     content = []
     
@@ -47,7 +74,7 @@ module ContactsHelper
     return "" unless journalized
 
     case journal.journalized_type
-    when 'Contact'
+    when 'FotonContact'
       journal.details.each do |detail|
         content << show_detail(detail, true)
       end
