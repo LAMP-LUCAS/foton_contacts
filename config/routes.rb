@@ -13,6 +13,9 @@ resources :contacts do
   end
   collection do
     get :new_employment_field
+    get :new_email_field
+    get :new_phone_field
+    get :new_address_field
     get 'search'
     get 'search_links'
     get 'autocomplete'

@@ -16,23 +16,41 @@
     <br><span class="description"><%= l(:text_name_description) %></span>
   </p>
 
-  <p>
-    <%= f.label :email %>
-    <%= f.text_field :email, size: 60, placeholder: "exemplo@dominio.com" %>
-    <br><span class="description"><%= l(:text_email_description) %></span>
-  </p>
+  <fieldset class="box" data-controller="nested-form">
+    <legend><%= l(:label_email_plural) %></legend>
+    <div id="emails" data-nested-form-target="target">
+      <%= f.fields_for :emails do |email_form| %>
+        <%= render 'contacts/email_fields', f: email_form %>
+      <% end %>
+    </div>
+    <div data-nested-form-target="template">
+      <%= link_to l(:label_add_email), new_email_field_contacts_path, class: 'icon icon-add', data: { turbo_stream: true } %>
+    </div>
+  </fieldset>
 
-  <p>
-    <%= f.label :phone %>
-    <%= f.text_field :phone, size: 30, placeholder: "(99) 99999-9999" %>
-    <br><span class="description"><%= l(:text_phone_description) %></span>
-  </p>
+  <fieldset class="box" data-controller="nested-form">
+    <legend><%= l(:label_phone_plural) %></legend>
+    <div id="phones" data-nested-form-target="target">
+      <%= f.fields_for :phones do |phone_form| %>
+        <%= render 'contacts/phone_fields', f: phone_form %>
+      <% end %>
+    </div>
+    <div data-nested-form-target="template">
+      <%= link_to l(:label_add_phone), new_phone_field_contacts_path, class: 'icon icon-add', data: { turbo_stream: true } %>
+    </div>
+  </fieldset>
 
-  <p>
-    <%= f.label :address %>
-    <%= f.text_area :address, rows: 5, placeholder: "Rua, número, bairro, cidade, estado, CEP" %>
-    <br><span class="description"><%= l(:text_address_description) %></span>
-  </p>
+  <fieldset class="box" data-controller="nested-form">
+    <legend><%= l(:label_address_plural) %></legend>
+    <div id="addresses" data-nested-form-target="target">
+      <%= f.fields_for :addresses do |address_form| %>
+        <%= render 'contacts/address_fields', f: address_form %>
+      <% end %>
+    </div>
+    <div data-nested-form-target="template">
+      <%= link_to l(:label_add_address), new_address_field_contacts_path, class: 'icon icon-add', data: { turbo_stream: true } %>
+    </div>
+  </fieldset>
 
   <p class="required">
     <%= f.label :status %>

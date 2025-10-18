@@ -1,5 +1,7 @@
 class ContactsController < ApplicationController
   helper FotonContactsLinkHelper
+  helper :foton_contacts_render
+  helper :analytics
   before_action :require_login
   before_action :find_contact, only: [:show, :edit, :update, :destroy, :career_history, :employees_list, :groups, :tasks, :history, :analytics, :show_edit]
   before_action :authorize_global, only: [:index, :show, :new, :create]
@@ -23,7 +25,7 @@ class ContactsController < ApplicationController
     sort_init 'name', 'asc'
     sort_update %w(name status created_at)
 
-    scope = Contact.visible(User.current)
+    scope = FotonContact.visible(User.current)
                   .includes(:author, :project)
                   
     # Filtros
@@ -35,8 +37,8 @@ class ContactsController < ApplicationController
     if params[:search].present?
       search = "%#{params[:search].downcase}%"
       scope = scope.where(
-        'LOWER(name) LIKE ? OR LOWER(email) LIKE ? OR LOWER(description) LIKE ?',
-        search, search, search
+        'LOWER(name) LIKE ? OR LOWER(description) LIKE ?',
+        search, search
       )
     end
     
@@ -49,7 +51,7 @@ class ContactsController < ApplicationController
     respond_to do |format|
       format.html
       format.api
-      format.csv { send_data(Contact.contacts_to_csv(@contacts), filename: 'contacts.csv') }
+      format.csv { send_data(FotonContact.contacts_to_csv(@contacts), filename: 'contacts.csv') }
     end
   end
   
@@ -119,7 +121,7 @@ class ContactsController < ApplicationController
   end
   
   def new
-    @contact = Contact.new(author: User.current, contact_type: params[:type])
+    @contact = FotonContact.new(author: User.current, contact_type: params[:type])
     @contact.employments_as_person.build if @contact.person?
     respond_to do |format|
       format.html
@@ -128,7 +130,7 @@ class ContactsController < ApplicationController
   end
 
   def create
-    @contact = Contact.new(contact_params.merge(author: User.current))
+    @contact = FotonContact.new(contact_params.merge(author: User.current))
     
     respond_to do |format|
       if @contact.save
@@ -209,7 +211,7 @@ class ContactsController < ApplicationController
       "(journalized_type = :employment_type AND journalized_id IN (:employment_ids)) OR " \
       "(journalized_type = :membership_type AND journalized_id IN (:membership_ids))",
       {
-        contact_type: 'Contact', contact_id: @contact.id,
+        contact_type: 'FotonContact', contact_id: @contact.id,
         employment_type: 'ContactEmployment', employment_ids: employment_ids.uniq,
         membership_type: 'ContactGroupMembership', membership_ids: membership_ids
       }
@@ -228,9 +230,39 @@ class ContactsController < ApplicationController
 
       # Current Workload
       @current_workload = @contact.issues.where.not(status: IssueStatus.where(is_closed: true)).includes(:project, :priority, :status).order(due_date: :asc)
+      @issue_allocations = {}
+      @current_workload.each do |issue|
+        if issue.estimated_hours.to_f > 0 && issue.start_date.present? && issue.due_date.present? && @contact.available_hours_per_day.to_f > 0
+          working_days = (issue.start_date..issue.due_date).count { |d| (1..5).include?(d.wday) }
+          if working_days > 0
+            hours_per_day_for_issue = issue.estimated_hours.to_f / working_days
+            allocation_percent = (hours_per_day_for_issue / @contact.available_hours_per_day.to_f) * 100
+            @issue_allocations[issue.id] = allocation_percent.round
+          end
+        end
+      end
 
       # Recent Performance (last 5 closed issues)
       @recent_performance_issues = @contact.issues.where(status: IssueStatus.where(is_closed: true)).order(closed_on: :desc).limit(5)
+
+      # Data for Performance Chart
+      closed_issues_by_project = @contact.issues.where(status: IssueStatus.where(is_closed: true)).group_by(&:project)
+      @performance_chart_data = closed_issues_by_project.map do |project, issues|
+        late_issues = issues.count { |i| i.due_date.present? && i.closed_on.present? && i.closed_on.to_date > i.due_date }
+        rework_issues = issues.count { |i| ['Bug', 'Correction'].include?(i.tracker.name) }
+        total_issues = issues.count
+
+        delay_rate = total_issues > 0 ? (late_issues.to_f / total_issues * 100) : 0
+        rework_rate = total_issues > 0 ? (rework_issues.to_f / total_issues * 100) : 0
+
+        {
+          name: project.name,
+          data: {
+            "Taxa de Atraso (%)": delay_rate.round(1),
+            "Índice de Retrabalho (%)": rework_rate.round(1)
+          }
+        }
+      end
     else
       # Analytics for companies are not yet defined in the mockup
       # We can add company-specific analytics here later.
@@ -261,8 +293,8 @@ class ContactsController < ApplicationController
 
     if query.present?
       # Search for Contacts (Pessoas)
-      persons = Contact.visible(User.current)
-                       .where(contact_type: Contact.contact_types[:person])
+      persons = FotonContact.visible(User.current)
+                       .where(contact_type: FotonContact.contact_types[:person])
                        .where('LOWER(name) LIKE LOWER(?)', "%#{query.downcase}%")
                        .limit(5)
 
@@ -296,13 +328,13 @@ class ContactsController < ApplicationController
     @issue = Issue.find(params[:issue_id])
 
     if query.blank?
-      @contacts = Contact.visible(User.current)
+      @contacts = FotonContact.visible(User.current)
                          .where(contact_type: :person)
                          .limit(10)
       @groups = ContactGroup.visible(User.current)
                             .limit(5)
     else
-      @contacts = Contact.visible(User.current)
+      @contacts = FotonContact.visible(User.current)
                          .where(contact_type: :person)
                          .where('LOWER(name) LIKE LOWER(?)', "%#{query}%")
                          .limit(10)
@@ -336,7 +368,7 @@ class ContactsController < ApplicationController
   end
   
   def autocomplete
-    @contacts = Contact.visible(User.current)
+    @contacts = FotonContact.visible(User.current)
                       .where('LOWER(name) LIKE LOWER(?)', "%#{params[:q]}%")
                       .limit(10)
     render layout: false
@@ -344,13 +376,37 @@ class ContactsController < ApplicationController
   
   def import
     if request.post? && params[:file].present?
-      count = Contact.import_csv(params[:file], User.current)
+      count = FotonContact.import_csv(params[:file], User.current)
       flash[:notice] = l(:notice_contacts_imported, count: count)
       redirect_to contacts_path
     end
   end
 
   def new_employment_field
+    respond_to do |format|
+      format.turbo_stream
+    end
+  end
+
+  def new_email_field
+    @contact = FotonContact.new
+    @contact.emails.build
+    respond_to do |format|
+      format.turbo_stream
+    end
+  end
+
+  def new_phone_field
+    @contact = FotonContact.new
+    @contact.phones.build
+    respond_to do |format|
+      format.turbo_stream
+    end
+  end
+
+  def new_address_field
+    @contact = FotonContact.new
+    @contact.addresses.build
     respond_to do |format|
       format.turbo_stream
     end
@@ -394,7 +450,7 @@ class ContactsController < ApplicationController
   private
   
   def find_contact
-    @contact = Contact.find(params[:id])
+    @contact = FotonContact.find(params[:id])
   rescue ActiveRecord::RecordNotFound
     render_404
   end
@@ -408,18 +464,18 @@ class ContactsController < ApplicationController
   end
 
   def contact_params
-    params.require(:contact).permit(
+    params.require(:foton_contact).permit(
       :name,
-      :email,
-      :phone,
-      :address,
       :contact_type,
       #:status,
       :is_private,
       :project_id,
       :description,
       :available_hours_per_day,
-      employments_as_person_attributes: [:id, :company_id, :position, :status, :start_date, :end_date, :_destroy]
+      employments_as_person_attributes: [:id, :company_id, :position, :status, :start_date, :end_date, :_destroy],
+      emails_attributes: [:id, :email, :is_primary, :_destroy],
+      phones_attributes: [:id, :phone, :is_primary, :_destroy],
+      addresses_attributes: [:id, :address, :is_primary, :_destroy]
     )
   end
 end
