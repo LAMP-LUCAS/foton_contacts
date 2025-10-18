@@ -295,6 +295,47 @@ A implementação seguirá rigorosamente as diretrizes de `@docs/concepts.md` e 
 
 ---
 
+### 🚀 Fase 6: Aprimoramento e Contextualização dos KPIs de Análise (Planejada)
+
+**Objetivo:** Evoluir o modal de análise individual de um simples mostrador de números para uma ferramenta de diagnóstico rápido e acionável. O foco é refatorar os KPIs (Key Performance Indicators) para que eles apresentem não apenas o dado bruto, mas também o contexto necessário para uma interpretação correta e imediata pelo gestor.
+
+#### 🗺️ Etapas Detalhadas de Implementação
+
+1.  **Refatorar o KPI "Fator de Criticidade" (FCP)**
+    *   **Problema:** A métrica atual, "Fator de Criticidade Ponderado", é um número abstrato (ex: 3.5) de difícil interpretação.
+    *   **Solução:** Substituir a média ponderada por uma contagem direta e compreensível de tarefas críticas.
+    *   **Plano de Ação:**
+        *   [ ] **1.1. Modificar `Analytics::IrpaCalculator`:** Alterar o método `calculate_fcp` para, em vez de calcular a média da posição das prioridades, contar o número de tarefas abertas que tenham prioridade "Alta" ou "Urgente". O método deve retornar este número inteiro.
+        *   [ ] **1.2. Atualizar `_analytics_modal.html.erb`:**
+            *   Alterar o "KPI Card" para exibir o novo dado.
+            *   O `kpi-value` mostrará o número de tarefas (ex: "3").
+            *   O `kpi-label` será alterado para "Tarefas Críticas Abertas".
+
+2.  **Contextualizar o KPI "Fator de Instabilidade"**
+    *   **Problema:** A métrica "Instabilidade: 20%" é vaga. O gestor não sabe o que causou essa instabilidade.
+    *   **Solução:** Adicionar um "tooltip" informativo que revela a causa do número.
+    *   **Plano de Ação:**
+        *   [ ] **2.1. Modificar `Analytics::IrpaCalculator`:** O método `calculate_instability_factor` já conta o número de alterações. Fazer com que o hash de retorno do `IrpaCalculator` inclua também este número bruto (ex: `instability_change_count`).
+        *   [ ] **2.2. Atualizar `_analytics_modal.html.erb`:**
+            *   Ao lado do KPI "Fator de Instabilidade", adicionar um ícone de informação (`<i>` com classes de ícone).
+            *   Usar o atributo `title` ou `data-bs-toggle="tooltip"` do Bootstrap neste ícone para exibir um texto explicativo ao passar o mouse, como: `"Baseado em X mudanças de projeto/status nos últimos 6 meses"`.
+
+3.  **Enriquecer o Gráfico de Performance por Projeto**
+    *   **Problema:** O gráfico de barras atual mostra taxas percentuais, mas não dá noção do volume de trabalho, o que pode levar a interpretações erradas.
+    *   **Solução:** Transformar o gráfico de barras simples em um gráfico de barras empilhadas ("stacked bar chart") que mostre o volume total de tarefas e a proporção de cada status (no prazo, atrasadas, retrabalho).
+    *   **Plano de Ação:**
+        *   [ ] **3.1. Modificar `ContactsController#analytics`:** A variável `@performance_chart_data` precisa ser reestruturada. Para cada projeto, em vez de calcular apenas as taxas, ela deverá fornecer a contagem bruta de:
+            *   Total de tarefas (`total_issues`)
+            *   Tarefas de retrabalho (`rework_issues`)
+            *   Tarefas atrasadas (que não são de retrabalho) (`late_issues`)
+            *   Tarefas no prazo (total - retrabalho - atrasadas) (`ontime_issues`)
+        *   [ ] **3.2. Atualizar `_analytics_modal.html.erb`:**
+            *   A chamada ao helper `bar_chart` será modificada para passar múltiplas séries de dados.
+            *   Configurar a opção `stacked: true` na biblioteca do gráfico.
+            *   As séries serão "No Prazo", "Atrasadas" e "Retrabalho", e os dados serão a contagem de tarefas em cada categoria por projeto.
+
+---
+
 ### 🧪 Testes e Validações (Pendente)
 
 **Objetivo:** Aumentar a robustez e a confiabilidade do plugin.
@@ -350,44 +391,3 @@ A implementação seguirá rigorosamente as diretrizes de `@docs/concepts.md` e 
 - **Problema:** A gestão de links para fora do plugin (e mesmo entre páginas completas dentro do plugin) está sendo feita no servidor com um *helper* que adiciona `data-turbo="false"` a todos os links de navegação. Embora funcional, isso causa um recarregamento completo da página, perdendo o benefício de velocidade do Turbo Drive.
 - **Solução Proposta:** No futuro, implementar um "porteiro" em JavaScript (via Stimulus controller) que gerencia o comportamento dos links de forma inteligente no lado do cliente. Isso permitiria manter a navegação rápida do Turbo Drive para todas as páginas, mas executando um `Turbo.visit()` programaticamente para garantir que o estado da página (como a URL no navegador) seja atualizado corretamente, oferecendo a melhor experiência de usuário possível.
 - **Status:** Pendente. A abordagem via helper no servidor foi priorizada para garantir a funcionalidade imediata.
-
----
-
-### 🚀 Fase 6: Aprimoramento e Contextualização dos KPIs de Análise (Planejada)
-
-**Objetivo:** Evoluir o modal de análise individual de um simples mostrador de números para uma ferramenta de diagnóstico rápido e acionável. O foco é refatorar os KPIs (Key Performance Indicators) para que eles apresentem não apenas o dado bruto, mas também o contexto necessário para uma interpretação correta e imediata pelo gestor.
-
-#### 🗺️ Etapas Detalhadas de Implementação
-
-1.  **Refatorar o KPI "Fator de Criticidade" (FCP)**
-    *   **Problema:** A métrica atual, "Fator de Criticidade Ponderado", é um número abstrato (ex: 3.5) de difícil interpretação.
-    *   **Solução:** Substituir a média ponderada por uma contagem direta e compreensível de tarefas críticas.
-    *   **Plano de Ação:**
-        *   [ ] **1.1. Modificar `Analytics::IrpaCalculator`:** Alterar o método `calculate_fcp` para, em vez de calcular a média da posição das prioridades, contar o número de tarefas abertas que tenham prioridade "Alta" ou "Urgente". O método deve retornar este número inteiro.
-        *   [ ] **1.2. Atualizar `_analytics_modal.html.erb`:**
-            *   Alterar o "KPI Card" para exibir o novo dado.
-            *   O `kpi-value` mostrará o número de tarefas (ex: "3").
-            *   O `kpi-label` será alterado para "Tarefas Críticas Abertas".
-
-2.  **Contextualizar o KPI "Fator de Instabilidade"**
-    *   **Problema:** A métrica "Instabilidade: 20%" é vaga. O gestor não sabe o que causou essa instabilidade.
-    *   **Solução:** Adicionar um "tooltip" informativo que revela a causa do número.
-    *   **Plano de Ação:**
-        *   [ ] **2.1. Modificar `Analytics::IrpaCalculator`:** O método `calculate_instability_factor` já conta o número de alterações. Fazer com que o hash de retorno do `IrpaCalculator` inclua também este número bruto (ex: `instability_change_count`).
-        *   [ ] **2.2. Atualizar `_analytics_modal.html.erb`:**
-            *   Ao lado do KPI "Fator de Instabilidade", adicionar um ícone de informação (`<i>` com classes de ícone).
-            *   Usar o atributo `title` ou `data-bs-toggle="tooltip"` do Bootstrap neste ícone para exibir um texto explicativo ao passar o mouse, como: `"Baseado em X mudanças de projeto/status nos últimos 6 meses"`.
-
-3.  **Enriquecer o Gráfico de Performance por Projeto**
-    *   **Problema:** O gráfico de barras atual mostra taxas percentuais, mas não dá noção do volume de trabalho, o que pode levar a interpretações erradas.
-    *   **Solução:** Transformar o gráfico de barras simples em um gráfico de barras empilhadas ("stacked bar chart") que mostre o volume total de tarefas e a proporção de cada status (no prazo, atrasadas, retrabalho).
-    *   **Plano de Ação:**
-        *   [ ] **3.1. Modificar `ContactsController#analytics`:** A variável `@performance_chart_data` precisa ser reestruturada. Para cada projeto, em vez de calcular apenas as taxas, ela deverá fornecer a contagem bruta de:
-            *   Total de tarefas (`total_issues`)
-            *   Tarefas de retrabalho (`rework_issues`)
-            *   Tarefas atrasadas (que não são de retrabalho) (`late_issues`)
-            *   Tarefas no prazo (total - retrabalho - atrasadas) (`ontime_issues`)
-        *   [ ] **3.2. Atualizar `_analytics_modal.html.erb`:**
-            *   A chamada ao helper `bar_chart` será modificada para passar múltiplas séries de dados.
-            *   Configurar a opção `stacked: true` na biblioteca do gráfico.
-            *   As séries serão "No Prazo", "Atrasadas" e "Retrabalho", e os dados serão a contagem de tarefas em cada categoria por projeto.

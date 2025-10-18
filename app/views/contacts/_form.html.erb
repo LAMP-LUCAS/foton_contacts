@@ -69,14 +69,6 @@
   </p>
 
   <p>
-    <%= f.label :project_id, l(:field_project) %>
-    <%= f.select :project_id,
-                @contact.allowed_target_projects.collect { |p| [p.name, p.id] },
-                include_blank: true %>
-    <br><span class="description"><%= l(:text_project_description) %></span>
-  </p>
-
-  <p>
     <%= f.label :description, l(:field_group_description) %>
     <%= f.text_area :description,
                     cols: 60,

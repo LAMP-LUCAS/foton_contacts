@@ -10,7 +10,7 @@ Este documento é o registro histórico e o manual de funcionalidades do plugin 
 
 ### Core
 
-- **Gestão de Contatos:** CRUD completo para contatos (pessoas e empresas).
+- **Gestão de Contatos Detalhada:** CRUD completo para contatos (pessoas e empresas). Cada contato pode ter **múltiplos e-mails, telefones e endereços**, com a capacidade de marcar um de cada tipo como "principal", oferecendo um cadastro flexível e completo.
 - **Tipos e Status:** Diferenciação entre contatos do tipo "pessoa" e "empresa", e controle de status (ativo, inativo, descontinuado).
 - **Campos Personalizados:** Suporte a campos personalizados para contatos.
 - **Anexos e Histórico:** Suporte a anexos e registro de histórico de alterações (`journals`) para contatos.

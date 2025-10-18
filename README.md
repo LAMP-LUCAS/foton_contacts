@@ -15,7 +15,7 @@ Com uma interface moderna e reativa construída com **Hotwire**, o plugin transf
 
 ### 🧩 Funcionalidades Principais
 
-- **Cadastro Unificado:** CRUD completo para contatos do tipo "Pessoa" e "Empresa".
+- **Cadastro Detalhado e Flexível:** Gerencie contatos do tipo "Pessoa" e "Empresa" com a capacidade de adicionar múltiplos e-mails, telefones e endereços para cada um, mantendo um registro completo e centralizado.
 - **Vínculos Profissionais:** Associe pessoas a múltiplas empresas com cargos, datas e histórico de carreira.
 - **Grupos Dinâmicos:** Crie e gerencie grupos de contatos para segmentação e comunicação.
 - **Integração Profunda com Tarefas:**
