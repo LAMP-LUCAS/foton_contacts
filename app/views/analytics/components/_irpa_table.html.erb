@@ -16,24 +16,13 @@
         </thead>
         <tbody>
           <% irpa_data.each do |data| %>
-            <% 
-              risk_level = case data[:risk_score]
-                         when 0..45 then 'success'
-                         when 45..75 then 'warning'
-                         else 'danger'
-                         end
-              status_text = case risk_level
-                            when 'success' then 'Baixo Risco'
-                            when 'warning' then 'Médio Risco'
-                            else 'Alto Risco'
-                            end
-            %>
-            <tr class="table-<%= risk_level %>">
+            <% status = irpa_status_data(data[:risk_score]) %>
+            <tr class="table-<%= status[:level] %>">
               <td><%= link_to data[:contact_name], analytics_contact_details_path(id: data[:contact_id]), data: { turbo_frame: "modal" } %></td>
-              <td><span class="badge bg-<%= risk_level %>"><%= number_with_precision(data[:risk_score], precision: 1) %></span></td>
+              <td><span class="badge bg-<%= status[:level] %>"><%= number_with_precision(data[:risk_score], precision: 1) %></span></td>
               <td><%= number_with_precision(data[:tah_percent], precision: 1) %>%</td>
               <td><%= number_with_precision(data[:ir_percent], precision: 1) %>%</td>
-              <td><span class="badge bg-<%= risk_level %>"><%= status_text %></span></td>
+              <td><span class="badge bg-<%= status[:level] %>"><%= status[:text] %></span></td>
             </tr>
           <% end %>
         </tbody>

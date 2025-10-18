@@ -44,7 +44,7 @@ class ContactGroupsController < ApplicationController
   end
   
   def show
-    @memberships = @contact_group.memberships.includes(contact: :author).order('contacts.name')
+    @memberships = @contact_group.memberships.includes(contact: :author).order('foton_contacts.name')
     @issues = @contact_group.issues.visible.order(updated_on: :desc)
     
     respond_to do |format|
@@ -56,7 +56,7 @@ class ContactGroupsController < ApplicationController
   def search_members
     query = params[:q].to_s.strip.downcase
     @contacts = if query.present?
-                  Contact.visible(User.current)
+                  FotonContact.visible(User.current)
                          .where("LOWER(name) LIKE ?", "%#{query}%")
                          .where.not(id: @contact_group.contact_ids)
                          .limit(10)
@@ -122,7 +122,7 @@ class ContactGroupsController < ApplicationController
   end
   
   def add_member
-    @contact = Contact.find(params[:contact_id])
+    @contact = FotonContact.find(params[:contact_id])
     @membership = @contact_group.memberships.build(contact: @contact)
 
     if @membership.save
@@ -144,7 +144,7 @@ class ContactGroupsController < ApplicationController
   end
   
   def remove_member
-    @contact = Contact.find(params[:contact_id])
+    @contact = FotonContact.find(params[:contact_id])
     @membership = @contact_group.memberships.find_by!(contact_id: @contact.id)
     @membership.destroy
 

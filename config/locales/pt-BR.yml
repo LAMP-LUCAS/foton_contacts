@@ -21,6 +21,19 @@ pt-BR:
   label_foton_contacts_search_group: "Buscar Grupo"
   label_no_data_for_period: "Sem dados para o período selecionado"
   label_error_loading_data: "Erro ao carregar os dados"
+
+  label_email_plural: "E-mails"
+  label_phone_plural: "Telefones"
+  label_address_plural: "Endereços"
+
+  label_add_email: "Adicionar E-mail"
+  label_add_phone: "Adicionar Telefone"
+  label_add_address: "Adicionar Endereço"
+
+  label_primary: "Principal"
+  button_remove: "Remover"
+  button_add: "Adicionar"
+
   
   label_member_count: "Quantidade de Membros"
   label_contact_group_plural: "Grupos"
@@ -184,6 +197,8 @@ pt-BR:
 
   # Analytics Modal
   label_foton_contacts_individual_analysis: "Análise Individual"
+  label_foton_contacts_low_risk: "Baixo Risco"
+  label_foton_contacts_medium_risk: "Médio Risco"
   label_foton_contacts_high_risk: "Alto Risco"
   label_foton_contacts_irpa_description: "Índice de Risco Preditivo de Alocação - Probabilidade alta de causar atrasos ou retrabalho."
   label_foton_contacts_historical_delay_rate: "Taxa de Atraso Histórica"
@@ -206,3 +221,49 @@ pt-BR:
   field_due_date: "Prazo"
   label_present: "Atual"
   label_done: "Concluído"
+
+
+  button_apply: "Aplicar"
+  button_cancel: "Cancelar"
+  button_clear: "Limpar"
+  button_close: "Fechar"
+  button_create: "Criar"
+  button_delete: "Deletar"
+  button_edit: "Editar"
+  button_save: "Salvar"
+  error_contact_group_not_deletable: "Erro: O contato foi possível deletar o contato"
+  field_address_plural: "Endereços"
+  field_email_plural: "Emails"
+  field_phone_plural: "Telefones"
+  field_subject: "TODO: field_subject"
+  field_updated_on: "Atualizado em:"
+  field_user: "Usuário"
+  general_text_no: "Não"
+  general_text_yes: "Sim"
+  label_attachment_plural: "Anexos"
+  label_companies_count: "Número de Empresas"
+  label_company_analytics: "Analise da Empresa"
+  label_custom_fields: "Campos Personalizados"
+  label_foton_contacts_group_name: "Nome do grupo de contatos"
+  label_foton_contacts_groups: "Grupos de Contatos"
+  label_foton_contacts_persons: "Pessoas"
+  label_foton_contacts_role_placeholder: "Função do Contato"
+  label_groups_count: "Número de Grupos"
+  label_linked_contacts_count: "Número de Contatos Vinculados"
+  label_loading: "Carregando..."
+  label_member_plural: "Membros"
+  label_none: "Vazio"
+  label_person_analytics: "Análise do Contato"
+  label_search: "Procurar"
+  label_tasks_count: "Número de Tarefas"
+  label_turnover_count: "Número de Turn-Hover"
+  notice_contact_added_to_group: "Contato adicionado ao grupo com sucesso!"
+  notice_contact_removed_from_group: "Contato removido do grupo com sucesso!"
+  notice_successful_create: "Criado com sucesso!"
+  notice_successful_delete: "Deletado com sucesso!"
+  
+  error_rendering_partial_check_log: "Erro no elemento, verifique os logs."
+  error_rendering_partial_title: "Opa! Houve um erro:"
+
+  label_foton_contacts_instability_factor: "Fator de Instabilidade"
+  

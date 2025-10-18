@@ -38,7 +38,7 @@ class ContactGroupMembershipsController < ApplicationController
     if project
       deny_access unless User.current.allowed_to?(:manage_contacts, project)
     else
-      deny_access unless User.current.allowed_to_globally?(:manage_contacts, @membership.contact_group)
+      deny_access unless User.current.allowed_to_globally?(:manage_contacts)
     end
   end
 end

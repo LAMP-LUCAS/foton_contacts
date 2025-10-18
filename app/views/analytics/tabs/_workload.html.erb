@@ -2,7 +2,7 @@
 <%= turbo_frame_tag "workload_tab_content" do %>
 
   <%# 1. O formulário de filtros. %>
-  <%= render partial: 'analytics/components/workload_filters', locals: { filter_params: filter_params } %>
+  <%= render partial: 'analytics/components/workload_filters', locals: { filter_params: filter_params, project_options_array: project_options_array } %>
 
   <%# 2. O Turbo Frame para os resultados, que carrega os dados iniciais. %>
   <%= turbo_frame_tag "workload_results", src: analytics_workload_results_path(params.permit(:filters, :period, :date)) do %>

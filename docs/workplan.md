@@ -257,41 +257,82 @@ A implementação seguirá rigorosamente as diretrizes de `@docs/concepts.md` e 
 #### 🗺️ Etapas Detalhadas de Implementação
 
 1.  **Criação da Nova Estrutura (Migrations)**
-    *   [ ] **1.1. Criar Migration para Novas Tabelas:** Criar um novo arquivo de migração (`db/migrate/XXX_create_foton_contact_details.rb`) para adicionar as tabelas `foton_contact_phones`, `foton_contact_emails` e `foton_contact_addresses`.
-    *   [ ] **1.2. Criar Migration para Renomear Tabela Principal:** Criar uma migração (`db/migrate/XXX_rename_contacts_to_foton_contacts.rb`) para renomear a tabela `contacts` para `foton_contacts` e atualizar suas referências em outras tabelas (`contact_group_memberships`, `contact_issue_links`, `contact_employments`).
-    *   [ ] **1.3. Criar Novos Modelos:** Criar os arquivos de modelo `app/models/foton_contact_phone.rb`, `app/models/foton_contact_email.rb`, e `app/models/foton_contact_address.rb` com suas respectivas validações e associações.
+    *   [x] **1.1. Criar Migration para Novas Tabelas:** Criar um novo arquivo de migração (`db/migrate/XXX_create_foton_contact_details.rb`) para adicionar as tabelas `foton_contact_phones`, `foton_contact_emails` e `foton_contact_addresses`. (As tabelas foram definidas em `001_init_foton_contacts_schema.rb`)
+    *   [x] **1.2. Criar Migration para Renomear Tabela Principal:** Criar uma migração (`db/migrate/XXX_rename_contacts_to_foton_contacts.rb`) para renomear a tabela `contacts` para `foton_contacts` e atualizar suas referências em outras tabelas (`contact_group_memberships`, `contact_issue_links`, `contact_employments`). (A tabela `foton_contacts` é criada diretamente e as chaves estrangeiras foram atualizadas em `001_init_foton_contacts_schema.rb`)
+    *   [x] **1.3. Criar Novos Modelos:** Criar os arquivos de modelo `app/models/foton_contact_phone.rb`, `app/models/foton_contact_email.rb`, e `app/models/foton_contact_address.rb` com suas respectivas validações e associações.
 
 2.  **Migração de Dados e Transição**
-    *   [ ] **2.1. Renomear Modelo Principal:** Renomear `app/models/contact.rb` para `app/models/foton_contact.rb` e a classe para `FotonContact`. Atualizar todas as referências no código.
-    *   [ ] **2.2. Atualizar Associações:** No novo `foton_contact.rb`, adicionar as associações `has_many` para `phones`, `emails`, e `addresses`, e configurar `accepts_nested_attributes_for`.
-    *   [ ] **2.3. Implementar Camada de Abstração:**
+    *   [x] **2.1. Renomear Modelo Principal:** Renomear `app/models/contact.rb` para `app/models/foton_contact.rb` e a classe para `FotonContact`. Atualizar todas as referências no código.
+    *   [x] **2.2. Atualizar Associações:** No novo `foton_contact.rb`, adicionar as associações `has_many` para `phones`, `emails`, e `addresses`, e configurar `accepts_nested_attributes_for`.
+    *   [x] **2.3. Implementar Camada de Abstração:**
         *   No modelo `FotonContact`, criar métodos delegados como `phone`, `email`, `address` que retornam o valor do registro primário (`is_primary: true`) das novas tabelas.
         *   **Exemplo:** `def phone; phones.find_by(is_primary: true)&.number || phones.first&.number; end`.
         *   Isso manterá a compatibilidade com as views e controllers existentes durante a refatoração.
-    *   [ ] **2.4. Criar Migration de Dados:** Criar uma migração de dados (`db/migrate/XXX_migrate_contact_data.rb`) que:
+    *   [x] **2.4. Criar Migration de Dados:** Criar uma migração de dados (`db/migrate/XXX_migrate_contact_data.rb`) que:
         *   Itera sobre todos os registros da tabela `foton_contacts`.
         *   Para cada contato, cria um novo registro em `foton_contact_phones` com o valor do campo `phone` antigo, marcando-o como primário.
-        *   Faz o mesmo para `email` e `address`.
-    *   [ ] **2.5. Criar Migration para Remover Colunas Antigas:** Após a migração de dados ser bem-sucedida e testada, criar uma migração (`db/migrate/XXX_remove_old_columns_from_foton_contacts.rb`) para remover as colunas `phone`, `email`, e `address` da tabela `foton_contacts`.
+        *   Faz o mesmo para `email` e `address`. (Não necessário para um plugin novo sem dados existentes)
+    *   [x] **2.5. Criar Migration para Remover Colunas Antigas:** Após a migração de dados ser bem-sucedida e testada, criar uma migração (`db/migrate/XXX_remove_old_columns_from_foton_contacts.rb`) para remover as colunas `phone`, `email`, e `address` da tabela `foton_contacts`. (Não necessário para um plugin novo, pois a tabela `foton_contacts` já é criada sem essas colunas)
 
 3.  **Refatoração da Interface e Lógica de Negócio (Incremental)**
-    *   [ ] **3.1. Atualizar `contacts_controller.rb`:**
+    *   [x] **3.1. Atualizar `contacts_controller.rb`:**
         *   Modificar `strong_params` para aceitar os atributos aninhados (`phones_attributes`, `emails_attributes`, etc.).
         *   Atualizar as actions `create` e `update`.
-    *   [ ] **3.2. Refatorar Formulários (`_form.html.erb`):**
+    *   [x] **3.2. Refatorar Formulários (`_form.html.erb`):**
         *   Substituir os campos de texto simples para `phone`, `email`, e `address` por um sistema de campos aninhados (nested forms), usando Stimulus (como o `nested_form_controller.js` já existente) para adicionar/remover dinamicamente múltiplos registros.
-    *   [ ] **3.3. Refatorar Views de Exibição (`show.html.erb`, `index.html.erb`):**
+    *   [x] **3.3. Refatorar Views de Exibição (`show.html.erb`, `index.html.erb`):**
         *   Atualizar as views para iterar sobre as coleções (`@contact.phones`, `@contact.emails`) em vez de exibir um único valor. Exibir o registro primário com destaque.
-    *   [ ] **3.4. Revisar Arquivos Afetados:**
-        *   **Controllers:** `contact_employments_controller.rb`, `contact_group_memberships_controller.rb`, `contact_issue_links_controller.rb`, `analytics_controller.rb`.
-        *   **Helpers:** `contacts_helper.rb`.
-        *   **Views:** Todas as views em `app/views/contacts/`, `app/views/issues/`, `app/views/analytics/` que exibem informações de contato.
-        *   **Patches:** `lib/patches/issue_patch.rb`, `lib/patches/user_patch.rb`.
-        *   **Exportação CSV:** Atualizar o método `contacts_to_csv` para lidar com os novos dados.
+    *   [x] **3.4. Revisar Arquivos Afetados:**
+        *   **Controllers:** `contact_employments_controller.rb`, `contact_group_memberships_controller.rb`, `contact_issue_links_controller.rb`, `analytics_controller.rb`. (Verificado: `contact_employments_controller.rb`, `contact_group_memberships_controller.rb`, `contact_issue_links_controller.rb`, `analytics_controller.rb` foram atualizados para usar `FotonContact`.)
+        *   **Helpers:** `contacts_helper.rb`. (Verificado: `contacts_helper.rb` foi atualizado para usar `FotonContact`.)
+        *   **Views:** Todas as views em `app/views/contacts/`, `app/views/issues/`, `app/views/analytics/` que exibem informações de contato. (Verificado: `app/views/contacts/show_tabs/_details.html.erb` foi atualizado. `index.html.erb` não precisou de alterações diretas para este item.)
+        *   **Patches:** `lib/patches/issue_patch.rb`, `lib/patches/user_patch.rb`. (Verificado: `lib/patches/issue_patch.rb` e `lib/patches/user_patch.rb` foram atualizados.)
+        *   **Exportação CSV:** Atualizar o método `contacts_to_csv` para lidar com os novos dados. (Verificado em `foton_contact.rb`)
 
 4.  **Atualização dos Testes**
-    *   [ ] **4.1. Atualizar Testes Existentes:** Modificar os testes unitários, funcionais e de integração para refletir o novo modelo de dados e a lógica de formulários aninhados.
-    *   [ ] **4.2. Criar Novos Testes:** Adicionar testes para as novas associações e para a lógica de múltiplos telefones/e-mails.
+    *   [x] **4.1. Atualizar Testes Existentes:** Modificar os testes unitários, funcionais e de integração para refletir o novo modelo de dados e a lógica de formulários aninhados.
+    *   [x] **4.2. Criar Novos Testes:** Adicionar testes para as novas associações e para a lógica de múltiplos telefones/e-mails.
+
+---
+
+### 🚀 Fase 6: Aprimoramento e Contextualização dos KPIs de Análise (Planejada)
+
+**Objetivo:** Evoluir o modal de análise individual de um simples mostrador de números para uma ferramenta de diagnóstico rápido e acionável. O foco é refatorar os KPIs (Key Performance Indicators) para que eles apresentem não apenas o dado bruto, mas também o contexto necessário para uma interpretação correta e imediata pelo gestor.
+
+#### 🗺️ Etapas Detalhadas de Implementação
+
+1.  **Refatorar o KPI "Fator de Criticidade" (FCP)**
+    *   **Problema:** A métrica atual, "Fator de Criticidade Ponderado", é um número abstrato (ex: 3.5) de difícil interpretação.
+    *   **Solução:** Substituir a média ponderada por uma contagem direta e compreensível de tarefas críticas.
+    *   **Plano de Ação:**
+        *   [ ] **1.1. Modificar `Analytics::IrpaCalculator`:** Alterar o método `calculate_fcp` para, em vez de calcular a média da posição das prioridades, contar o número de tarefas abertas que tenham prioridade "Alta" ou "Urgente". O método deve retornar este número inteiro.
+        *   [ ] **1.2. Atualizar `_analytics_modal.html.erb`:**
+            *   Alterar o "KPI Card" para exibir o novo dado.
+            *   O `kpi-value` mostrará o número de tarefas (ex: "3").
+            *   O `kpi-label` será alterado para "Tarefas Críticas Abertas".
+
+2.  **Contextualizar o KPI "Fator de Instabilidade"**
+    *   **Problema:** A métrica "Instabilidade: 20%" é vaga. O gestor não sabe o que causou essa instabilidade.
+    *   **Solução:** Adicionar um "tooltip" informativo que revela a causa do número.
+    *   **Plano de Ação:**
+        *   [ ] **2.1. Modificar `Analytics::IrpaCalculator`:** O método `calculate_instability_factor` já conta o número de alterações. Fazer com que o hash de retorno do `IrpaCalculator` inclua também este número bruto (ex: `instability_change_count`).
+        *   [ ] **2.2. Atualizar `_analytics_modal.html.erb`:**
+            *   Ao lado do KPI "Fator de Instabilidade", adicionar um ícone de informação (`<i>` com classes de ícone).
+            *   Usar o atributo `title` ou `data-bs-toggle="tooltip"` do Bootstrap neste ícone para exibir um texto explicativo ao passar o mouse, como: `"Baseado em X mudanças de projeto/status nos últimos 6 meses"`.
+
+3.  **Enriquecer o Gráfico de Performance por Projeto**
+    *   **Problema:** O gráfico de barras atual mostra taxas percentuais, mas não dá noção do volume de trabalho, o que pode levar a interpretações erradas.
+    *   **Solução:** Transformar o gráfico de barras simples em um gráfico de barras empilhadas ("stacked bar chart") que mostre o volume total de tarefas e a proporção de cada status (no prazo, atrasadas, retrabalho).
+    *   **Plano de Ação:**
+        *   [ ] **3.1. Modificar `ContactsController#analytics`:** A variável `@performance_chart_data` precisa ser reestruturada. Para cada projeto, em vez de calcular apenas as taxas, ela deverá fornecer a contagem bruta de:
+            *   Total de tarefas (`total_issues`)
+            *   Tarefas de retrabalho (`rework_issues`)
+            *   Tarefas atrasadas (que não são de retrabalho) (`late_issues`)
+            *   Tarefas no prazo (total - retrabalho - atrasadas) (`ontime_issues`)
+        *   [ ] **3.2. Atualizar `_analytics_modal.html.erb`:**
+            *   A chamada ao helper `bar_chart` será modificada para passar múltiplas séries de dados.
+            *   Configurar a opção `stacked: true` na biblioteca do gráfico.
+            *   As séries serão "No Prazo", "Atrasadas" e "Retrabalho", e os dados serão a contagem de tarefas em cada categoria por projeto.
 
 ---
 

@@ -5,7 +5,7 @@ class ContactIssueLink < ActiveRecord::Base
   acts_as_journalized watch: ['role']
 
   belongs_to :issue
-  belongs_to :contact, optional: true
+  belongs_to :contact, class_name: 'FotonContact', optional: true
   belongs_to :contact_group, optional: true
 
   validates :issue_id, presence: true

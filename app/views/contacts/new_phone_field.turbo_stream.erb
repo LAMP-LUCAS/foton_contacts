@@ -1,0 +1,6 @@
+<%# app/views/contacts/new_phone_field.turbo_stream.erb %>
+<%= turbo_stream.append "phones" do %>
+  <%= fields_for "foton_contact[phones_attributes][]", @contact.phones.last, child_index: Time.now.to_i do |f| %>
+    <%= render "contacts/phone_fields", f: f %>
+  <% end %>
+<% end %>

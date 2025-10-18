@@ -13,7 +13,7 @@ module Analytics
       company_ids = ContactEmployment.joins(contact: :issues)
                                      .where(issues: { created_on: @start_date..@end_date })
                                      .pluck(:company_id).uniq
-      companies = Contact.where(id: company_ids)
+      companies = FotonContact.where(id: company_ids)
 
       result = companies.map do |company|
         employees = company.employees.uniq

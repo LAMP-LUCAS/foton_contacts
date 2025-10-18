@@ -2,7 +2,7 @@ module Patches
   module UserPatch
     def self.included(base)
       base.class_eval do
-        has_one :contact, dependent: :nullify
+        has_one :foton_contact, class_name: 'FotonContact', dependent: :nullify
 
         after_create :create_contact_profile, if: :create_contact_profile?
 
@@ -13,7 +13,7 @@ module Patches
         end
 
         def create_contact_profile
-          Contact.create(
+          FotonContact.create(
             name: self.name,
             email: self.mail,
             contact_type: 'person',

@@ -52,8 +52,8 @@ module Analytics
     end
 
     def get_filtered_contacts
-      scope = Contact.person.includes(:contact_groups)
-      scope = scope.where("LOWER(contacts.name) LIKE ?", "%#{@filters[:name].downcase}%") if @filters[:name].present?
+      scope = FotonContact.person.includes(:contact_groups)
+      scope = scope.where("LOWER(foton_contacts.name) LIKE ?", "%#{@filters[:name].downcase}%") if @filters[:name].present?
       scope.order(:name)
     end
 

@@ -9,7 +9,7 @@
 <h2><%= l(:label_contacts) %></h2>
 
 <%# Render Quality Monitor Cards - The partial now contains the row/col structure %>
-<%= render partial: 'analytics/components/data_quality', locals: { quality_data: @quality_data } %>
+<%= safe_render partial: 'analytics/components/data_quality', locals: { quality_data: @quality_data } %>
 
 <%= turbo_frame_tag "contacts" do %>
   <%= form_tag(contacts_path, 
@@ -31,13 +31,13 @@
             </p>
             <p>
               <%= label_tag 'contact_type', l(:field_type) %>
-              <%= select_tag 'contact_type', options_for_select([[l(:label_all), '']] + Contact.contact_types.keys.map { |t| [l("label_#{t}"), t] }, params[:contact_type]) %>
+              <%= select_tag 'contact_type', options_for_select([[l(:label_all), '']] + FotonContact.contact_types.keys.map { |t| [l("label_#{t}"), t] }, params[:contact_type]) %>
             </p>
           </div>
           <div class="splitcontentright">
             <p>
               <%= label_tag 'status', l(:field_status) %>
-              <%= select_tag 'status', options_for_select([[l(:label_all), '']] + Contact.statuses.keys.map { |s| [l("label_#{s}"), s] }, params[:status]) %>
+              <%= select_tag 'status', options_for_select([[l(:label_all), '']] + FotonContact.statuses.keys.map { |s| [l("label_#{s}"), s] }, params[:status]) %>
             </p>
           </div>
         </div>
@@ -55,19 +55,21 @@
         <tr>
           <th><%= l(:field_name) %></th>
           <th><%= l(:field_type) %></th>
-          <th><%= l(:field_status) %></th>
-          <th><%= l(:field_project) %></th>
+          <th><%= l(:field_phone) %></th>
+          <th><%= l(:field_email) %></th>
           <th><%= l(:field_created_on) %></th>
+          <th><%= l(:field_status) %></th>
           <th style="width: 15%"><%= l(:label_actions) %></th>
         </tr>
       </thead>
       <tbody id="contacts_tbody">
         <% @contacts.each do |contact| %>
-          <%= render partial: 'contact_row', locals: { contact: contact } %>
+          <%= safe_render partial: 'contact_row', locals: { contact: contact } %>
         <% end %>
       </tbody>
     </table>
   </div>
+  <p class="pagination"><%= pagination_links_full @contact_pages, @contact_count %></p>
 
   <% if @contacts.empty? %>
     <%= render partial: 'common/empty_state', locals: {
