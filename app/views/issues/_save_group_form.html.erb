@@ -1,0 +1,9 @@
+<div class="save-group-form box">
+  <%= form_with(model: ContactGroup.new, url: contact_groups_path, html: { class: "" }) do |f| %>
+    <%= f.hidden_field :issue_id, value: issue.id %>
+    <div class="input-container">
+      <%= f.text_field :name, required: true, placeholder: l(:label_foton_contacts_group_name) %>
+      <%= f.submit l(:button_create_group), class: "button -success" %>
+    </div>
+  <% end %>
+</div>

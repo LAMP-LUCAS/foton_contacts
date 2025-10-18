@@ -10,7 +10,7 @@ Este documento é o registro histórico e o manual de funcionalidades do plugin 
 
 ### Core
 
-- **Gestão de Contatos:** CRUD completo para contatos (pessoas e empresas).
+- **Gestão de Contatos Detalhada:** CRUD completo para contatos (pessoas e empresas). Cada contato pode ter **múltiplos e-mails, telefones e endereços**, com a capacidade de marcar um de cada tipo como "principal", oferecendo um cadastro flexível e completo.
 - **Tipos e Status:** Diferenciação entre contatos do tipo "pessoa" e "empresa", e controle de status (ativo, inativo, descontinuado).
 - **Campos Personalizados:** Suporte a campos personalizados para contatos.
 - **Anexos e Histórico:** Suporte a anexos e registro de histórico de alterações (`journals`) para contatos.
@@ -18,13 +18,21 @@ Este documento é o registro histórico e o manual de funcionalidades do plugin 
 
 ### Relacionamentos
 
-- **Vínculos Empregatícios:** Associação de contatos (pessoas) a empresas com cargos específicos, incluindo histórico de carreira.
-- **Grupos de Contatos:** Criação de grupos de contatos para organização.
-- **Vínculo com Tarefas:** Associação de contatos a tarefas do Redmine.
+- **Vínculos Empregatícios (Carreira):** Associação dinâmica de contatos (pessoas) a empresas. A criação, edição e remoção de vínculos ocorrem em um modal com Hotwire, permitindo a construção de um histórico de carreira detalhado (cargo, datas de início e fim) sem recarregar a página.
+- **Grupos de Contatos:** CRUD completo e dinâmico para criação de grupos, permitindo organizar contatos de forma segmentada. A adição e remoção de membros são feitas de forma interativa.
+
+### Integração com Tarefas (Issues)
+
+Esta é a funcionalidade central que conecta a gestão de contatos ao trabalho diário no Redmine.
+
+- **Vínculo Direto a Tarefas:** Permite associar múltiplos contatos e/ou grupos de contatos diretamente a uma tarefa, criando um registro claro de todos os stakeholders envolvidos.
+- **Atribuição de Funções (Roles):** Ao vincular um contato a uma tarefa, é possível atribuir uma **função** específica a ele (ex: "Aprovador", "Fornecedor", "Cliente"). Esse campo é editável diretamente na lista de contatos da tarefa, salvando automaticamente.
+- **Busca Inteligente na Tarefa:** Dentro da tela de uma tarefa, uma caixa de busca permite encontrar e adicionar contatos ou grupos rapidamente, sem interromper o fluxo de trabalho. A busca sugere resultados em tempo real.
+- **Gestão Visual:** Os contatos vinculados são exibidos como "cards" informativos na própria tarefa, cada um com um botão para remoção rápida e a opção de editar a função.
 
 ### Integração com Redmine
 
-- **Permissões:** Sistema de permissões integrado ao Redmine para controlar o acesso aos contatos.
+- **Permissões:** Sistema de permissões integrado ao Redmine para controlar o acesso aos contatos (visualizar, criar, editar, etc.).
 - **Visibilidade:** Controle de visibilidade de contatos (público, privado, por projeto).
 - **Perfil de Usuário:** Vínculo de um contato a um usuário do Redmine.
 
@@ -50,6 +58,39 @@ A interface foi completamente modernizada com **Hotwire (Turbo + Stimulus)** par
 ### Testes
 
 - **Testes de Integração:** Cobertura de testes de integração para o `ContactsController`, validando as principais ações de CRUD e filtros.
+
+### Análises e Business Intelligence
+
+O plugin integra um módulo de análise para transformar dados de contatos e projetos em inteligência acionável, com um foco em análise histórica e preditiva.
+
+- **Dashboard de Análises:** Uma área dedicada com múltiplos painéis (Visão Geral, Performance da Equipe, Carga de Trabalho) para visualização de dados gerenciais.
+
+- **Índice de Risco Preditivo de Alocação (IRPA):**
+  - Calcula um score de risco para cada contato, permitindo identificar proativamente possíveis gargalos.
+  - A fórmula foi aprimorada para incluir não apenas o desempenho em tarefas (atrasos, retrabalho), mas também um **Fator de Instabilidade**, que mede a frequência com que o status ou o projeto de um contato mudam, com base no seu histórico no `Journal`.
+
+- **Painel de Performance da Equipe:**
+  - Compara o desempenho de diferentes grupos através de um Gráfico de Radar e uma tabela de ranking.
+  - A métrica de **Índice de Coesão da Equipa (ICE)** foi aprimorada para usar o `Journal`, calculando a duração real da permanência de cada membro no grupo e fornecendo um dado de estabilidade muito mais preciso.
+
+- **Análise de Parceiros:**
+  - Um gráfico de bolhas na "Visão Geral" permite comparar a estabilidade e a experiência das equipes de empresas parceiras.
+  - A métrica de **Turnover** agora é calculada com precisão, usando o histórico de criação e destruição de vínculos empregatícios (`ContactEmployment`) registrados no `Journal`. A análise pode ser filtrada por período.
+
+- **Mapa de Calor de Carga de Trabalho (Workload):**
+  - Visualiza a alocação percentual de cada membro da equipe por dia, semana ou mês.
+  - Identifica rapidamente períodos de sobrecarga ou ociosidade.
+  - Permite filtrar a análise por projeto e alternar entre horas estimadas e lançadas.
+
+---
+
+## 🎯 Próximos Passos
+
+A próxima grande fase de desenvolvimento se concentrará em expandir as ferramentas de análise para incluir:
+
+- **Índice de Risco Preditivo de Alocação (IRPA):** Uma métrica para identificar proativamente os contatos com maior risco de se tornarem gargalos.
+- **Painel de Performance da Equipe:** Gráficos e rankings para comparar a performance entre diferentes equipes ou grupos.
+- **Monitor de Qualidade dos Dados:** Ferramentas para garantir que os dados dos contatos estejam sempre completos e atualizados.
 
 ---
 

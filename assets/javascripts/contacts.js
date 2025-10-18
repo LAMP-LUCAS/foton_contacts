@@ -1,6 +1,6 @@
 /* Scripts para o plugin de contatos */
 
-$(document).ready(function() {
+document.addEventListener("turbo:load", function() {
   // Funções de Modal (definidas globalmente para serem acessíveis por new.js.erb)
   window.showModal = function(id) {
     $('#' + id).dialog({
@@ -17,9 +17,6 @@ $(document).ready(function() {
     $(element).closest('.ui-dialog-content').dialog('close');
   };
 
-
-
-  
   // Confirmações de exclusão
   $('form.button_to[data-confirm]').submit(function(){
     return confirm($(this).data('confirm'));

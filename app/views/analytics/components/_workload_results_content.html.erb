@@ -1,0 +1,22 @@
+<div class="card mt-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">Mapa de Calor da Carga de Trabalho</h5>
+  </div>
+  <div class="card-body">
+    <%= render partial: 'analytics/components/workload_heatmap', 
+               locals: { 
+                 contacts: workload[:contacts],
+                 date_range: workload[:date_range],
+                 workload_data: workload[:data],
+                 period: workload[:period]
+               } %>
+  </div>
+</div>
+
+<div class="card mt-4">
+  <div class="card-header"><h5>Estatísticas da Seleção</h5></div>
+  <div class="card-body">
+    <p><strong>Carga Média:</strong> <%= workload.dig(:summary, :average) %>%</p>
+    <p><strong>Carga Mediana:</strong> <%= workload.dig(:summary, :median) %>%</p>
+  </div>
+</div>

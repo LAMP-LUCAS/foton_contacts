@@ -1,13 +1,25 @@
-<tr id="<%= dom_id(contact) %>" class="<%= cycle('odd', 'even') %>">
-  <td class="name"><%= link_to contact.name, contact_path(contact), data: { turbo_frame: '_top' } %></td>
+<tr id="<%= dom_id(contact) %>">
+  <td>
+    <div class="d-flex align-items-center">
+      <%= contact_avatar(contact) %>
+      <div class="flex-grow-1 ms-3">
+        <%= link_to contact.name, contact_path(contact), data: { turbo_frame: '_top' }, style: 'font-weight: bold;' %>
+        <% if contact.person? && contact.employments_as_person.any? %>
+          <div class="text-muted small"><%= contact.employments_as_person.first.company.name %></div>
+        <% end %>
+      </div>
+    </div>
+  </td>
   <td><%= l("label_#{contact.contact_type}") %></td>
-  <td><span class="status <%= contact.status %>"><%= l("label_#{contact.status}") %></span></td>
-  <td><%= contact.project ? link_to_project(contact.project) : '---' %></td>
+  <td><%= contact.phone || '---' %></td>
+  <td><%= contact.email ? mail_to(contact.email) : '---' %></td>
   <td><%= format_date(contact.created_at) %></td>
-  <td class="buttons">
-    <%= link_to '📊', analytics_contact_path(contact), data: { turbo_frame: 'modal' }, title: l(:button_analysis) %>
-    <%= link_to '✏️', edit_contact_path(contact), data: { turbo_frame: 'modal' }, class: 'contact-edit', title: l(:button_edit) %>
-    <%= delete_link contact_path(contact) if User.current.allowed_to?(:manage_contacts, @project, global: true) %>
-
+  <td><%= status_badge(contact.status) %></td>
+  <td>
+    <div class="btn-group btn-group-sm">
+      <%= link_to raw('<i class="bi bi-graph-up"></i> ' + l(:button_analysis)), analytics_contact_path(contact), data: { turbo_frame: 'modal' }, class: 'btn btn-outline-primary' %>
+      <%= link_to raw('<i class="bi bi-pencil"></i> ' + l(:button_edit)), edit_contact_path(contact), data: { turbo_frame: 'modal' }, class: 'btn btn-outline-secondary' %>
+      <%= delete_link contact_path(contact), class: 'btn btn-outline-danger' if User.current.allowed_to?(:manage_contacts, @project, global: true) %>
+    </div>
   </td>
 </tr>

@@ -1,0 +1,11 @@
+<%# app/views/contacts/_address_fields.html.erb %>
+<div class="contact-address-fields nested-fields">
+  <%= f.hidden_field :id %>
+  <%= f.hidden_field :_destroy %>
+  <p>
+    <%= f.label :address, l(:field_address) %>
+    <%= f.text_area :address, rows: 3, placeholder: "Rua, número, bairro, cidade, estado, CEP" %>
+    <%= f.check_box :is_primary %> <%= f.label :is_primary, l(:label_primary) %>
+    <%= link_to l(:button_remove), '#', class: 'icon icon-del remove_fields' %>
+  </p>
+</div>

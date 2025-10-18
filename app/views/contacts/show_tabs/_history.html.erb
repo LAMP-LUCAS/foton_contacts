@@ -9,15 +9,13 @@
             <%= avatar(journal.user, size: 24) %>
             <%= authoring(journal.created_on, journal.user, format: :long) %>
           </h4>
-          <% if journal.notes.present? %>
+          <% if journal.notes.present? && journal.journalized_type == 'Contact' %>
             <div class="wiki-note">
               <%= textilizable(journal, :notes) %>
             </div>
           <% end %>
           <ul class="details">
-            <% journal.details.each do |detail| %>
-              <li><%= show_detail(detail) %></li>
-            <% end %>
+            <%= render_foton_journal_entry(journal) %>
           </ul>
         </div>
       <% end %>

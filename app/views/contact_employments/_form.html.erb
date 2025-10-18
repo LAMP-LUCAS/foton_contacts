@@ -32,6 +32,6 @@
 
   <div class="buttons">
     <%= f.submit l(f.object.new_record? ? :button_create : :button_save), data: { 'form-target': 'submit' } %>
-    <%= link_to l(:button_cancel), close_modal_contacts_path, data: { turbo_frame: 'modal' } %>
+    <%= link_to l(:button_cancel), close_modal_contacts_path, data: { "turbo-method": :post } %>
   </div>
 <% end %>
