@@ -336,6 +336,64 @@ A implementação seguirá rigorosamente as diretrizes de `@docs/concepts.md` e 
 
 ---
 
+### 🚀 Fase 7: Compatibilidade Avançada de Importação e Exportação (Planejada)
+
+**Objetivo:** Aprimorar os recursos de importação e exportação para serem totalmente compatíveis com os formatos padrão de mercado, especificamente o **Google CSV** e o **Apple vCard (.vcf)**. Isso garantirá uma migração de dados fluida e direta para usuários que vêm de outras plataformas, eliminando a necessidade de manipulação manual de planilhas.
+
+#### 🔬 Análise da Estrutura de Dados de Origem
+
+A compatibilidade exige um mapeamento detalhado dos campos de origem para o modelo de dados normalizado do Foton Contacts.
+
+1.  **Estrutura do Google CSV (`contacts.csv`):**
+    *   **Formato:** Planilha "larga" com uma linha de cabeçalho e múltiplos campos numerados.
+    *   **Nome:** Separado em colunas (`First Name`, `Middle Name`, `Last Name`).
+    *   **Dados Múltiplos:** Telefones e e-mails são distribuídos em colunas como `Phone 1 - Value`, `Phone 1 - Label`, `E-mail 1 - Value`, `E-mail 1 - Label`, e assim por diante. O mapeador precisará pivotar essas colunas em múltiplos registros nas tabelas `foton_contact_phones` e `foton_contact_emails`.
+    *   **Grupos:** Consolidados em uma única coluna `Labels`, com valores separados por ` ::: `. O importador deverá parsear essa string e associar o contato aos grupos correspondentes, criando-os se não existirem.
+    *   **Organização:** Mapeada pelos campos `Organization Name` e `Organization Title`.
+
+2.  **Estrutura do Apple vCard (`vCards iCloud.vcf`):**
+    *   **Formato:** Padrão VCF 3.0, um formato de texto estruturado onde cada contato é um bloco `BEGIN:VCARD`...`END:VCARD`.
+    *   **Nome:** Estruturado nos campos `FN` (Nome Completo) e `N` (Sobrenome;Nome;;;).
+    *   **Dados Múltiplos:** Cada telefone e e-mail é uma linha separada (ex: `TEL;TYPE=CELL:...` ou `item1.TEL;X-ABLabel=...`). O mapeador deve identificar o tipo (`CELL`, `WORK`, etc.) e o valor de cada entrada.
+    *   **Grupos:** Definidos no campo `CATEGORIES`, com valores separados por vírgula.
+    *   **Organização:** Mapeada pelos campos `ORG` e `TITLE`.
+
+#### 🗺️ Etapas Detalhadas de Implementação
+
+1.  **Backend: Mapeamento e Lógica de Importação**
+    *   [ ] **1.1. Criar `Contacts::ImportService`:** Desenvolver um novo service object para orquestrar o processo de importação.
+    *   [ ] **1.2. Implementar Mapeadores (Mappers):** Dentro do serviço, criar classes ou módulos mapeadores dedicados:
+        *   `Contacts::Importers::GoogleCsvMapper`: Responsável por ler a planilha CSV e traduzir as colunas para o formato de atributos do `FotonContact` e seus modelos associados (`phones`, `emails`).
+        *   `Contacts::Importers::VcardMapper`: Responsável por parsear o arquivo `.vcf` (usando uma gem como `vcardigan` se necessário) e mapear os campos `FN`, `N`, `TEL`, `EMAIL`, `ORG`, `CATEGORIES` para os atributos do plugin.
+    *   [ ] **1.3. Refatorar `ContactsController#import`:** Modificar a action para:
+        *   Receber o arquivo e um parâmetro indicando o formato (ex: `google_csv`, `apple_vcf`).
+        *   Invocar o `Contacts::ImportService` com o arquivo e o formato.
+        *   Melhorar o feedback, retornando contagens de contatos criados, atualizados e que falharam.
+    *   [ ] **1.4. Lógica de Duplicidade:** Implementar uma estratégia para lidar com contatos duplicados. Uma opção é usar o e-mail como chave única: se um contato com o mesmo e-mail já existe, o importador deve atualizar seus dados em vez de criar um novo.
+
+2.  **Backend: Lógica de Exportação Inteligente**
+    *   [ ] **2.1. Criar `Contacts::ExportService`:** Desenvolver um serviço para lidar com a exportação.
+    *   [ ] **2.2. Refatorar `ContactsController#export`:**
+        *   A action deverá passar os parâmetros de filtro atuais (`params[:q]`, etc.) para o `Contacts::ExportService`.
+        *   O serviço usará esses filtros para buscar a coleção exata de contatos visíveis na tela.
+    *   [ ] **2.3. Implementar Serializadores:**
+        *   `Contacts::Exporters::CsvSerializer`: Deverá pegar a coleção de contatos filtrados e construir um arquivo CSV. O desafio é "desnormalizar" os dados: para um contato com múltiplos telefones, decidir se cria múltiplas linhas ou múltiplas colunas. A abordagem de múltiplas colunas (`Phone 1 - Value`, etc.) é mais compatível com o padrão Google.
+        *   `Contacts::Exporters::VcardSerializer`: Deverá iterar sobre a coleção de contatos e gerar um único arquivo `.vcf` contendo múltiplos blocos `VCARD`, um para cada contato.
+    *   [ ] **2.4. Exportação Completa de Dados:** Garantir que a exportação inclua **todos** os dados do contato (todos os e-mails, telefones, endereços, vínculos empregatícios), e não apenas os campos exibidos na tabela da UI.
+
+3.  **Frontend: Melhorias na Experiência do Usuário**
+    *   [ ] **3.1. Atualizar a Página de Importação:**
+        *   Adicionar botões de rádio para que o usuário selecione o formato do arquivo (`Google CSV`, `Apple vCard`).
+        *   Incluir um link para download de um template CSV para auxiliar o usuário no preenchimento.
+    *   [ ] **3.2. Implementar Feedback Detalhado:** Após a importação, em vez de uma simples mensagem, exibir um resumo detalhado: "Importação concluída: X contatos criados, Y contatos atualizados, Z erros encontrados." Listar os erros, se houver.
+
+4.  **Testes**
+    *   [ ] **4.1. Testes de Unidade para Mappers:** Criar testes específicos para os mappers de CSV e vCard, garantindo que eles traduzem os dados corretamente.
+    *   [ ] **4.2. Testes de Integração:** Criar testes que simulem o upload dos arquivos de exemplo (`contacts.csv`, `vCards iCloud.vcf`) e verifiquem se os contatos e seus dados associados são criados corretamente no banco de dados.
+    *   [ ] **4.3. Testes de Exportação:** Criar testes que apliquem um filtro, executem a exportação e verifiquem se o arquivo gerado contém os dados corretos e completos dos contatos filtrados.
+
+---
+
 ### 🧪 Testes e Validações (Pendente)
 
 **Objetivo:** Aumentar a robustez e a confiabilidade do plugin.
