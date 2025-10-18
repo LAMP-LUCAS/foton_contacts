@@ -38,8 +38,8 @@ class ContactEmployment < ApplicationRecord
   include JournalizableDummiesConcern
   acts_as_journalized watch: %w(position start_date end_date)
 
-  belongs_to :contact, class_name: 'Contact'
-  belongs_to :company, class_name: 'Contact'
+  belongs_to :contact, class_name: 'FotonContact'
+  belongs_to :company, class_name: 'FotonContact'
 
   validates :contact_id, presence: true
   validates :company_id, presence: true
