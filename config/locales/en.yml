@@ -1,0 +1,11 @@
+en:
+  label_contact_import: "Import Contacts"
+  label_import_select_file: "Select file to import"
+  label_import_file_format: "File format"
+  label_import_format_google_csv: "Google CSV"
+  label_import_format_apple_vcf: "Apple vCard (.vcf)"
+  text_import_template_download: "Download the template to ensure correct formatting:"
+  label_import_template_csv: "CSV Template"
+  notice_contacts_imported_detailed: "%{created} contacts created, %{updated} updated, %{failed} failed."
+  label_export_as_vcf: "Export as vCard"
+  label_export_as_csv: "Export as CSV"

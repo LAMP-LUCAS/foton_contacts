@@ -266,4 +266,16 @@ pt-BR:
   error_rendering_partial_title: "Opa! Houve um erro:"
 
   label_foton_contacts_instability_factor: "Fator de Instabilidade"
+
+  # Import/Export
+  label_contact_import: "Importar Contatos"
+  label_import_select_file: "Selecione o arquivo para importar"
+  label_import_file_format: "Formato do arquivo"
+  label_import_format_google_csv: "Google CSV"
+  label_import_format_apple_vcf: "Apple vCard (.vcf)"
+  text_import_template_download: "Faça o download do template para garantir a formatação correta:"
+  label_import_template_csv: "Template CSV"
+  notice_contacts_imported_detailed: "%{created} contatos criados, %{updated} atualizados, %{failed} falharam."
+  label_export_as_vcf: "Exportar como vCard"
+  label_export_as_csv: "Exportar como CSV"
   

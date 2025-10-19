@@ -19,6 +19,7 @@ resources :contacts do
     get 'search'
     get 'search_links'
     get 'autocomplete'
+    get 'import' # Add GET route for the import form
     post 'import'
     get 'export'
     post 'close_modal'
