@@ -336,61 +336,80 @@ A implementação seguirá rigorosamente as diretrizes de `@docs/concepts.md` e 
 
 ---
 
-### 🚀 Fase 7: Compatibilidade Avançada de Importação e Exportação (Planejada)
+### 🚀 Fase 7: Compatibilidade Avançada de Importação e Exportação (Revisada)
 
-**Objetivo:** Aprimorar os recursos de importação e exportação para serem totalmente compatíveis com os formatos padrão de mercado, especificamente o **Google CSV** e o **Apple vCard (.vcf)**. Isso garantirá uma migração de dados fluida e direta para usuários que vêm de outras plataformas, eliminando a necessidade de manipulação manual de planilhas.
-
-#### 🔬 Análise da Estrutura de Dados de Origem
-
-A compatibilidade exige um mapeamento detalhado dos campos de origem para o modelo de dados normalizado do Foton Contacts.
-
-1.  **Estrutura do Google CSV (`contacts.csv`):**
-    *   **Formato:** Planilha "larga" com uma linha de cabeçalho e múltiplos campos numerados.
-    *   **Nome:** Separado em colunas (`First Name`, `Middle Name`, `Last Name`).
-    *   **Dados Múltiplos:** Telefones e e-mails são distribuídos em colunas como `Phone 1 - Value`, `Phone 1 - Label`, `E-mail 1 - Value`, `E-mail 1 - Label`, e assim por diante. O mapeador precisará pivotar essas colunas em múltiplos registros nas tabelas `foton_contact_phones` e `foton_contact_emails`.
-    *   **Grupos:** Consolidados em uma única coluna `Labels`, com valores separados por ` ::: `. O importador deverá parsear essa string e associar o contato aos grupos correspondentes, criando-os se não existirem.
-    *   **Organização:** Mapeada pelos campos `Organization Name` e `Organization Title`.
-
-2.  **Estrutura do Apple vCard (`vCards iCloud.vcf`):**
-    *   **Formato:** Padrão VCF 3.0, um formato de texto estruturado onde cada contato é um bloco `BEGIN:VCARD`...`END:VCARD`.
-    *   **Nome:** Estruturado nos campos `FN` (Nome Completo) e `N` (Sobrenome;Nome;;;).
-    *   **Dados Múltiplos:** Cada telefone e e-mail é uma linha separada (ex: `TEL;TYPE=CELL:...` ou `item1.TEL;X-ABLabel=...`). O mapeador deve identificar o tipo (`CELL`, `WORK`, etc.) e o valor de cada entrada.
-    *   **Grupos:** Definidos no campo `CATEGORIES`, com valores separados por vírgula.
-    *   **Organização:** Mapeada pelos campos `ORG` e `TITLE`.
+**Objetivo:** Garantir que os recursos de importação e exportação sejam totalmente compatíveis com os formatos padrão de mercado (Google CSV, Apple vCard), facilitando a migração de dados de outras plataformas.
 
 #### 🗺️ Etapas Detalhadas de Implementação
 
-1.  **Backend: Mapeamento e Lógica de Importação**
-    *   [ ] **1.1. Criar `Contacts::ImportService`:** Desenvolver um novo service object para orquestrar o processo de importação.
-    *   [ ] **1.2. Implementar Mapeadores (Mappers):** Dentro do serviço, criar classes ou módulos mapeadores dedicados:
-        *   `Contacts::Importers::GoogleCsvMapper`: Responsável por ler a planilha CSV e traduzir as colunas para o formato de atributos do `FotonContact` e seus modelos associados (`phones`, `emails`).
-        *   `Contacts::Importers::VcardMapper`: Responsável por parsear o arquivo `.vcf` (usando uma gem como `vcardigan` se necessário) e mapear os campos `FN`, `N`, `TEL`, `EMAIL`, `ORG`, `CATEGORIES` para os atributos do plugin.
-    *   [ ] **1.3. Refatorar `ContactsController#import`:** Modificar a action para:
-        *   Receber o arquivo e um parâmetro indicando o formato (ex: `google_csv`, `apple_vcf`).
-        *   Invocar o `Contacts::ImportService` com o arquivo e o formato.
-        *   Melhorar o feedback, retornando contagens de contatos criados, atualizados e que falharam.
-    *   [ ] **1.4. Lógica de Duplicidade:** Implementar uma estratégia para lidar com contatos duplicados. Uma opção é usar o e-mail como chave única: se um contato com o mesmo e-mail já existe, o importador deve atualizar seus dados em vez de criar um novo.
+1.  **Backend: Lógica de Importação e Exportação**
+    *   [x] **1.1. Criar `Contacts::ImportService`:** Desenvolver um service object para orquestrar o processo de importação, com suporte a múltiplos formatos.
+    *   [x] **1.2. Implementar Mapeadores (Mappers):**
+        *   [x] `Contacts::Importers::GoogleCsvMapper`: Para traduzir planilhas do Google CSV.
+        *   [x] `Contacts::Importers::VcardMapper`: Para parsear arquivos `.vcf`.
+    *   [x] **1.3. Refatorar `ContactsController#import`:** Modificar a action para usar o `ImportService` e fornecer feedback detalhado (criados, atualizados, falhas).
+    *   [x] **1.4. Criar `Contacts::ExportService`:** Desenvolver um serviço para lidar com a exportação para múltiplos formatos.
+    *   [x] **1.5. Implementar Serializadores (Serializers):**
+        *   [x] `Contacts::Exporters::CsvSerializer`: Para gerar arquivos CSV no padrão Google.
+        *   [x] `Contacts::Exporters::VcardSerializer`: Para gerar um arquivo `.vcf` com múltiplos contatos.
+    *   [x] **1.6. Refatorar `ContactsController#export`:** Criar uma action dedicada que utiliza o `ExportService` para gerar os arquivos com base nos filtros da tela.
 
-2.  **Backend: Lógica de Exportação Inteligente**
-    *   [ ] **2.1. Criar `Contacts::ExportService`:** Desenvolver um serviço para lidar com a exportação.
-    *   [ ] **2.2. Refatorar `ContactsController#export`:**
-        *   A action deverá passar os parâmetros de filtro atuais (`params[:q]`, etc.) para o `Contacts::ExportService`.
-        *   O serviço usará esses filtros para buscar a coleção exata de contatos visíveis na tela.
-    *   [ ] **2.3. Implementar Serializadores:**
-        *   `Contacts::Exporters::CsvSerializer`: Deverá pegar a coleção de contatos filtrados e construir um arquivo CSV. O desafio é "desnormalizar" os dados: para um contato com múltiplos telefones, decidir se cria múltiplas linhas ou múltiplas colunas. A abordagem de múltiplas colunas (`Phone 1 - Value`, etc.) é mais compatível com o padrão Google.
-        *   `Contacts::Exporters::VcardSerializer`: Deverá iterar sobre a coleção de contatos e gerar um único arquivo `.vcf` contendo múltiplos blocos `VCARD`, um para cada contato.
-    *   [ ] **2.4. Exportação Completa de Dados:** Garantir que a exportação inclua **todos** os dados do contato (todos os e-mails, telefones, endereços, vínculos empregatícios), e não apenas os campos exibidos na tabela da UI.
+2.  **Frontend: Experiência do Usuário**
+    *   [x] **2.1. Criar Página de Importação:** Desenvolver a view `import.html.erb` com opções para seleção de formato de arquivo.
+    *   [x] **2.2. Melhorar Feedback:** Implementar mensagens de notificação detalhadas após a importação.
+    *   [x] **2.3. Atualizar Links de Exportação:** Substituir o link genérico por links específicos para CSV e vCard na `index.html.erb`.
 
-3.  **Frontend: Melhorias na Experiência do Usuário**
-    *   [ ] **3.1. Atualizar a Página de Importação:**
-        *   Adicionar botões de rádio para que o usuário selecione o formato do arquivo (`Google CSV`, `Apple vCard`).
-        *   Incluir um link para download de um template CSV para auxiliar o usuário no preenchimento.
-    *   [ ] **3.2. Implementar Feedback Detalhado:** Após a importação, em vez de uma simples mensagem, exibir um resumo detalhado: "Importação concluída: X contatos criados, Y contatos atualizados, Z erros encontrados." Listar os erros, se houver.
+3.  **Lógica de Duplicidade (Simplificada na Importação)**
+    *   [x] **3.1. Verificação por E-mail:** O `ImportService` implementa uma verificação básica por e-mail exato para decidir entre criar um novo contato ou atualizar um existente.
+    *   [ ] **3.2. Notificação Pós-Importação:** Ao final da importação, adicionar uma mensagem recomendando ao usuário que visite a futura "Central de Qualidade de Dados" para uma análise mais profunda de duplicatas.
+
+---
+
+### 🚀 Fase 8: Central de Qualidade de Dados (Gestão de Duplicatas) (Planejada)
+
+**Objetivo:** Criar um módulo dedicado para a manutenção contínua da base de contatos, permitindo a identificação, revisão e mesclagem de duplicatas de forma inteligente, segura e assistida pelo usuário.
+
+#### 🧠 Arquitetura e Princípios
+
+- **Módulo Dedicado:** A funcionalidade viverá em sua própria área (`/data_quality`), desacoplada do fluxo de importação.
+- **Segurança em Primeiro Lugar:** Nenhuma alteração nos dados será feita automaticamente. Todas as mesclagens exigirão confirmação explícita do usuário.
+- **Análise Inteligente:** A detecção de duplicatas usará múltiplos critérios (e-mail, similaridade de nome) para aumentar a precisão.
+- **Reaproveitamento de Código:** A lógica de mapeamento e os serviços já criados na Fase 7 serão a base para a análise e processamento dos dados.
+
+#### 🗺️ Etapas Detalhadas de Implementação
+
+1.  **Backend: Serviços de Análise e Mesclagem**
+    *   [ ] **1.1. Criar `Analytics::DuplicateFinderService`:**
+        *   Desenvolver a lógica para varrer a tabela `foton_contacts`.
+        *   Implementar a busca por duplicatas com base em e-mails idênticos.
+        *   Implementar a busca por duplicatas com base em nomes com alta similaridade (ex: usando a gem `fuzzy-match` ou similar).
+        *   O serviço deverá retornar uma lista de pares de contatos suspeitos, sem alterar nenhum dado.
+    *   [ ] **1.2. Criar `Contacts::MergeService`:**
+        *   Desenvolver o serviço que receberá dois IDs de contato (o principal e o duplicado) e um hash com os dados a serem mantidos.
+        *   A lógica deverá ser transacional (`ActiveRecord::Base.transaction`).
+        *   **Etapas da Transação:**
+            1.  Atualizar o contato principal com os atributos escolhidos.
+            2.  Reassociar todos os objetos relacionados do contato duplicado para o principal (vínculos com tarefas, grupos, histórico, anexos, etc.).
+            3.  Arquivar ou excluir o contato duplicado.
+
+2.  **Frontend: Interface da Central de Qualidade**
+    *   [ ] **2.1. Criar `DataQualityController`:** Criar o novo controller para gerenciar as ações do módulo (`index`, `scan`, `review`, `merge`).
+    *   [ ] **2.2. Adicionar Rotas:** Definir as rotas para o novo controller em `config/routes.rb` (ex: `resources :data_quality, only: [:index, :create, :show, :update]`).
+    *   [ ] **2.3. View Principal (`index.html.erb`):**
+        *   Criar a página inicial do módulo com o botão "Analisar Duplicatas".
+        *   Esta página também listará os pares de duplicatas encontrados após a análise, usando `Turbo Frames` para atualização assíncrona.
+    *   [ ] **2.4. View de Revisão e Mesclagem (`show.html.erb`):**
+        *   Desenvolver a interface de comparação lado a lado para um par de duplicatas.
+        *   Para cada campo conflitante, fornecer botões ou rádio-buttons para que o usuário escolha qual dado prevalecerá.
+        *   Um formulário (`form_with`) enviará os IDs dos contatos e os dados escolhidos para a action `update` (ou `merge`) do controller.
+
+3.  **Integração e Fluxo de Usuário**
+    *   [ ] **3.1. Adicionar Link no Menu:** Inserir um link ou aba na área de Contatos para acessar a "Central de Qualidade de Dados".
+    *   [ ] **3.2. Atualizar Mensagem de Importação:** Implementar o item 3.2 da Fase 7, adicionando um link para a nova central na mensagem de feedback da importação.
 
 4.  **Testes**
-    *   [ ] **4.1. Testes de Unidade para Mappers:** Criar testes específicos para os mappers de CSV e vCard, garantindo que eles traduzem os dados corretamente.
-    *   [ ] **4.2. Testes de Integração:** Criar testes que simulem o upload dos arquivos de exemplo (`contacts.csv`, `vCards iCloud.vcf`) e verifiquem se os contatos e seus dados associados são criados corretamente no banco de dados.
-    *   [ ] **4.3. Testes de Exportação:** Criar testes que apliquem um filtro, executem a exportação e verifiquem se o arquivo gerado contém os dados corretos e completos dos contatos filtrados.
+    *   [ ] **4.1. Testes de Unidade:** Criar testes para o `DuplicateFinderService` e o `MergeService`, validando a lógica de detecção e a segurança da transação de mesclagem.
+    *   [ ] **4.2. Testes de Integração:** Criar testes para o fluxo completo: iniciar a análise, selecionar um par, revisar e confirmar a mesclagem, e verificar se o resultado no banco de dados está correto.
 
 ---
 
