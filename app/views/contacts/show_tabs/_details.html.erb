@@ -1,51 +1,51 @@
 <%# Principal Details %>
 <div class="box">
-  <p><strong><%= l(:field_type) %>:</strong> <%= l("label_#{@contact.contact_type}") %></p>
-  <p><strong><%= l(:field_status) %>:</strong> <%= l("label_#{@contact.status}") %></p>
+  <p><strong><%= l(:field_type) %>:</strong> <%= l("label_#{contact.contact_type}") %></p>
+  <p><strong><%= l(:field_status) %>:</strong> <%= l("label_#{contact.status}") %></p>
 
-  <% if @contact.emails.any? %>
+  <% if contact.emails.any? %>
     <p><strong><%= l(:field_email_plural) %>:</strong></p>
     <ul>
-      <% @contact.emails.each do |email| %>
+      <% contact.emails.each do |email| %>
         <li><%= mail_to email.email %><%= email.is_primary ? " (#{l(:label_primary)})" : "" %></li>
       <% end %>
     </ul>
   <% end %>
 
-  <% if @contact.phones.any? %>
+  <% if contact.phones.any? %>
     <p><strong><%= l(:field_phone_plural) %>:</strong></p>
     <ul>
-      <% @contact.phones.each do |phone| %>
+      <% contact.phones.each do |phone| %>
         <li><%= phone.phone %><%= phone.is_primary ? " (#{l(:label_primary)})" : "" %></li>
       <% end %>
     </ul>
   <% end %>
 
-  <% if @contact.addresses.any? %>
+  <% if contact.addresses.any? %>
     <p><strong><%= l(:field_address_plural) %>:</strong></p>
     <ul>
-      <% @contact.addresses.each do |address| %>
+      <% contact.addresses.each do |address| %>
         <li><%= simple_format(address.address) %><%= address.is_primary ? " (#{l(:label_primary)})" : "" %></li>
       <% end %>
     </ul>
   <% end %>
-  <p><strong><%= l(:field_group_description) %>:</strong> <%= simple_format(@contact.description) %></p>
+  <p><strong><%= l(:field_group_description) %>:</strong> <%= simple_format(contact.description) %></p>
   <hr/>
-  <p><strong><%= l(:field_author) %>:</strong> <%= link_to_user @contact.author %></p>
-  <% if @contact.user.present? %>
-    <p><strong><%= l(:field_user) %>:</strong> <%= link_to_user @contact.user %></p>
+  <p><strong><%= l(:field_author) %>:</strong> <%= link_to_user contact.author %></p>
+  <% if contact.user.present? %>
+    <p><strong><%= l(:field_user) %>:</strong> <%= link_to_user contact.user %></p>
   <% end %>
-  <p><strong><%= l(:field_created_on) %>:</strong> <%= format_time(@contact.created_at) %></p>
-  <p><strong><%= l(:field_is_private) %>:</strong> <%= @contact.is_private? ? l(:general_text_yes) : l(:general_text_no) %></p>
-  <% if @contact.project %>
-    <p><strong><%= l(:field_project) %>:</strong> <%= link_to_project @contact.project %></p>
+  <p><strong><%= l(:field_created_on) %>:</strong> <%= format_time(contact.created_at) %></p>
+  <p><strong><%= l(:field_is_private) %>:</strong> <%= contact.is_private? ? l(:general_text_yes) : l(:general_text_no) %></p>
+  <% if contact.project %>
+    <p><strong><%= l(:field_project) %>:</strong> <%= link_to_project contact.project %></p>
   <% end %>
 </div>
 
 <%# Custom Fields %>
-<% if @custom_values.any? %>
+<% if custom_values.any? %>
   <div class="box">
     <h3><%= l(:label_custom_fields) %></h3>
-    <%= render_custom_fields_rows(@contact) %>
+    <%= render_custom_fields_rows(contact) %>
   </div>
 <% end %>
