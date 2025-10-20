@@ -71,3 +71,18 @@ end
 
 # Configurações do plugin
 get 'settings/plugin/foton_contacts', to: 'settings#plugin', as: 'contact_settings'
+
+# Data Quality Center
+resources :data_quality, only: [:index, :show, :update] do
+  collection do
+    post 'scan'
+    post 'batch_action'
+    post 'batch_process_imports'
+  end
+  member do
+    post 'merge'
+    post 'confirmation'
+    post 'preview'
+    get 'success'
+  end
+end

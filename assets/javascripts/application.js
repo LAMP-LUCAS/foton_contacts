@@ -8,6 +8,7 @@
 //= require controllers/show_tabs_controller
 //= require controllers/inline_edit_controller
 
+
 document.addEventListener("turbo:load", function() {
   if (!window.Stimulus) {
     console.error("Foton Contacts plugin: Stimulus not found on window object.");
@@ -40,4 +41,6 @@ document.addEventListener("turbo:load", function() {
   if (window.WorkloadAlertController && !application.router.modulesByIdentifier.has("workload-alert")) {
     application.register("workload-alert", window.WorkloadAlertController);
   }
+
+
 });
