@@ -397,22 +397,17 @@ class ContactsController < ApplicationController
   
   def import
     if request.post? && params[:file].present?
-      format = params[:format] || 'google_csv' # Default to google_csv for now
-      stats = Contacts::ImportService.call(params[:file], format, User.current)
+      format = params[:format] || 'google_csv'
+      result = Contacts::ImportService.call(params[:file], format, User.current)
       
-      notice = l(:notice_contacts_imported_detailed,
-                 created: stats[:created],
-                 updated: stats[:updated],
-                 failed: stats[:failed])
-
-      if stats[:failed] > 0
-        # You might want to log stats[:errors] or display them to the user
-        flash[:warning] = notice
-      else
-        flash[:notice] = notice
+      if Setting.plugin_foton_contacts['enable_async_analysis']
+        # In a real app with a job backend, this would be: 
+        # Analytics::DuplicateAnalysisJob.perform_later(result[:batch_id])
+        Analytics::DuplicateAnalysisJob.perform(result[:batch_id]) # Simulate for now
       end
 
-      redirect_to contacts_path
+      redirect_to data_quality_index_path(tab: 'import_review'), 
+                  notice: l(:notice_import_successful, count: result[:stats][:created])
     end
   end
 
