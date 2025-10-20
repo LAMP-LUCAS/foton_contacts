@@ -23,7 +23,8 @@ Redmine::Plugin.register :foton_contacts do
     'enable_issue_links' => true,
     'enable_custom_fields' => true,
     'enable_attachments' => true,
-    'create_user_contact' => 1
+    'create_user_contact' => 1,
+    'enable_async_analysis' => false
   }, partial: 'settings/contact_settings'
 
   # Menu principal

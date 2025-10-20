@@ -278,4 +278,79 @@ pt-BR:
   notice_contacts_imported_detailed: "%{created} contatos criados, %{updated} atualizados, %{failed} falharam."
   label_export_as_vcf: "Exportar como vCard"
   label_export_as_csv: "Exportar como CSV"
+  text_import_recommend_quality_check: "Importação concluída. Recomendamos visitar a Central de Qualidade de Dados para verificar a existência de duplicatas em potencial."
+
+  # Central de Qualidade de Dados
+  label_data_quality_center: "Central de Qualidade de Dados"
+  text_data_quality_intro: "Use esta ferramenta para encontrar e mesclar contatos duplicados em sua base de dados."
+  button_scan_for_duplicates: "Analisar Duplicatas"
+  text_no_duplicates_found: "Nenhuma duplicata em potencial foi encontrada."
+  label_potential_match_reason: "Motivo"
+  label_merge_contacts: "Mesclar Contatos"
+  button_review: "Revisar"
+  field_attribute: "Atributo"
+  text_merge_warning: "Atenção: A mesclagem é irreversível. O segundo contato será excluído e todo o seu histórico e associações serão transferidos para o primeiro."
+  button_merge_confirm: "Confirmar Mesclagem"
+  notice_merge_successful: "Contatos mesclados com sucesso."
+  error_merge_failed: "Ocorreu um erro ao mesclar os contatos. Por favor, verifique os logs."
+
+  # Ações em Lote
+  label_with_selected: "Com os selecionados..."
+  button_perform_action: "Ir"
+  option_merge_recommended: "Mesclar recomendados"
+  option_ignore_selected: "Ignorar selecionados"
+
+  # Revisão de Importação
+  title_conflicting_imports: "Duplicatas Potenciais para Revisão Manual"
+  subtitle_conflicting_imports: "Estes contatos importados parecem corresponder a contatos existentes. Por favor, revise cada um."
+  title_safe_imports: "Novos Contatos para Criação"
+  subtitle_safe_imports: "Estes contatos não foram encontrados na base de dados e estão prontos para serem criados."
+  text_no_safe_imports: "Nenhum novo contato para criar."
+  option_create_selected: "Registrar Selecionados"
+  option_delete_selected: "Excluir Selecionados"
+  error_no_imports_selected: "Nenhum contato importado foi selecionado."
+  notice_imports_created: "%{{count}} novos contatos foram criados com sucesso."
+  notice_imports_deleted: "%{{count}} registros importados foram excluídos."
+  error_batch_merge_failed: "Falha ao mesclar %{count} pares. Por favor, revise-os manualmente."
+  error_no_pairs_selected: "Nenhum par de duplicatas foi selecionado."
+  notice_batch_merge_completed: "Ação em lote concluída: %{count} pares foram mesclados."
+  notice_pairs_ignored: "%{{count}} pares foram marcados como não-duplicados e serão ignorados em futuras análises."
+  label_database_duplicates: "Duplicatas no Banco de Dados"
+  label_import_review: "Revisão de Importação"
+  label_potential_duplicate: "Duplicata Potencial"
+  text_no_pending_imports: "Não há importações pendentes para revisão."
+
+  # Configurações
+  label_enable_async_analysis: "Habilitar análise assíncrona"
+  text_enable_async_analysis_info: "Se marcado, a análise de duplicatas após uma importação será executada como uma tarefa em segundo plano."
+  notice_import_successful: "%{{count}} contatos foram importados com sucesso e estão pendentes de revisão."
+
+  # Página de Revisão de Mesclagem
+  text_duplicate_detected: "Duplicata Detectada"
+  title_conflicting_fields: "Campos em Conflito"
+  subtitle_conflicting_fields: "Selecione os valores que deseja manter no contato final"
+  button_review_and_confirm: "Revisar e Confirmar Mesclagem"
+  label_recommended: "Recomendado"
+  label_recommended_short: "Rec."
+
+  # Página de Confirmação
+  title_merge_confirmation: "Confirmação de Mesclagem"
+  subtitle_merge_confirmation: "Revise o contato final antes de confirmar a mesclagem."
+  button_back_to_review: "Voltar para Revisão"
+  button_merge_definitively: "Confirmar Mesclagem"
+  button_preview_merge: "Pré-visualizar Mesclagem"
+  label_resolved: "Resolvido"
+  label_most_recent: "Mais Recente"
+
+  # Página de Sucesso
+  title_merge_success: "Mesclagem Concluída!"
+  subtitle_merge_success: "Os contatos foram mesclados com sucesso."
+  label_merged_contact: "Contato Resultante"
+  button_view_duplicates: "Ver Duplicatas"
+  button_view_contact: "Ver Contato"
+  notice_merge_skipped_same_contact: "A mesclagem não foi necessária, pois o mesmo contato foi selecionado."
+  title_merge_status: "Status da Mesclagem"
+  label_fields_resolved: "campos resolvidos"
+  label_merge_result: "Resultado da Mesclagem"
+  label_source_data: "Dados de Origem"
   
