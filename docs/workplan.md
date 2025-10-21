@@ -19,6 +19,93 @@ Para garantir a consistência e a qualidade, o desenvolvimento é guiado por um 
 
 ---
 
+## ✅ Verificação de compatibilidade do Workplan com o código atual
+
+Esta seção documenta o resultado da verificação do conteúdo deste documento (`workplan.md`) em relação ao código atualmente presente no repositório do plugin. A checagem foi realizada lendo controladores, serviços, modelos, migrations e serializers mencionados neste plano.
+
+Resumo rápido:
+
+- A maioria dos itens das Fases 1 a 3 (arquitetura de BI, controllers, services principais, import/export, journaling e refatoração do modelo de contatos) está implementada no código.
+- Itens pontuais de ajuste e pequenas lacunas (listadas abaixo) permanecem pendentes ou requerem alinhamento com as diretrizes do workplan.
+
+Mapeamento por área (status, arquivos relevantes e observações):
+
+- Analytics / BI — Status: CONCLUÍDO / PRESENTE
+    - Arquivo controller: `app/controllers/analytics_controller.rb` (actions: `index`, `overview_tab`, `team_performance_tab`, `workload_tab`, `workload_results`, `contact_details`, `irpa_trend`, `dynamic_dashboard`, etc.)
+    - Services lidos: `app/services/analytics/irpa_calculator.rb`, `team_scorecard_query.rb`, `workload_query.rb`, `historical_state_query.rb`, `data_quality_query.rb`, `partner_analysis_query.rb`.
+    - Observação: a infraestrutura de widgets, frames e partials existe sob `app/views/analytics/`.
+
+- IRPA (`Analytics::IrpaCalculator`) — Status: PRESENTE, AÇÕES PENDENTES
+    - Arquivo: `app/services/analytics/irpa_calculator.rb`
+    - Observação: implementa TAH, IR, FCP e Instability. Contudo, o workplan solicita duas mudanças de comportamento:
+        1. Alterar `calculate_fcp` para retornar contagem de tarefas críticas (prioridade Alta/Urgente) — atualmente `calculate_fcp` retorna a média das posições de prioridade.
+        2. Incluir no hash de retorno o campo bruto `instability_change_count` além do `instability_factor` — atualmente só é retornado `instability_factor`.
+    - Recomendação: ajustar `calculate_fcp` e adicionar `instability_change_count` ao hash de retorno; atualizar views se necessário.
+
+- TeamScorecard / ICE — Status: CONCLUÍDO
+    - Arquivo: `app/services/analytics/team_scorecard_query.rb`
+    - Observação: cálculo de ICE usa `Journal` e eventos `Created` / `Destroyed` conforme o workplan.
+
+- Workload & check_workload — Status: CONCLUÍDO
+    - Arquivos: `app/services/analytics/workload_query.rb`, `app/services/analytics/workload_checker_service.rb`, `app/controllers/contacts_controller.rb` (action `check_workload`), rotas em `config/routes.rb`.
+
+- Journaling (ActsAsJournalizedConcern) — Status: CONCLUÍDO
+    - Arquivo: `lib/acts_as_journalized_concern.rb`
+    - Observação: inclui callbacks `after_create`, `after_destroy`, `after_save` e suporta `acts_as_journalized watch: [...]` nos modelos.
+
+- Modelo de dados `FotonContact` e detalhes (phones/emails/addresses) — Status: CONCLUÍDO
+    - Arquivos: `app/models/foton_contact.rb`, `app/models/foton_contact_email.rb`, `app/models/foton_contact_phone.rb`, `app/models/foton_contact_address.rb` e migration principal `db/migrate/001_init_foton_contacts_schema.rb`.
+    - Observação: `FotonContact` implementa `has_many` e `accepts_nested_attributes_for` e métodos delegados `email`, `phone`, `address` para compatibilidade.
+
+- Import / Export — Status: CONCLUÍDO
+    - Arquivos: `app/services/contacts/import_service.rb`, `app/services/contacts/importers/vcard_mapper.rb`, `app/services/contacts/importers/google_csv_mapper.rb`, `app/services/contacts/export_service.rb`, `app/services/contacts/exporters/csv_serializer.rb`, `app/services/contacts/exporters/vcard_serializer.rb`.
+    - Controller: `app/controllers/contacts_controller.rb` (`import`, `export` actions presentes).
+
+- Data Quality / Merge — Status: PARCIAL
+    - Arquivo de merge: `app/services/contacts/merge_service.rb` presente e implementa reassociação/transação.
+    - Observação: o serviço `Analytics::DuplicateFinderService` nomeado no workplan não foi encontrado pelo nome exato — pode ainda não existir ou estar implementado com outro nome. A infraestrutura (imported_contacts, data_quality routes) existe.
+
+Principais divergências / pendências detectadas (priorizadas):
+
+1. `Analytics::IrpaCalculator` — alteração do FCP (Fator de Criticidade) e inclusão de `instability_change_count` no retorno (ver `app/services/analytics/irpa_calculator.rb`).
+     - Impacto: atual views e visualizações do modal analytics esperam campos com nomes/formatos atuais. Se alterarmos o formato de retorno, atualizar `_analytics_modal.html.erb` para exibir o valor e o label (ex.: "Tarefas Críticas Abertas").
+
+2. `Analytics::DuplicateFinderService` — não foi encontrado com esse nome.
+     - Observação: workplan lista a criação deste serviço; o `merge_service.rb` existe. Recomenda-se implementar (ou documentar o nome existente) para o módulo Data Quality.
+
+3. Frontend: controller `contact-filter-observer-controller.js` (workplan menciona refatoração) — marcado como pendente no workplan e não verificado aqui (requer investigação no diretório `assets/javascripts` / `app/javascript`).
+
+4. UI/CSS e testes visuais: As alterações de estilo e auditoria de `contacts.css` e grid foram aplicadas parcialmente (assets `bootstrap.min.css`, `contacts.css` estão presentes), porém validação visual completa deve ser feita em navegador. Também há um bug JS intermitente documentado no backlog.
+
+Checks executados / arquivos lidos (amostra):
+
+- `app/controllers/analytics_controller.rb`
+- `app/services/analytics/irpa_calculator.rb`
+- `app/services/analytics/team_scorecard_query.rb`
+- `app/services/analytics/workload_query.rb`
+- `app/services/analytics/historical_state_query.rb`
+- `app/models/foton_contact.rb`
+- `lib/acts_as_journalized_concern.rb`
+- `app/services/contacts/import_service.rb`
+- `app/services/contacts/importers/vcard_mapper.rb`
+- `app/services/contacts/importers/google_csv_mapper.rb`
+- `app/services/contacts/export_service.rb`
+- `app/services/contacts/exporters/csv_serializer.rb`
+- `app/services/contacts/merge_service.rb`
+- `db/migrate/001_init_foton_contacts_schema.rb`
+
+Recomendações imediatas (ações concretas):
+
+- Implementar a mudança no `IrpaCalculator#calculate_fcp` para retornar a contagem de tarefas críticas (prioridades definidas) e adicionar `instability_change_count` ao hash retornado. Arquivo: `app/services/analytics/irpa_calculator.rb`.
+- Verificar se existe um serviço de detecção de duplicatas com outro nome; caso contrário, implementar `Analytics::DuplicateFinderService` usando `imported_contacts`, e-mail exato e `pg_trgm` para fuzzy search. Arquivo sugerido: `app/services/analytics/duplicate_finder_service.rb`.
+- Rodar a suíte de testes do plugin (rake test) e ajustar os testes que esperam os antigos formatos de métricas.
+- Testes manuais: validar visualmente o dashboard de BI com navegação via Turbo Drive para reproduzir o erro `Cannot read properties of undefined (reading 'start')` e adicionar guards nos scripts JS que inicializam gráficos.
+
+Se preferir, implemento agora as alterações no `IrpaCalculator` (mudança de FCP + inclusion de instability_change_count) e adapto as views mínimas necessárias. Caso queira, também posso criar um esqueleto para `Analytics::DuplicateFinderService`.
+
+---
+
+
 ## 🚀 Fases de Desenvolvimento
 
 ### ✅ Fase 1: Modernização da Interface com Hotwire (Concluída)
@@ -333,6 +420,83 @@ A implementação seguirá rigorosamente as diretrizes de `@docs/concepts.md` e 
             *   A chamada ao helper `bar_chart` será modificada para passar múltiplas séries de dados.
             *   Configurar a opção `stacked: true` na biblioteca do gráfico.
             *   As séries serão "No Prazo", "Atrasadas" e "Retrabalho", e os dados serão a contagem de tarefas em cada categoria por projeto.
+
+---
+
+### 🚀 Fase 7: Compatibilidade Avançada de Importação e Exportação (Revisada)
+
+**Objetivo:** Garantir que os recursos de importação e exportação sejam totalmente compatíveis com os formatos padrão de mercado (Google CSV, Apple vCard), facilitando a migração de dados de outras plataformas.
+
+#### 🗺️ Etapas Detalhadas de Implementação
+
+1.  **Backend: Lógica de Importação e Exportação**
+    *   [x] **1.1. Criar `Contacts::ImportService`:** Desenvolver um service object para orquestrar o processo de importação, com suporte a múltiplos formatos.
+    *   [x] **1.2. Implementar Mapeadores (Mappers):**
+        *   [x] `Contacts::Importers::GoogleCsvMapper`: Para traduzir planilhas do Google CSV.
+        *   [x] `Contacts::Importers::VcardMapper`: Para parsear arquivos `.vcf`.
+    *   [x] **1.3. Refatorar `ContactsController#import`:** Modificar a action para usar o `ImportService` e fornecer feedback detalhado (criados, atualizados, falhas).
+    *   [x] **1.4. Criar `Contacts::ExportService`:** Desenvolver um serviço para lidar com a exportação para múltiplos formatos.
+    *   [x] **1.5. Implementar Serializadores (Serializers):**
+        *   [x] `Contacts::Exporters::CsvSerializer`: Para gerar arquivos CSV no padrão Google.
+        *   [x] `Contacts::Exporters::VcardSerializer`: Para gerar um arquivo `.vcf` com múltiplos contatos.
+    *   [x] **1.6. Refatorar `ContactsController#export`:** Criar uma action dedicada que utiliza o `ExportService` para gerar os arquivos com base nos filtros da tela.
+
+2.  **Frontend: Experiência do Usuário**
+    *   [x] **2.1. Criar Página de Importação:** Desenvolver a view `import.html.erb` com opções para seleção de formato de arquivo.
+    *   [x] **2.2. Melhorar Feedback:** Implementar mensagens de notificação detalhadas após a importação.
+    *   [x] **2.3. Atualizar Links de Exportação:** Substituir o link genérico por links específicos para CSV e vCard na `index.html.erb`.
+
+3.  **Lógica de Duplicidade (Simplificada na Importação)**
+    *   [x] **3.1. Verificação por E-mail:** O `ImportService` implementa uma verificação básica por e-mail exato para decidir entre criar um novo contato ou atualizar um existente.
+    *   [ ] **3.2. Notificação Pós-Importação:** Ao final da importação, adicionar uma mensagem recomendando ao usuário que visite a futura "Central de Qualidade de Dados" para uma análise mais profunda de duplicatas.
+
+---
+
+### 🚀 Fase 8: Central de Qualidade de Dados (Gestão de Duplicatas) (Planejada)
+
+**Objetivo:** Criar um módulo dedicado para a manutenção contínua da base de contatos, permitindo a identificação, revisão e mesclagem de duplicatas de forma inteligente, segura e assistida pelo usuário.
+
+#### 🧠 Arquitetura e Princípios
+
+- **Módulo Dedicado:** A funcionalidade viverá em sua própria área (`/data_quality`), desacoplada do fluxo de importação.
+- **Segurança em Primeiro Lugar:** Nenhuma alteração nos dados será feita automaticamente. Todas as mesclagens exigirão confirmação explícita do usuário.
+- **Análise Inteligente:** A detecção de duplicatas usará múltiplos critérios (e-mail, similaridade de nome) para aumentar a precisão.
+- **Reaproveitamento de Código:** A lógica de mapeamento e os serviços já criados na Fase 7 serão a base para a análise e processamento dos dados.
+
+#### 🗺️ Etapas Detalhadas de Implementação
+
+1.  **Backend: Serviços de Análise e Mesclagem**
+    *   [ ] **1.1. Criar `Analytics::DuplicateFinderService`:**
+        *   Desenvolver a lógica para varrer a tabela `foton_contacts`.
+        *   Implementar a busca por duplicatas com base em e-mails idênticos.
+        *   Implementar a busca por duplicatas com base em nomes com alta similaridade (ex: usando a gem `fuzzy-match` ou similar).
+        *   O serviço deverá retornar uma lista de pares de contatos suspeitos, sem alterar nenhum dado.
+    *   [ ] **1.2. Criar `Contacts::MergeService`:**
+        *   Desenvolver o serviço que receberá dois IDs de contato (o principal e o duplicado) e um hash com os dados a serem mantidos.
+        *   A lógica deverá ser transacional (`ActiveRecord::Base.transaction`).
+        *   **Etapas da Transação:**
+            1.  Atualizar o contato principal com os atributos escolhidos.
+            2.  Reassociar todos os objetos relacionados do contato duplicado para o principal (vínculos com tarefas, grupos, histórico, anexos, etc.).
+            3.  Arquivar ou excluir o contato duplicado.
+
+2.  **Frontend: Interface da Central de Qualidade**
+    *   [ ] **2.1. Criar `DataQualityController`:** Criar o novo controller para gerenciar as ações do módulo (`index`, `scan`, `review`, `merge`).
+    *   [ ] **2.2. Adicionar Rotas:** Definir as rotas para o novo controller em `config/routes.rb` (ex: `resources :data_quality, only: [:index, :create, :show, :update]`).
+    *   [ ] **2.3. View Principal (`index.html.erb`):**
+        *   Criar a página inicial do módulo com o botão "Analisar Duplicatas".
+        *   Esta página também listará os pares de duplicatas encontrados após a análise, usando `Turbo Frames` para atualização assíncrona.
+    *   [ ] **2.4. View de Revisão e Mesclagem (`show.html.erb`):**
+        *   Desenvolver a interface de comparação lado a lado para um par de duplicatas.
+        *   Para cada campo conflitante, fornecer botões ou rádio-buttons para que o usuário escolha qual dado prevalecerá.
+        *   Um formulário (`form_with`) enviará os IDs dos contatos e os dados escolhidos para a action `update` (ou `merge`) do controller.
+
+3.  **Integração e Fluxo de Usuário**
+    *   [ ] **3.1. Adicionar Link no Menu:** Inserir um link ou aba na área de Contatos para acessar a "Central de Qualidade de Dados".
+    *   [ ] **3.2. Atualizar Mensagem de Importação:** Implementar o item 3.2 da Fase 7, adicionando um link para a nova central na mensagem de feedback da importação.
+
+4.  **Testes**
+    *   [ ] **4.1. Testes de Unidade:** Criar testes para o `DuplicateFinderService` e o `MergeService`, validando a lógica de detecção e a segurança da transação de mesclagem.
+    *   [ ] **4.2. Testes de Integração:** Criar testes para o fluxo completo: iniciar a análise, selecionar um par, revisar e confirmar a mesclagem, e verificar se o resultado no banco de dados está correto.
 
 ---
 

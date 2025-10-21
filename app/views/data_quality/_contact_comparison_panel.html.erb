@@ -1,0 +1,26 @@
+<div class="contact-card">
+  <div class="card-header">
+    <h3 class="card-title"><%= contact.name %></h3>
+    <% if is_recommended %>
+      <span class="contact-source"><%= l(:label_most_recent) %></span>
+    <% end %>
+  </div>
+  <div class="card-body">
+    <div class="contact-field">
+      <div class="contact-field-label"><%= l(:field_email) %></div>
+      <div class="contact-field-value"><%= contact.email %></div>
+    </div>
+    <div class="contact-field">
+      <div class="contact-field-label"><%= l(:field_phone) %></div>
+      <div class="contact-field-value"><%= contact.phone %></div>
+    </div>
+    <div class="contact-field">
+      <div class="contact-field-label"><%= l(:field_description) %></div>
+      <div class="contact-field-value"><%= simple_format(contact.description) %></div>
+    </div>
+    <div class="contact-field">
+      <div class="contact-field-label"><%= l(:field_updated_on) %></div>
+      <div class="contact-field-value"><%= format_time(contact.updated_at) %></div>
+    </div>
+  </div>
+</div>

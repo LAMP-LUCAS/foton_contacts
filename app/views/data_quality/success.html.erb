@@ -1,0 +1,19 @@
+<div class="card">
+  <div class="card-body confirmation-content">
+    <div class="confirmation-icon">
+      <i class="fas fa-check-circle"></i>
+    </div>
+    <h2 class="card-title"><%= l(:title_merge_success) %></h2>
+    <p class="card-subtitle"><%= l(:subtitle_merge_success) %></p>
+    
+    <div class="result-preview" style="margin: 2rem auto; max-width: 600px;">
+      <h3 class="card-title" style="text-align: center; margin-bottom: 1rem;"><%= l(:label_merged_contact) %></h3>
+      <%= render partial: 'contacts/show_tabs/details', locals: { contact: @contact, custom_values: @contact.custom_values } %>
+    </div>
+
+    <div class="action-buttons">
+      <%= link_to l(:button_view_duplicates), data_quality_index_path, class: 'btn btn-primary', data: { turbo_frame: '_top' } %>
+      <%= link_to l(:button_view_contact), contact_path(@contact), class: 'btn btn-secondary', data: { turbo_frame: '_top' } %>
+    </div>
+  </div>
+</div>

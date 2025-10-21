@@ -118,8 +118,8 @@ class FotonContact < ActiveRecord::Base
   accepts_nested_attributes_for :employments_as_person, allow_destroy: true, reject_if: :all_blank
 
   validates :name, presence: true
-  enum contact_type: [:person, :company]
-  enum status: [:active, :inactive, :discontinued]
+  enum :contact_type, [:person, :company], default: :person
+  enum :status, [:active, :inactive, :discontinued], default: :active
 
   validates :contact_type, presence: true
   validates :status, presence: true

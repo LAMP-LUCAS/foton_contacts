@@ -24,7 +24,7 @@
 <% @tabs.each_with_index do |tab, i| %>
   <div class="tab-content <%= (params[:tab].to_s == tab[:name].to_s || (params[:tab].blank? && i == 0)) ? 'selected' : nil %>" id="tab-<%= tab[:name] %>" data-show-tabs-target="content" data-tab-name="<%= tab[:name] %>">
     <%# The partial is a 'frame' that contains the actual lazy-loaded turbo_frame_tag %>
-    <%= render partial: tab[:partial], locals: { contact: @contact } %>
+    <%= render partial: tab[:partial], locals: { contact: @contact, custom_values: @custom_values } %>
   </div>
 <% end %>
 

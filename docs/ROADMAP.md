@@ -86,11 +86,26 @@ O plugin integra um módulo de análise para transformar dados de contatos e pro
 
 ## 🎯 Próximos Passos
 
-A próxima grande fase de desenvolvimento se concentrará em expandir as ferramentas de análise para incluir:
+O desenvolvimento do plugin continua, focado em aprimorar a inteligência de dados e a experiência do usuário. As próximas fases incluem:
 
-- **Índice de Risco Preditivo de Alocação (IRPA):** Uma métrica para identificar proativamente os contatos com maior risco de se tornarem gargalos.
-- **Painel de Performance da Equipe:** Gráficos e rankings para comparar a performance entre diferentes equipes ou grupos.
-- **Monitor de Qualidade dos Dados:** Ferramentas para garantir que os dados dos contatos estejam sempre completos e atualizados.
+-   **Fase 6: Aprimoramento e Contextualização dos KPIs de Análise:** Evoluir o modal de análise individual para uma ferramenta de diagnóstico rápido e acionável, contextualizando os KPIs para uma interpretação imediata.
+-   **Fase 8: Central de Qualidade de Dados:** Criar um módulo dedicado para identificação, revisão e mesclagem assistida de duplicatas, garantindo a integridade da base de contatos.
+-   **Testes e Validações:** Aumentar a robustez e a confiabilidade do plugin com testes unitários, de permissão, de interface e de resiliência.
+-   **Empacotamento e Documentação Final:** Facilitar a adoção, o uso e a contribuição para o plugin, incluindo a documentação de API REST e hooks para desenvolvedores.
+
+**Backlog de Funcionalidades:**
+
+-   **Avaliação de Sobrecarga para Grupos de Contatos:** Estender o alerta de sobrecarga para grupos, somando a alocação dos membros.
+-   **Refatorar Grupos de Contatos:** Avaliar a substituição de flags booleanas por um enum `group_type` mais robusto.
+
+**Backlog de Bugs:**
+
+-   **Erro de JavaScript intermitente no Dashboard de BI:** Investigar e corrigir o `Uncaught TypeError` durante a navegação via Turbo Drive.
+-   **Botão de Excluir Vínculo no Modal de Edição Não Funciona:** Corrigir a remoção visual e a marcação para exclusão de vínculos empregatícios em modais.
+
+**Backlog de Tecnologia e Otimizações:**
+
+-   **Implementar Gerenciador de Links (Porteiro) no Frontend:** Refatorar a gestão de links para manter a navegação rápida do Turbo Drive para todas as páginas.
 
 ---
 

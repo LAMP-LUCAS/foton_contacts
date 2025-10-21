@@ -1,0 +1,37 @@
+<h2><%= l(:label_data_quality_center) %></h2>
+
+<div class="tabs">
+  <ul>
+    <li><a href="<%= data_quality_index_path %>" class="<%= @active_tab == 'database_duplicates' ? 'selected' : '' %>"><%= l(:label_database_duplicates) %></a></li>
+    <li><a href="<%= data_quality_index_path(tab: 'import_review') %>" class="<%= @active_tab == 'import_review' ? 'selected' : '' %>"><%= l(:label_import_review) %></a></li>
+  </ul>
+</div>
+
+<% if @active_tab == 'import_review' %>
+  <div id="import_review">
+    <%= render partial: 'data_quality/imported_contacts_list', locals: { conflicting_imports: @conflicting_imports, safe_imports: @safe_imports } %>
+  </div>
+<% else %>
+  <div id="database_duplicates">
+    <%= form_tag(scan_data_quality_index_path, method: :post) do %>
+      <div class="box">
+        <p><%= l(:text_data_quality_intro) %></p>
+        <%= submit_tag l(:button_scan_for_duplicates), class: 'btn btn-primary' %>
+      </div>
+    <% end %>
+
+    <%= form_tag(batch_action_data_quality_index_path, method: :post) do %>
+      <div class="autoscroll">
+        <%= turbo_frame_tag "duplicate_results" do %>
+          <%# Content is now loaded exclusively by the scan action %>
+        <% end %>
+      </div>
+
+      <div class="contextual">
+        <label for="batch_action"> <%= l(:label_with_selected) %> </label>
+        <%= select_tag :batch_action, options_for_select([ [l(:option_merge_recommended), 'merge_recommended'], [l(:option_ignore_selected), 'ignore'] ]), id: 'batch_action' %>
+        <%= submit_tag l(:button_perform_action), class: 'btn btn-secondary' %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

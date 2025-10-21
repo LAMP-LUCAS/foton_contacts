@@ -51,8 +51,29 @@ class ContactsController < ApplicationController
     respond_to do |format|
       format.html
       format.api
-      format.csv { send_data(FotonContact.contacts_to_csv(@contacts), filename: 'contacts.csv') }
     end
+  end
+
+  def export
+    # Get filtered contacts
+    sort_init 'name', 'asc'
+    sort_update %w(name status created_at)
+    scope = FotonContact.visible(User.current).includes(:author, :project)
+    scope = scope.where(contact_type: params[:contact_type]) if params[:contact_type].present?
+    scope = scope.where(status: params[:status]) if params[:status].present?
+    if params[:search].present?
+      search = "%#{params[:search].downcase}%"
+      scope = scope.where('LOWER(name) LIKE ? OR LOWER(description) LIKE ?', search, search)
+    end
+    @contacts = scope.order(sort_clause)
+
+    format = params[:format] || 'csv'
+    data = Contacts::ExportService.call(@contacts, format)
+    
+    filename = "contacts.#{format}"
+    content_type = format == 'csv' ? 'text/csv' : 'text/vcard'
+
+    send_data(data, filename: filename, type: content_type)
   end
   
   def show
@@ -376,9 +397,16 @@ class ContactsController < ApplicationController
   
   def import
     if request.post? && params[:file].present?
-      count = FotonContact.import_csv(params[:file], User.current)
-      flash[:notice] = l(:notice_contacts_imported, count: count)
-      redirect_to contacts_path
+      Rails.logger.info "[ETL-TRACE] ContactsController#import - ENTER - file: #{params[:file].original_filename}, content_type: #{params[:file].content_type}"
+      result = Contacts::ImportService.call(file: params[:file])
+      Rails.logger.info "[ETL-TRACE] ContactsController#import - EXIT - Service result: #{result.inspect}"
+
+      if Setting.plugin_foton_contacts['enable_async_analysis'] && result[:batch_id]
+        Analytics::DuplicateAnalysisJob.perform_now(result[:batch_id])
+      end
+
+      redirect_to data_quality_index_path(tab: 'import_review'),
+                  notice: l(:notice_import_successful, count: result[:created_count])
     end
   end
 

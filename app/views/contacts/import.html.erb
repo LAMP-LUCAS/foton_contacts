@@ -1,0 +1,23 @@
+<h2><%= l(:label_contact_import) %></h2>
+
+<%= form_tag(import_contacts_path, multipart: true) do %>
+  <div class="box">
+    <p>
+      <%= label_tag 'file', l(:label_import_select_file) %><br>
+      <%= file_field_tag 'file', accept: '.csv,.vcf' %>
+    </p>
+
+    <p><%= l(:label_import_file_format) %><br>
+      <label><%= radio_button_tag 'format', 'google_csv', true %> <%= l(:label_import_format_google_csv) %></label><br>
+      <label><%= radio_button_tag 'format', 'apple_vcf', false %> <%= l(:label_import_format_apple_vcf) %></label>
+    </p>
+
+    <p>
+      <%= l(:text_import_template_download) %>
+      <%= link_to l(:label_import_template_csv), contacts_path(format: :csv, template: true) %>
+    </p>
+  </div>
+
+  <%= submit_tag l(:button_import), class: 'btn btn-primary' %>
+  <%= link_to l(:button_cancel), contacts_path, class: 'btn btn-secondary' %>
+<% end %>
