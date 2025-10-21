@@ -12,8 +12,8 @@ Redmine::Plugin.register :foton_contacts do
   author 'Mundo AEC'
   author_url 'https://mundoaec.com/'
   description 'Plugin de gestão de contatos para o setor AEC'
-  version '0.1.0'
-  url 'https://mundoaec.com/'
+  version '0.0.1'
+  url 'https://github.com/LAMP-LUCAS/foton_contacts'
 
   settings default: {
     'contact_types' => ['person', 'company'],
