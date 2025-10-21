@@ -26,7 +26,7 @@ Este documento é o registro histórico e o manual de funcionalidades do plugin 
 Esta é a funcionalidade central que conecta a gestão de contatos ao trabalho diário no Redmine.
 
 - **Vínculo Direto a Tarefas:** Permite associar múltiplos contatos e/ou grupos de contatos diretamente a uma tarefa, criando um registro claro de todos os stakeholders envolvidos.
-- **Atribuição de Funções (Roles):** Ao vincular um contato a uma tarefa, é possível atribuir uma **função** específica a ele (ex: "Aprovador", "Fornecedor", "Cliente"). Esse campo é editável diretamente na lista de contatos da tarefa, salvando automaticamente.
+- **Atribuição de Funções (Roles):** Ao vincular um contato a uma tarefa, é possível atribuir uma **função** específica a ele (ex: "Arquiteto", "Engenheiro", "Cliente"). Esse campo é editável diretamente na lista de contatos da tarefa, salvando automaticamente.
 - **Busca Inteligente na Tarefa:** Dentro da tela de uma tarefa, uma caixa de busca permite encontrar e adicionar contatos ou grupos rapidamente, sem interromper o fluxo de trabalho. A busca sugere resultados em tempo real.
 - **Gestão Visual:** Os contatos vinculados são exibidos como "cards" informativos na própria tarefa, cada um com um botão para remoção rápida e a opção de editar a função.
 
