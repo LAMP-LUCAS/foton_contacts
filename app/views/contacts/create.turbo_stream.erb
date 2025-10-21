@@ -1,3 +1,10 @@
 <%# app/views/contacts/create.turbo_stream.erb %>
+
+<%# Adiciona a nova linha de contato ao topo da tabela %>
 <%= turbo_stream.prepend "contacts_tbody", partial: "contacts/contact_row", locals: { contact: @contact } %>
+
+<%# Passo 1: Remove o frame do modal, acionando o `disconnect()` do controller Stimulus para esconder a "casca" %>
 <%= turbo_stream.remove "modal" %>
+
+<%# Passo 2: Recria o placeholder do turbo-frame para que o modal possa ser aberto novamente no futuro %>
+<%= turbo_stream.append "content", "<turbo-frame id='modal' data-controller='modal'></turbo-frame>" %>

@@ -1,0 +1,9 @@
+<% contacts.each do |contact| %>
+  <div class="contact-search-result">
+    <span><%= contact.name %></span>
+    <%= link_to l(:button_add), 
+                add_member_contact_group_path(contact_group, contact_id: contact.id), 
+                data: { turbo_method: :post },
+                class: 'button -mini' %>
+  </div>
+<% end %>

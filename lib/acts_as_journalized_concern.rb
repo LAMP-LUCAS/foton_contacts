@@ -5,12 +5,14 @@ module ActsAsJournalizedConcern
   included do
     has_many :journals, as: :journalized, dependent: :destroy, class_name: 'Journal'
 
+    after_create :create_creation_journal_entry
+    after_destroy :create_destruction_journal_entry
+    after_save :create_update_journal_entry
+
     # Define um método de classe para configurar o journaling
     def self.acts_as_journalized(options = {})
       cattr_accessor :journalized_attributes
       self.journalized_attributes = options[:watch].map(&:to_s) if options[:watch].present?
-
-      after_save :create_journal_entry
     end
 
     # Adicionar este método de instância para satisfazer a expectativa da classe Journal do Redmine
@@ -19,16 +21,13 @@ module ActsAsJournalizedConcern
     end
   end
 
-  # Callback method para criar uma entrada de journal após salvar
-  def create_journal_entry
+  # Callback para registrar atualizações nos atributos monitorados
+  def create_update_journal_entry
     return unless self.class.journalized_attributes.present? && self.persisted?
 
-    # Coleta as mudanças apenas dos atributos monitorados
     changes_to_watch = self.saved_changes.slice(*self.class.journalized_attributes)
     return if changes_to_watch.empty?
 
-    # Cria uma nova entrada de journal
-    # Assumindo que User.current está disponível no contexto do Redmine
     journal = Journal.new(journalized: self, user: User.current)
     
     changes_to_watch.each do |attr, (old_value, new_value)|
@@ -40,6 +39,18 @@ module ActsAsJournalizedConcern
       )
     end
     journal.save
+  end
+
+  # Callback para registrar a criação do objeto
+  def create_creation_journal_entry
+    journal = Journal.new(journalized: self, user: User.current, notes: "Created")
+    journal.save
+  end
+
+  # Callback para registrar a destruição do objeto
+  def create_destruction_journal_entry
+    # Usamos Journal.create para garantir que seja salvo mesmo que o objeto esteja sendo destruído
+    Journal.create(journalized: self, user: User.current, notes: "Destroyed")
   end
 
   # Métodos auxiliares existentes (mantidos)

@@ -19,8 +19,8 @@ Para uma visão geral das funcionalidades, consulte o **[Roadmap e Manual](ROADM
 O plugin adota a filosofia "The Hotwire Way" como padrão para toda a sua arquitetura de front-end, minimizando a necessidade de código JavaScript complexo e maximizando a produtividade do desenvolvedor.
 
 ### Back-End
-- **Padrão Rails:** Seguir as convenções do Ruby on Rails, utilizando `strong_parameters` para segurança e Services/Queries para organizar a lógica de negócio.
-- **Modelos "Magra":** A lógica de negócio principal e as validações são mantidas nos modelos sempre que possível.
+- **Padrão Rails com Service Objects:** A lógica de negócio complexa é extraída para classes de serviço dedicadas (Service Objects ou Query Objects). Isso mantém os controllers e modelos limpos e focados em suas responsabilidades principais. O `Analytics::HistoricalStateQuery` é um exemplo prático deste padrão, encapsulando a lógica de consultas temporais para ser reutilizada em diferentes análises.
+- **Modelos "Magros" (Fat Model, Skinny Controller):** A lógica diretamente associada a um modelo (validações, associações, métodos de instância simples) permanece nele, mas a lógica de negócio que coordena múltiplos modelos ou fontes de dados deve ser movida para um serviço.
 
 ### Front-End: The Hotwire Stack
 
@@ -32,12 +32,43 @@ A interação do usuário é inteiramente controlada pelo Hotwire, um conjunto d
     - **Lazy-Loading:** Carregamento sob demanda do conteúdo de abas, otimizando a performance.
 - **Turbo Streams:** Entregam atualizações de página a partir do servidor, permitindo modificar partes específicas do DOM em resposta a ações do usuário (como criar, atualizar ou deletar um registro). É a tecnologia por trás da atualização dinâmica da lista de contatos após uma edição no modal.
 
+### Componentização com Partials
+
+Para promover a reutilização e a clareza, a interface é dividida em componentes independentes usando partials do Rails. Elementos de UI complexos ou recorrentes, como a lista de tarefas vinculadas a um contato (`app/views/issues/_issue_list.html.erb`), são encapsulados em seus próprios partials. Isso torna o código das views mais limpo e facilita a manutenção.
+
 ### JavaScript com Stimulus
+
+> ATENÇÃO: Redmine 6.0.7 com Rails 7.2.2.2 não serve automaticamente arquivos JS da pasta assets/javascripts via /plugin_assets/... como fazia em versões anteriores.
 
 - **Interatividade Leve e Focada:** O Stimulus é usado para interatividade que complementa o ciclo do Hotwire. Os controllers Stimulus são pequenos e focados em um único comportamento, como:
     - Desabilitar um botão de "Salvar" durante o envio de um formulário.
     - Animar a adição/remoção de campos em formulários aninhados.
     - Integrar bibliotecas JavaScript de terceiros (como `Tom Select`) de forma limpa.
+
+---
+
+## Principais Entidades e Conceitos
+
+O plugin é construído sobre um modelo de dados normalizado que representa os stakeholders e seus relacionamentos de forma flexível e robusta.
+
+- **Contato (FotonContact):** É a entidade central. Um contato pode ser de dois tipos:
+  - **Pessoa (Person):** Representa um indivíduo.
+  - **Empresa (Company):** Representa uma organização.
+
+- **Detalhes de Contato (Tabelas Satélite):** Para permitir maior flexibilidade, os detalhes de contato são armazenados em tabelas separadas, permitindo que um único `FotonContact` tenha múltiplos registros:
+  - **`FotonContactEmail`**: Armazena uma lista de e-mails.
+  - **`FotonContactPhone`**: Armazena uma lista de telefones.
+  - **`FotonContactAddress`**: Armazena uma lista de endereços.
+  - Cada registro pode ser marcado como `is_primary`, indicando o contato principal daquele tipo.
+
+- **Vínculo Empregatício (ContactEmployment):** Modela o relacionamento de carreira entre uma Pessoa e uma Empresa. Ele registra o cargo, a data de início e a data de fim, formando o histórico profissional de um contato.
+
+- **Grupo de Contatos (ContactGroup):** Permite agrupar Pessoas e Empresas de forma lógica (ex: "Equipe de Projeto X", "Fornecedores de TI").
+
+- **Vínculo a Tarefas (ContactIssueLink):** É a entidade que conecta o CRM ao sistema de gestão de projetos do Redmine. Ela representa a associação entre um `FotonContact` (Pessoa ou Empresa) ou um `ContactGroup` e uma `Issue` (tarefa). Este vínculo possui um atributo adicional crucial:
+  - **Função (Role):** Um campo de texto que descreve *qual o papel* daquele contato ou grupo naquela tarefa específica (ex: "Aprovador", "Consultor Técnico", "Cliente").
+
+- **Histórico (Journals):** O plugin utiliza e estende o sistema de journaling do Redmine para rastrear todas as alterações feitas em um contato e seus relacionamentos (`ContactEmployment`, `ContactGroupMembership`), fornecendo uma trilha de auditoria completa e a base para análises de tendência.
 
 ---
 

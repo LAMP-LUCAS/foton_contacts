@@ -1,0 +1,25 @@
+<%= turbo_frame_tag "workload_results" do %>
+  <%# Renderiza o heatmap normal %>
+  <%= render partial: 'analytics/components/workload_heatmap', 
+             locals: { 
+               contacts: workload[:contacts],
+               workload_data: workload[:data],
+               date_range: workload[:date_range],
+               period: workload[:period]
+             } %>
+  <!-- 
+  <hr />
+  <details class="box mt-4 alert alert-info">
+    <summary class="title">Debug Info:</summary>
+      
+      <p>Contacts: <%= workload[:contacts].size %></p>
+      <p>Period: <%= workload[:period] %></p>
+      <p>Date Range: <%= workload[:date_range].first %> to <%= workload[:date_range].last %></p>
+      <p>Data Keys: <%= workload[:data].keys.inspect %></p>
+
+  <%# Renderiza a tabela de debug logo abaixo %>
+  <hr />
+  <%= render partial: 'analytics/components/debug_workload_data', locals: { workload: workload } %>
+  </details>
+  -->
+<% end %>

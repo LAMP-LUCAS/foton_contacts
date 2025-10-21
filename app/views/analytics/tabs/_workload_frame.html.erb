@@ -1,0 +1,13 @@
+<details class="box mt-4">
+  <summary class="title">Sobre a Carga de Trabalho</summary>
+  <p>Esta aba permite visualizar a carga de trabalho alocada para cada contato ao longo do tempo, identificando dias de sobrecarga (>100%) ou subutilização.</p>
+  <ul>
+    <li><b>O que é analisado:</b> A distribuição das horas estimadas das tarefas ao longo do tempo para cada contato.</li>
+    <li><b>Dados de Entrada:</b> As horas estimadas, data de início e fim das tarefas de cada contato, e a disponibilidade diária de trabalho configurada para cada um.</li>
+    <li><b>Cálculos:</b> As horas de cada tarefa são distribuídas pelos seus dias úteis. O sistema soma as horas de todas as tarefas de um contato para cada dia, semana ou mês e calcula o percentual de alocação.</li>
+    <li><b>Dados de Saída:</b> Um mapa de calor (Heatmap) que mostra a porcentagem de alocação de cada contato, com cores que indicam subutilização, carga ideal ou sobrecarga.</li>
+  </ul>
+</details>
+<%= turbo_frame_tag "workload_tab_content", src: url_for(action: 'workload_tab'), loading: :lazy do %>
+  <p><%= l(:label_loading) %>...</p>
+<% end %>

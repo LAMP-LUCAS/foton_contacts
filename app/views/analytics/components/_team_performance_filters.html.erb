@@ -1,0 +1,21 @@
+<%= form_tag(url_for(action: 'team_performance_results'), method: :get, data: { turbo_frame: 'team_performance_results', turbo_action: 'advance' }) do %>
+  <div class="card">
+    <div class="card-header"><h5>Filtro de Equipes</h5></div>
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-10">
+          <label for="group_ids" class="form-label">Selecione as equipes para comparar</label>
+          <%= select_tag 'group_ids', 
+                         options_from_collection_for_select(groups, :id, :name, @filter_params[:group_ids]), 
+                         multiple: true, 
+                         class: 'form-control', 
+                         data: { controller: 'tom-select' } %>
+        </div>
+        <div class="col-md-2">
+          <%= submit_tag 'Comparar', class: 'btn btn-primary w-100' %>
+        </div>
+      </div>
+      <div class="form-text">Deixe em branco para comparar todas as equipes.</div>
+    </div>
+  </div>
+<% end %>

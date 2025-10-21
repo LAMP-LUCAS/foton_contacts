@@ -1,0 +1,15 @@
+<%= error_messages_for @contact_group %>
+
+<%= form_for @contact_group do |f| %>
+  <div class="box">
+    <p>
+      <%= f.label :name %><br />
+      <%= f.text_field :name, required: true %>
+    </p>
+    <p>
+      <%= f.label :description %><br />
+      <%= f.text_area :description, rows: 5 %>
+    </p>
+  </div>
+  <%= f.submit l(:button_save) %>
+<% end %>

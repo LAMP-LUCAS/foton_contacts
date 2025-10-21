@@ -1,0 +1,43 @@
+<%= turbo_frame_tag "team_performance_results" do %>
+  <div class="row">
+    <div class="col-md-7">
+      <%# = render partial: 'analytics/components/team_radar_chart', locals: { chart_data: @chart_data } %>
+    </div>
+
+
+    <div class="col-md-8">
+
+      <%= render partial: "analytics/components/team_radar_chart", locals: {
+        title: "Comparativo de Performance das Equipes",
+        dom_id: "radar-equipes",
+        chart_labels: ["Design", "Código", "Testes", "Documentação", "Entrega"],
+        chart_data: [
+          {
+            label: "Equipe A",
+            data: [80, 90, 70, 60, 85],
+            backgroundColor: "rgba(54, 162, 235, 0.2)",
+            borderColor: "rgb(54, 162, 235)"
+          },
+          {
+            label: "Equipe B",
+            data: [65, 75, 60, 80, 70],
+            backgroundColor: "rgba(255, 99, 132, 0.2)",
+            borderColor: "rgb(255, 99, 132)"
+          }
+        ]
+      } %>
+
+
+    </div>
+
+
+
+
+    <div class="col-md-5">
+      <%= render partial: 'analytics/components/team_ranking_table', locals: { scorecard_data: @scorecard_data } %>
+      <%= turbo_frame_tag "team_details_card" %>
+    </div>
+  </div>
+
+  
+<% end %>

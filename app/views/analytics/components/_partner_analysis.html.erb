@@ -1,0 +1,71 @@
+<%= turbo_frame_tag "partner_analysis_widget_frame" do %>
+  <div class="card mt-4">
+    <div class="card-header"><h5>Análise de Empresas Parceiras</h5></div>
+    <div class="card-body">
+
+      <%# Formulário de Filtro por Data %>
+      <%= form_tag(analytics_partner_analysis_widget_path, 
+                 method: :get, 
+                 data: { "turbo-frame": "partner_analysis_widget_frame" },
+                 class: "mb-3") do %>
+        <div class="row g-2 align-items-center">
+          <div class="col-auto">
+            <%# Garante que o campo de data tenha um valor padrão para exibição %>
+            <%= date_field_tag :start_date, (start_date || 6.months.ago.to_date).strftime('%Y-%m-%d'), class: 'form-control form-control-sm' %>
+          </div>
+          <div class="col-auto">-</div>
+          <div class="col-auto">
+            <%= date_field_tag :end_date, (end_date || Date.today).strftime('%Y-%m-%d'), class: 'form-control form-control-sm' %>
+          </div>
+          <div class="col-auto">
+            <%= button_tag l(:button_apply), class: 'btn btn-sm btn-primary' %>
+          </div>
+        </div>
+      <% end %>
+
+      <%# Lógica de Resiliência e Exibição %>
+      <% if defined?(error) && error %>
+        <%# Estado de Erro %>
+        <div class="nodata"><%= l(:label_error_loading_data) %></div>
+        <script>
+          console.error("Foton Contacts BI: An error occurred while calculating Partner Analysis data. Check Redmine logs for details.");
+        </script>
+
+      <% elsif partner_data.blank? %>
+        <%# Estado Vazio %>
+        <div class="nodata"><%= l(:label_no_data_for_period) %></div>
+
+      <% else %>
+        <%# Estado com Dados (Gráfico) %>
+        <% 
+          scatter_data = partner_data.map do |d|
+            { name: d[:name], data: d[:data] } 
+          end
+        %>
+        <div style="height: 250px;">
+          <%= scatter_chart scatter_data, library: {
+                type: 'bubble',
+                options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                      callbacks: {
+                        label: raw("function(context) { const r = context.raw.r || 0; return `${context.dataset.label}: ${r} colaborador(es)`; }")
+                      }
+                    }
+                  },
+                  scales: {
+                    x: { title: { display: true, text: 'Experiência Média (Anos)' } },
+                    y: { title: { display: true, text: 'Estabilidade (%)' } }
+                  }
+                }
+              } 
+          %>
+        </div>
+        <div class="small text-muted mt-2">Tamanho da bolha: Nº de colaboradores</div>
+      <% end %>
+    </div>
+  </div>
+<% end %>

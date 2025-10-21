@@ -15,6 +15,13 @@
                    options_for_select([['private', 'private'], ['public', 'public']], 
                    @settings['default_visibility']) %>
   </p>
+
+  <p>
+    <%= label_tag 'settings[default_workload_hours]', l(:label_default_workload_hours) %>
+    <%= number_field_tag 'settings[default_workload_hours]', @settings['default_workload_hours'], min: 0, max: 24, step: 0.5 %>
+    <br>
+    <em class="info"><%= l(:text_default_workload_hours_info) %></em>
+  </p>
 </fieldset>
 
 <fieldset class="box">
@@ -38,5 +45,12 @@
   <p>
     <%= label_tag 'settings[enable_attachments]', l(:label_enable_attachments) %>
     <%= check_box_tag 'settings[enable_attachments]', 1, @settings['enable_attachments'] %>
+  </p>
+
+  <p>
+    <%= label_tag 'settings[enable_async_analysis]', l(:label_enable_async_analysis) %>
+    <%= check_box_tag 'settings[enable_async_analysis]', 1, @settings['enable_async_analysis'] %>
+    <br>
+    <em class="info"><%= l(:text_enable_async_analysis_info) %></em>
   </p>
 </fieldset>

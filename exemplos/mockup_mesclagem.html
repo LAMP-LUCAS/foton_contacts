@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mesclagem Inteligente de Contatos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #7c3aed;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--gray-50);
+            color: var(--gray-800);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        /* Header Styles */
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--gray-800);
+        }
+
+        .nav-mobile {
+            display: flex;
+            justify-content: space-between;
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+            padding: 0.5rem 1rem;
+        }
+
+        .nav-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .nav-btn.active {
+            background-color: #dbeafe;
+            color: var(--primary);
+        }
+
+        .nav-btn:not(.active) {
+            color: var(--gray-600);
+        }
+
+        /* Card Styles */
+        .card {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--gray-200);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+        }
+
+        .card-subtitle {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+        }
+
+        /* Contact Card */
+        .contact-card {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .contact-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .contact-source {
+            background-color: #e0e7ff;
+            color: var(--primary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .contact-source.redmine {
+            background-color: #ede9fe;
+            color: var(--secondary);
+        }
+
+        .contact-field {
+            padding: 0.75rem;
+            background-color: var(--gray-50);
+            border-radius: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .contact-field-label {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-bottom: 0.25rem;
+        }
+
+        .contact-field-value {
+            font-weight: 500;
+            word-break: break-word;
+        }
+
+        /* Comparison Layout */
+        .comparison-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .comparison-layout {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* Conflict Resolution */
+        .conflict-field {
+            border: 1px solid var(--gray-200);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .conflict-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .conflict-title {
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .recommended-badge {
+            background-color: #dbeafe;
+            color: var(--primary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .source-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .source-option {
+            position: relative;
+            border: 2px solid var(--gray-200);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .source-option.recommended {
+            border-color: var(--primary);
+            background-color: #eff6ff;
+        }
+
+        .source-option.selected {
+            border-color: var(--success);
+            background-color: #ecfdf5;
+        }
+
+        .source-label {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-bottom: 0.5rem;
+        }
+
+        .source-value {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .source-date {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+
+        .recommended-marker {
+            position: absolute;
+            top: -0.75rem;
+            right: -0.75rem;
+            background-color: var(--primary);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background-color: var(--gray-200);
+            color: var(--gray-700);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--gray-300);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #059669;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn i {
+            margin-right: 0.5rem;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--gray-200);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar {
+            height: 0.5rem;
+            background-color: var(--gray-200);
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary);
+            border-radius: 9999px;
+            transition: width 0.3s ease;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background-color: var(--gray-50);
+            border-radius: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        /* Result Preview */
+        .result-preview {
+            background-color: var(--gray-50);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .result-field {
+            margin-bottom: 0.75rem;
+        }
+
+        .result-label {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-bottom: 0.25rem;
+        }
+
+        .result-value {
+            font-weight: 500;
+        }
+
+        /* Confirmation Step */
+        .confirmation-content {
+            text-align: center;
+        }
+
+        .confirmation-icon {
+            font-size: 4rem;
+            color: var(--success);
+            margin-bottom: 1rem;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.75rem;
+            margin: 1rem 0;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem;
+            background-color: var(--gray-50);
+            border-radius: 0.25rem;
+        }
+
+        /* Search Section */
+        .search-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        @media (min-width: 640px) {
+            .search-form {
+                flex-direction: row;
+            }
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .search-select {
+            padding: 0.75rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .contact-result {
+            border: 1px solid var(--gray-200);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .contact-result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-result-name {
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .contact-result-source {
+            background-color: #ede9fe;
+            color: var(--secondary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .contact-result-info {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            margin-bottom: 0.25rem;
+        }
+
+        .contact-result-date {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+
+        .contact-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .contact-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+        }
+
+        .contact-btn.review {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .contact-btn.view {
+            background-color: var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        /* Status Banner */
+        .status-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #fef3c7;
+            border: 1px solid #fbbf24;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .status-text {
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            color: #92400e;
+        }
+
+        .status-text i {
+            margin-right: 0.5rem;
+        }
+
+        .status-sources {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .source-indicator {
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 50%;
+        }
+
+        .source-crm {
+            background-color: var(--primary);
+        }
+
+        .source-redmine {
+            background-color: var(--secondary);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .comparison-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .source-comparison {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-mobile">
+        <button class="nav-btn active" onclick="showStep('search')">
+            <i class="fas fa-search"></i> Duplicatas
+        </button>
+        <button class="nav-btn" onclick="showStep('review')">
+            <i class="fas fa-eye"></i> Revisar
+        </button>
+    </div>
+
+    <div class="container">
+        <!-- Search Step -->
+        <div id="search-step">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Localizar Contatos Duplicados</h2>
+                    <p class="card-subtitle">Importe arquivos CSV ou vCard para identificar duplicatas</p>
+                </div>
+                <div class="card-body">
+                    <form class="search-form">
+                        <input type="text" class="search-input" placeholder="Buscar por nome, email ou empresa...">
+                        <select class="search-select">
+                            <option value="all">Todos os contatos</option>
+                            <option value="duplicates">Apenas duplicatas</option>
+                            <option value="recent">Recentes</option>
+                        </select>
+                        <button type="button" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Resultados da Busca</h3>
+                    <p class="card-subtitle">2 contatos duplicados encontrados</p>
+                </div>
+                <div class="card-body">
+                    <div class="contact-result">
+                        <div class="contact-result-header">
+                            <div class="contact-result-name">
+                                <i class="fas fa-user"></i> João Silva
+                            </div>
+                            <span class="contact-result-source">CRM</span>
+                        </div>
+                        <div class="contact-result-info">joao.silva@empresa.com</div>
+                        <div class="contact-result-info">Empresa ABC</div>
+                        <div class="contact-result-date">Atualizado em: 2024-01-15</div>
+                        <div class="contact-actions">
+                            <button class="contact-btn review" onclick="showStep('review')">
+                                <i class="fas fa-eye"></i> Revisar
+                            </button>
+                            <button class="contact-btn view">
+                                <i class="fas fa-external-link-alt"></i> Ver
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="contact-result">
+                        <div class="contact-result-header">
+                            <div class="contact-result-name">
+                                <i class="fas fa-user"></i> João Carlos Silva
+                            </div>
+                            <span class="contact-result-source">Redmine</span>
+                        </div>
+                        <div class="contact-result-info">joao.silva@empresa.com</div>
+                        <div class="contact-result-info">Empresa ABC S/A</div>
+                        <div class="contact-result-date">Atualizado em: 2024-01-20</div>
+                        <div class="contact-actions">
+                            <button class="contact-btn review" onclick="showStep('review')">
+                                <i class="fas fa-eye"></i> Revisar
+                            </button>
+                            <button class="contact-btn view">
+                                <i class="fas fa-external-link-alt"></i> Ver
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Review Step -->
+        <div id="review-step" style="display: none;">
+            <div class="status-banner">
+                <div class="status-text">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Duplicata Detectada
+                </div>
+                <div class="status-sources">
+                    <span>CRM vs Redmine</span>
+                    <div class="source-indicator source-crm"></div>
+                    <div class="source-indicator source-redmine"></div>
+                </div>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-header">
+                    <h3 class="card-title">Status da Mesclagem</h3>
+                    <span>4 de 6 campos resolvidos</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 66.66%;"></div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value">1</div>
+                        <div class="stat-label">Campos Iguais</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">4</div>
+                        <div class="stat-label">Resolvidos</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">2</div>
+                        <div class="stat-label">Pendentes</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">2</div>
+                        <div class="stat-label">Contatos</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="comparison-layout">
+                <!-- Existing Contact -->
+                <div class="contact-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-user" style="color: var(--primary);"></i>
+                            Contato Existente
+                        </h3>
+                        <span class="contact-source">CRM</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="contact-field">
+                            <div class="contact-field-label">Nome</div>
+                            <div class="contact-field-value">João Silva</div>
+                        </div>
+                        <div class="contact-field">
+                            <div class="contact-field-label">Email</div>
+                            <div class="contact-field-value" style="color: var(--primary);">joao.silva@empresa.com</div>
+                        </div>
+                        <div class="contact-field">
+                            <div class="contact-field-label">Telefone</div>
+                            <div class="contact-field-value">+55 11 99999-8888</div>
+                        </div>
+                        <div class="contact-field">
+                            <div class="contact-field-label">Empresa</div>
+                            <div class="contact-field-value">Empresa ABC</div>
+                        </div>
+                        <div class="contact-field">
+                            <div class="contact-field-label">Endereço</div>
+                            <div class="contact-field-value">Av. Paulista, 1000 - São Paulo/SP</div>
+                        </div>
+                        <div class="contact-field">
+                            <div class="contact-field-label">Cargo</div>
+                            <div class="contact-field-value">Gerente de Projetos</div>
+                        </div>
+                        <div class="contact-field">
+                            <div class="contact-field-label">Departamento</div>
+                            <div class="contact-field-value">TI</div>
+                        </div>
+                        <div class="contact-field">
+                            <div class="contact-field-label">Última Atualização</div>
+                            <div class="contact-field-value">2024-01-15</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- New Contact -->
+                <div class="contact-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-user" style="color: var(--secondary);"></i>
+                            Novo Contato
+                        </h3>
+                        <span class="contact-source redmine">Redmine</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="contact-field">
+                            <div class="contact-field-label">Nome</div>
+                            <div class="contact-field-value">João Carlos Silva</div>
+                        </div>
+                        <div class="contact-field">
+                            <div class="contact-field-label">Email</div>
+                            <div class="contact-field-value" style="color: var(--primary);">joao.silva@empresa.com</div>
+                        </div>
+                        <div class="contact-field">
+                            <div class="contact-field-label">Telefone</div>
+                            <div class="contact-field-value">+55 11 99999-8787</div>
+                        </div>
+                        <div class="contact-field">
+                            <div class="contact-field-label">Empresa</div>
+                            <div class="contact-field-value">Empresa ABC S/A</div>
+                        </div>
+                        <div class="contact-field">
+                            <div class="contact-field-label">Endereço</div>
+                            <div class="contact-field-value">Av. Paulista, 1000 - São Paulo - SP</div>
+                        </div>
+                        <div class="contact-field">
+                            <div class="contact-field-label">Cargo</div>
+                            <div class="contact-field-value">Gerente de Projetos Senior</div>
+                        </div>
+                        <div class="contact-field">
+                            <div class="contact-field-label">Departamento</div>
+                            <div class="contact-field-value">Desenvolvimento</div>
+                        </div>
+                        <div class="contact-field">
+                            <div class="contact-field-label">Última Atualização</div>
+                            <div class="contact-field-value">2024-01-20</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conflict Resolution -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Campos em Conflito</h3>
+                    <p class="card-subtitle">Selecione os valores que deseja manter no contato resultante</p>
+                </div>
+                <div class="card-body">
+                    <!-- Name Conflict -->
+                    <div class="conflict-field">
+                        <div class="conflict-header">
+                            <div class="conflict-title">Nome</div>
+                            <div class="recommended-badge">Recomendado</div>
+                        </div>
+                        <div class="source-comparison">
+                            <div class="source-option" onclick="selectOption('name', 'existing')">
+                                <div class="source-label">Existente (CRM)</div>
+                                <div class="source-value">João Silva</div>
+                                <div class="source-date">2024-01-15</div>
+                            </div>
+                            <div class="source-option recommended selected" onclick="selectOption('name', 'new')">
+                                <div class="recommended-marker">Rec.</div>
+                                <div class="source-label">Novo (Redmine)</div>
+                                <div class="source-value">João Carlos Silva</div>
+                                <div class="source-date">2024-01-20</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phone Conflict -->
+                    <div class="conflict-field">
+                        <div class="conflict-header">
+                            <div class="conflict-title">Telefone</div>
+                            <div class="recommended-badge">Recomendado</div>
+                        </div>
+                        <div class="source-comparison">
+                            <div class="source-option" onclick="selectOption('phone', 'existing')">
+                                <div class="source-label">Existente (CRM)</div>
+                                <div class="source-value">+55 11 99999-8888</div>
+                                <div class="source-date">2024-01-15</div>
+                            </div>
+                            <div class="source-option recommended selected" onclick="selectOption('phone', 'new')">
+                                <div class="recommended-marker">Rec.</div>
+                                <div class="source-label">Novo (Redmine)</div>
+                                <div class="source-value">+55 11 99999-8787</div>
+                                <div class="source-date">2024-01-20</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Company Conflict -->
+                    <div class="conflict-field">
+                        <div class="conflict-header">
+                            <div class="conflict-title">Empresa</div>
+                            <div class="recommended-badge">Recomendado</div>
+                        </div>
+                        <div class="source-comparison">
+                            <div class="source-option" onclick="selectOption('company', 'existing')">
+                                <div class="source-label">Existente (CRM)</div>
+                                <div class="source-value">Empresa ABC</div>
+                                <div class="source-date">2024-01-15</div>
+                            </div>
+                            <div class="source-option recommended selected" onclick="selectOption('company', 'new')">
+                                <div class="recommended-marker">Rec.</div>
+                                <div class="source-label">Novo (Redmine)</div>
+                                <div class="source-value">Empresa ABC S/A</div>
+                                <div class="source-date">2024-01-20</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Position Conflict -->
+                    <div class="conflict-field">
+                        <div class="conflict-header">
+                            <div class="conflict-title">Cargo</div>
+                        </div>
+                        <div class="source-comparison">
+                            <div class="source-option selected" onclick="selectOption('position', 'existing')">
+                                <div class="source-label">Existente (CRM)</div>
+                                <div class="source-value">Gerente de Projetos</div>
+                                <div class="source-date">2024-01-15</div>
+                            </div>
+                            <div class="source-option" onclick="selectOption('position', 'new')">
+                                <div class="source-label">Novo (Redmine)</div>
+                                <div class="source-value">Gerente de Projetos Senior</div>
+                                <div class="source-date">2024-01-20</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="showStep('confirmation')">
+                    <i class="fas fa-check"></i> Confirmar Mesclagem
+                </button>
+            </div>
+        </div>
+
+        <!-- Confirmation Step -->
+        <div id="confirmation-step" style="display: none;">
+            <div class="card">
+                <div class="card-body confirmation-content">
+                    <h2 class="card-title">Confirmação de Mesclagem</h2>
+                    <p class="card-subtitle">Revise o contato resultante antes de confirmar a mesclagem</p>
+                    
+                    <div class="result-preview">
+                        <h3 class="card-title" style="text-align: center; margin-bottom: 1rem;">Contato Resultante</h3>
+                        <div class="result-grid">
+                            <div>
+                                <div class="result-field">
+                                    <div class="result-label">Nome</div>
+                                    <div class="result-value">João Carlos Silva</div>
+                                </div>
+                                <div class="result-field">
+                                    <div class="result-label">Email</div>
+                                    <div class="result-value" style="color: var(--primary);">joao.silva@empresa.com</div>
+                                </div>
+                                <div class="result-field">
+                                    <div class="result-label">Telefone</div>
+                                    <div class="result-value">+55 11 99999-8787</div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="result-field">
+                                    <div class="result-label">Empresa</div>
+                                    <div class="result-value">Empresa ABC S/A</div>
+                                </div>
+                                <div class="result-field">
+                                    <div class="result-label">Cargo</div>
+                                    <div class="result-value">Gerente de Projetos</div>
+                                </div>
+                                <div class="result-field">
+                                    <div class="result-label">Fonte</div>
+                                    <div class="result-value">Mesclado</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="card-title" style="text-align: center; margin: 2rem 0 1rem;">Escolhas Realizadas</h3>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <span>Nome</span>
+                            <span>Novo</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Telefone</span>
+                            <span>Novo</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Empresa</span>
+                            <span>Novo</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Cargo</span>
+                            <span>Existente</span>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" onclick="showStep('review')">
+                            <i class="fas fa-arrow-left"></i> Voltar
+                        </button>
+                        <button class="btn btn-success" onclick="showStep('success')">
+                            Confirmar Mesclagem <i class="fas fa-check"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Step -->
+        <div id="success-step" style="display: none;">
+            <div class="card">
+                <div class="card-body confirmation-content">
+                    <div class="confirmation-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h2 class="card-title">Mesclagem Concluída!</h2>
+                    <p class="card-subtitle">Os contatos foram mesclados com sucesso.</p>
+                    
+                    <div class="result-preview" style="margin: 2rem auto; max-width: 400px;">
+                        <h3 class="card-title" style="text-align: center; margin-bottom: 1rem;">Contato Resultante</h3>
+                        <div>
+                            <div class="result-field">
+                                <div class="result-label">Nome</div>
+                                <div class="result-value">João Carlos Silva</div>
+                            </div>
+                            <div class="result-field">
+                                <div class="result-label">Email</div>
+                                <div class="result-value" style="color: var(--primary);">joao.silva@empresa.com</div>
+                            </div>
+                            <div class="result-field">
+                                <div class="result-label">Telefone</div>
+                                <div class="result-value">+55 11 99999-8787</div>
+                            </div>
+                            <div class="result-field">
+                                <div class="result-label">Empresa</div>
+                                <div class="result-value">Empresa ABC S/A</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="showStep('search')">
+                            <i class="fas fa-search"></i> Ver Duplicatas
+                        </button>
+                        <button class="btn btn-secondary" onclick="showStep('review')">
+                            <i class="fas fa-eye"></i> Revisar Novamente
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Current step tracking
+        let currentStep = 'search';
+        let selections = {
+            name: 'new',
+            phone: 'new',
+            company: 'new',
+            position: 'existing'
+        };
+
+        function showStep(step) {
+            // Hide all steps
+            document.getElementById('search-step').style.display = 'none';
+            document.getElementById('review-step').style.display = 'none';
+            document.getElementById('confirmation-step').style.display = 'none';
+            document.getElementById('success-step').style.display = 'none';
+            
+            // Show requested step
+            document.getElementById(step + '-step').style.display = 'block';
+            
+            // Update mobile nav
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            if (step === 'search' || step === 'review') {
+                document.querySelector(`.nav-btn[onclick="showStep('${step}')"]`).classList.add('active');
+            }
+            
+            currentStep = step;
+        }
+
+        function selectOption(field, source) {
+            selections[field] = source;
+            
+            // Update UI to show selection
+            const conflictField = event.target.closest('.conflict-field');
+            const options = conflictField.querySelectorAll('.source-option');
+            
+            options.forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            event.target.closest('.source-option').classList.add('selected');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            showStep('search');
+        });
+    </script>>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<%# Section 1: Conflicting Imports %>
+<% if conflicting_imports.any? %>
+  <h3><%= l(:title_conflicting_imports) %></h3>
+  <p class="subtitle"><%= l(:subtitle_conflicting_imports) %></p>
+  <table class="list">
+    <thead>
+      <tr>
+        <th><%= l(:field_name) %></th>
+        <th><%= l(:field_email) %></th>
+        <th><%= l(:label_potential_duplicate) %></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% conflicting_imports.each do |ic| %>
+        <tr>
+          <td><%= ic.name %></td>
+          <td><%= ic.email %></td>
+          <td><%= link_to ic.potential_duplicate.name, contact_path(ic.potential_duplicate) %></td>
+          <td class="buttons"><%= link_to l(:button_review), data_quality_path(id: ic.potential_duplicate_id, imported_id: ic.id), class: 'icon icon-edit' %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <hr/>
+<% end %>
+
+<%# Section 2: Safe Imports %>
+<h3><%= l(:title_safe_imports) %></h3>
+<% if safe_imports.any? %>
+  <p class="subtitle"><%= l(:subtitle_safe_imports) %></p>
+  <%= form_tag(batch_process_imports_data_quality_index_path, method: :post) do %>
+    <div class="autoscroll">
+      <table class="list">
+        <thead>
+          <tr>
+            <th class="checkbox"><input type="checkbox" id="check_all_safe_imports" /></th>
+            <th><%= l(:field_name) %></th>
+            <th><%= l(:field_email) %></th>
+            <th><%= l(:field_phone) %></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% safe_imports.each do |ic| %>
+            <tr>
+              <td class="checkbox"><%= check_box_tag "imported_ids[]", ic.id, false, class: 'safe-import-checkbox' %></td>
+              <td><%= ic.name %></td>
+              <td><%= ic.email %></td>
+              <td><%= ic.phone %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <div class="contextual">
+      <label for="batch_action"> <%= l(:label_with_selected) %> </label>
+      <%= select_tag :batch_action, options_for_select([ [l(:option_create_selected), 'create'], [l(:option_delete_selected), 'delete'] ]), id: 'batch_action' %>
+      <%= submit_tag l(:button_perform_action), class: 'btn btn-secondary' %>
+    </div>
+  <% end %>
+<% else %>
+  <div class="nodata"><%= l(:text_no_safe_imports) %></div>
+<% end %>
+
+<script>
+  document.getElementById('check_all_safe_imports').addEventListener('click', function(event) {
+    const isChecked = event.target.checked;
+    document.querySelectorAll('.safe-import-checkbox').forEach(cb => cb.checked = isChecked);
+  });
+</script>

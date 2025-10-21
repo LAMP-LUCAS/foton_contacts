@@ -1,4 +1,5 @@
 class ContactEmploymentsController < ApplicationController
+  helper FotonContactsLinkHelper
   helper :contacts
   before_action :require_login
   before_action :find_employment, only: [:edit, :update, :destroy]
@@ -83,7 +84,7 @@ class ContactEmploymentsController < ApplicationController
   def find_contact
     # Handles finding contact from both new action link and form submission
     contact_id = params[:contact_id] || params.dig(:contact_employment, :contact_id)
-    @contact = Contact.find(contact_id)
+    @contact = FotonContact.find(contact_id)
   end
 
   def find_employment

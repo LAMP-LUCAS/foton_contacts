@@ -7,32 +7,50 @@
     <%= f.select :contact_type,
                 [[l(:label_person), 'person'], [l(:label_company), 'company']],
                 required: true %>
-    <br><span class="description">Selecione se o contato é uma pessoa ou uma empresa.</span>
+    <br><span class="description"><%= l(:text_contact_type_description) %></span>
   </p>
 
   <p class="required">
     <%= f.label :name %>
     <%= f.text_field :name, required: true, size: 60, placeholder: "Nome completo ou razão social" %>
-    <br><span class="description">Nome do contato ou da empresa.</span>
+    <br><span class="description"><%= l(:text_name_description) %></span>
   </p>
 
-  <p>
-    <%= f.label :email %>
-    <%= f.text_field :email, size: 60, placeholder: "exemplo@dominio.com" %>
-    <br><span class="description">Endereço de e-mail principal do contato.</span>
-  </p>
+  <fieldset class="box" data-controller="nested-form">
+    <legend><%= l(:label_email_plural) %></legend>
+    <div id="emails" data-nested-form-target="target">
+      <%= f.fields_for :emails do |email_form| %>
+        <%= render 'contacts/email_fields', f: email_form %>
+      <% end %>
+    </div>
+    <div data-nested-form-target="template">
+      <%= link_to l(:label_add_email), new_email_field_contacts_path, class: 'icon icon-add', data: { turbo_stream: true } %>
+    </div>
+  </fieldset>
 
-  <p>
-    <%= f.label :phone %>
-    <%= f.text_field :phone, size: 30, placeholder: "(99) 99999-9999" %>
-    <br><span class="description">Telefone principal para contato.</span>
-  </p>
+  <fieldset class="box" data-controller="nested-form">
+    <legend><%= l(:label_phone_plural) %></legend>
+    <div id="phones" data-nested-form-target="target">
+      <%= f.fields_for :phones do |phone_form| %>
+        <%= render 'contacts/phone_fields', f: phone_form %>
+      <% end %>
+    </div>
+    <div data-nested-form-target="template">
+      <%= link_to l(:label_add_phone), new_phone_field_contacts_path, class: 'icon icon-add', data: { turbo_stream: true } %>
+    </div>
+  </fieldset>
 
-  <p>
-    <%= f.label :address %>
-    <%= f.text_area :address, rows: 5, placeholder: "Rua, número, bairro, cidade, estado, CEP" %>
-    <br><span class="description">Endereço completo do contato.</span>
-  </p>
+  <fieldset class="box" data-controller="nested-form">
+    <legend><%= l(:label_address_plural) %></legend>
+    <div id="addresses" data-nested-form-target="target">
+      <%= f.fields_for :addresses do |address_form| %>
+        <%= render 'contacts/address_fields', f: address_form %>
+      <% end %>
+    </div>
+    <div data-nested-form-target="template">
+      <%= link_to l(:label_add_address), new_address_field_contacts_path, class: 'icon icon-add', data: { turbo_stream: true } %>
+    </div>
+  </fieldset>
 
   <p class="required">
     <%= f.label :status %>
@@ -41,15 +59,13 @@
                  [l(:label_inactive), 'inactive'],
                  [l(:label_discontinued), 'discontinued']],
                 required: true %>
-    <br><span class="description">Status atual do contato.</span>
+    <br><span class="description"><%= l(:text_status_description) %></span>
   </p>
 
-  <p>
-    <%= f.label :project_id, l(:field_project) %>
-    <%= f.select :project_id,
-                @contact.allowed_target_projects.collect { |p| [p.name, p.id] },
-                include_blank: true %>
-    <br><span class="description">Associe este contato a um projeto existente.</span>
+  <p class="person-only">
+    <%= f.label :available_hours_per_day %>
+    <%= f.number_field :available_hours_per_day, min: 0, max: 24, step: 0.5, placeholder: Setting.plugin_foton_contacts[:default_workload_hours] %>
+    <br><span class="description"><%= l(:text_available_hours_per_day_info) %></span>
   </p>
 
   <p>
@@ -58,7 +74,7 @@
                     cols: 60,
                     rows: 15,
                     class: 'wiki-edit',
-                    placeholder: "Adicione uma descrição detalhada sobre o contato." %>
+                    placeholder: l(:text_description_description) %>
   </p>
 
 
@@ -73,7 +89,7 @@
     </div>
 
     <div data-nested-form-target="template">
-      <%= link_to l(:label_employment_add), new_employment_field_contacts_path, class: 'icon icon-add', data: { turbo_stream: true } %>
+      <%= link_to l(:label_add_employment), new_employment_field_contacts_path, class: 'icon icon-add', data: { turbo_stream: true } %>
     </div>
   </fieldset>
 
@@ -85,7 +101,7 @@
   <p>
     <%= f.label :is_private %>
     <%= f.check_box :is_private %>
-    <br><span class="description">Se marcado, o contato será visível apenas para você e para administradores.</span>
+    <br><span class="description"><%= l(:text_is_private_description) %></span>
   </p>
 
   <%= call_hook(:view_contacts_form_details, contact: @contact, form: f) %>

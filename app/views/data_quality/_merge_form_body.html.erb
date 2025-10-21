@@ -1,0 +1,27 @@
+<div class="attribute-group">
+  <strong><%= l(:field_name) %></strong>
+  <div class="merge-option">
+    <%= radio_button_tag 'attributes[name]', (side == :left ? contact1.name : contact2.name), (side == :left) %>
+    <%= (side == :left ? contact1.name : contact2.name) %>
+  </div>
+</div>
+
+<div class="attribute-group">
+  <strong><%= l(:field_description) %></strong>
+  <div class="merge-option">
+    <%= radio_button_tag 'attributes[description]', (side == :left ? contact1.description : contact2.description), (side == :left) %>
+  </div>
+</div>
+
+<div class="attribute-group">
+  <strong><%= l(:label_email_plural) %></strong>
+  <% contact = (side == :left ? contact1 : contact2) %>
+  <% contact.emails.each do |email| %>
+    <div class="merge-option">
+      <%= check_box_tag 'attributes[emails][]', email.email, false, id: "email_#{email.id}" %>
+      <label for="email_#{email.id}"><%= email.email %></label>
+    </div>
+  <% end %>
+</div>
+
+<%# We will add emails, phones, etc. here %>

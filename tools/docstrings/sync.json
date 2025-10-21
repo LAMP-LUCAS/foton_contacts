@@ -1,0 +1,4 @@
+{
+  "class User": "Classe responsável por representar usuários do sistema.",
+  "def full_name": "Retorna o nome completo do usuário."
+}

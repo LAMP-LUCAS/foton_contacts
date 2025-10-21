@@ -1,0 +1,32 @@
+<div class="card">
+  <div class="card-header">
+    <h5 class="mb-0"><%= l(:label_irpa_widget_title, default: 'Índice de Risco Preditivo (IRPA)') %></h5>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th><%= l(:label_contact) %></th>
+            <th>IRPA</th>
+            <th>Taxa de Atraso</th>
+            <th>Índice Retrabalho</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% irpa_data.each do |data| %>
+            <% status = irpa_status_data(data[:risk_score]) %>
+            <tr class="table-<%= status[:level] %>">
+              <td><%= link_to data[:contact_name], analytics_contact_details_path(id: data[:contact_id]), data: { turbo_frame: "modal" } %></td>
+              <td><span class="badge bg-<%= status[:level] %>"><%= number_with_precision(data[:risk_score], precision: 1) %></span></td>
+              <td><%= number_with_precision(data[:tah_percent], precision: 1) %>%</td>
+              <td><%= number_with_precision(data[:ir_percent], precision: 1) %>%</td>
+              <td><span class="badge bg-<%= status[:level] %>"><%= status[:text] %></span></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
