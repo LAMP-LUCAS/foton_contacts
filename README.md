@@ -35,7 +35,7 @@ Para uma lista exaustiva de todas as funcionalidades e um manual detalhado, cons
 
 ### 🏛️ Arquitetura e Filosofia de Design
 
-A interface do plugin é construída com o **framework Hotwire (Turbo + Stimulus)**, garantindo uma experiência de usuário fluida, rápida e moderna, que se integra de forma nativa ao Redmine. A filosofia é de "HTML-over-the-wire", minimizando a complexidade no frontend.
+A interface do plugin é construída com o **framework Hotwire (Turbo + Stimulus)**, garantindo uma experiência de usuário fluida, rápida e moderna, que se integra de forma nativa ao Redmine. A filosofia é de "HTML-over-the-wire", minimizando a complexidade no frontend. O design visual é aprimorado com **Bootstrap 5** para componentes e **CSS Grid** para layouts complexos, assegurando uma estética moderna e responsiva.
 
 - **Navegação Acelerada com Turbo Drive:** Interações rápidas, sem recarregamento de página.
 - **Componentes Reativos com Turbo Frames e Streams:** Modais, abas e listas são atualizados dinamicamente, proporcionando uma experiência de SPA (Single Page Application).

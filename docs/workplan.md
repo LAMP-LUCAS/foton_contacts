@@ -19,6 +19,93 @@ Para garantir a consistência e a qualidade, o desenvolvimento é guiado por um 
 
 ---
 
+## ✅ Verificação de compatibilidade do Workplan com o código atual
+
+Esta seção documenta o resultado da verificação do conteúdo deste documento (`workplan.md`) em relação ao código atualmente presente no repositório do plugin. A checagem foi realizada lendo controladores, serviços, modelos, migrations e serializers mencionados neste plano.
+
+Resumo rápido:
+
+- A maioria dos itens das Fases 1 a 3 (arquitetura de BI, controllers, services principais, import/export, journaling e refatoração do modelo de contatos) está implementada no código.
+- Itens pontuais de ajuste e pequenas lacunas (listadas abaixo) permanecem pendentes ou requerem alinhamento com as diretrizes do workplan.
+
+Mapeamento por área (status, arquivos relevantes e observações):
+
+- Analytics / BI — Status: CONCLUÍDO / PRESENTE
+    - Arquivo controller: `app/controllers/analytics_controller.rb` (actions: `index`, `overview_tab`, `team_performance_tab`, `workload_tab`, `workload_results`, `contact_details`, `irpa_trend`, `dynamic_dashboard`, etc.)
+    - Services lidos: `app/services/analytics/irpa_calculator.rb`, `team_scorecard_query.rb`, `workload_query.rb`, `historical_state_query.rb`, `data_quality_query.rb`, `partner_analysis_query.rb`.
+    - Observação: a infraestrutura de widgets, frames e partials existe sob `app/views/analytics/`.
+
+- IRPA (`Analytics::IrpaCalculator`) — Status: PRESENTE, AÇÕES PENDENTES
+    - Arquivo: `app/services/analytics/irpa_calculator.rb`
+    - Observação: implementa TAH, IR, FCP e Instability. Contudo, o workplan solicita duas mudanças de comportamento:
+        1. Alterar `calculate_fcp` para retornar contagem de tarefas críticas (prioridade Alta/Urgente) — atualmente `calculate_fcp` retorna a média das posições de prioridade.
+        2. Incluir no hash de retorno o campo bruto `instability_change_count` além do `instability_factor` — atualmente só é retornado `instability_factor`.
+    - Recomendação: ajustar `calculate_fcp` e adicionar `instability_change_count` ao hash de retorno; atualizar views se necessário.
+
+- TeamScorecard / ICE — Status: CONCLUÍDO
+    - Arquivo: `app/services/analytics/team_scorecard_query.rb`
+    - Observação: cálculo de ICE usa `Journal` e eventos `Created` / `Destroyed` conforme o workplan.
+
+- Workload & check_workload — Status: CONCLUÍDO
+    - Arquivos: `app/services/analytics/workload_query.rb`, `app/services/analytics/workload_checker_service.rb`, `app/controllers/contacts_controller.rb` (action `check_workload`), rotas em `config/routes.rb`.
+
+- Journaling (ActsAsJournalizedConcern) — Status: CONCLUÍDO
+    - Arquivo: `lib/acts_as_journalized_concern.rb`
+    - Observação: inclui callbacks `after_create`, `after_destroy`, `after_save` e suporta `acts_as_journalized watch: [...]` nos modelos.
+
+- Modelo de dados `FotonContact` e detalhes (phones/emails/addresses) — Status: CONCLUÍDO
+    - Arquivos: `app/models/foton_contact.rb`, `app/models/foton_contact_email.rb`, `app/models/foton_contact_phone.rb`, `app/models/foton_contact_address.rb` e migration principal `db/migrate/001_init_foton_contacts_schema.rb`.
+    - Observação: `FotonContact` implementa `has_many` e `accepts_nested_attributes_for` e métodos delegados `email`, `phone`, `address` para compatibilidade.
+
+- Import / Export — Status: CONCLUÍDO
+    - Arquivos: `app/services/contacts/import_service.rb`, `app/services/contacts/importers/vcard_mapper.rb`, `app/services/contacts/importers/google_csv_mapper.rb`, `app/services/contacts/export_service.rb`, `app/services/contacts/exporters/csv_serializer.rb`, `app/services/contacts/exporters/vcard_serializer.rb`.
+    - Controller: `app/controllers/contacts_controller.rb` (`import`, `export` actions presentes).
+
+- Data Quality / Merge — Status: PARCIAL
+    - Arquivo de merge: `app/services/contacts/merge_service.rb` presente e implementa reassociação/transação.
+    - Observação: o serviço `Analytics::DuplicateFinderService` nomeado no workplan não foi encontrado pelo nome exato — pode ainda não existir ou estar implementado com outro nome. A infraestrutura (imported_contacts, data_quality routes) existe.
+
+Principais divergências / pendências detectadas (priorizadas):
+
+1. `Analytics::IrpaCalculator` — alteração do FCP (Fator de Criticidade) e inclusão de `instability_change_count` no retorno (ver `app/services/analytics/irpa_calculator.rb`).
+     - Impacto: atual views e visualizações do modal analytics esperam campos com nomes/formatos atuais. Se alterarmos o formato de retorno, atualizar `_analytics_modal.html.erb` para exibir o valor e o label (ex.: "Tarefas Críticas Abertas").
+
+2. `Analytics::DuplicateFinderService` — não foi encontrado com esse nome.
+     - Observação: workplan lista a criação deste serviço; o `merge_service.rb` existe. Recomenda-se implementar (ou documentar o nome existente) para o módulo Data Quality.
+
+3. Frontend: controller `contact-filter-observer-controller.js` (workplan menciona refatoração) — marcado como pendente no workplan e não verificado aqui (requer investigação no diretório `assets/javascripts` / `app/javascript`).
+
+4. UI/CSS e testes visuais: As alterações de estilo e auditoria de `contacts.css` e grid foram aplicadas parcialmente (assets `bootstrap.min.css`, `contacts.css` estão presentes), porém validação visual completa deve ser feita em navegador. Também há um bug JS intermitente documentado no backlog.
+
+Checks executados / arquivos lidos (amostra):
+
+- `app/controllers/analytics_controller.rb`
+- `app/services/analytics/irpa_calculator.rb`
+- `app/services/analytics/team_scorecard_query.rb`
+- `app/services/analytics/workload_query.rb`
+- `app/services/analytics/historical_state_query.rb`
+- `app/models/foton_contact.rb`
+- `lib/acts_as_journalized_concern.rb`
+- `app/services/contacts/import_service.rb`
+- `app/services/contacts/importers/vcard_mapper.rb`
+- `app/services/contacts/importers/google_csv_mapper.rb`
+- `app/services/contacts/export_service.rb`
+- `app/services/contacts/exporters/csv_serializer.rb`
+- `app/services/contacts/merge_service.rb`
+- `db/migrate/001_init_foton_contacts_schema.rb`
+
+Recomendações imediatas (ações concretas):
+
+- Implementar a mudança no `IrpaCalculator#calculate_fcp` para retornar a contagem de tarefas críticas (prioridades definidas) e adicionar `instability_change_count` ao hash retornado. Arquivo: `app/services/analytics/irpa_calculator.rb`.
+- Verificar se existe um serviço de detecção de duplicatas com outro nome; caso contrário, implementar `Analytics::DuplicateFinderService` usando `imported_contacts`, e-mail exato e `pg_trgm` para fuzzy search. Arquivo sugerido: `app/services/analytics/duplicate_finder_service.rb`.
+- Rodar a suíte de testes do plugin (rake test) e ajustar os testes que esperam os antigos formatos de métricas.
+- Testes manuais: validar visualmente o dashboard de BI com navegação via Turbo Drive para reproduzir o erro `Cannot read properties of undefined (reading 'start')` e adicionar guards nos scripts JS que inicializam gráficos.
+
+Se preferir, implemento agora as alterações no `IrpaCalculator` (mudança de FCP + inclusion de instability_change_count) e adapto as views mínimas necessárias. Caso queira, também posso criar um esqueleto para `Analytics::DuplicateFinderService`.
+
+---
+
+
 ## 🚀 Fases de Desenvolvimento
 
 ### ✅ Fase 1: Modernização da Interface com Hotwire (Concluída)
