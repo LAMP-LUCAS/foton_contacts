@@ -1,0 +1,44 @@
+<h2><%= l(:label_merge_contacts) %></h2>
+
+<div class="comparison-layout">
+  <%= render partial: 'data_quality/contact_comparison_panel', locals: { contact: @contact1, is_recommended: true } %>
+  <%= render partial: 'data_quality/contact_comparison_panel', locals: { contact: @contact2, is_recommended: false } %>
+</div>
+
+<hr/>
+
+<%= form_with url: preview_data_quality_path(id: @contact1.id, other_id: @contact2.id), method: :post, id: "merge_form" do |f| %>
+  <% 
+    field_schema = [
+      { name: :name, type: :string, label: l(:field_name) },
+      { name: :description, type: :text, label: l(:field_description) },
+      { name: :emails, type: :has_many, label: l(:label_email_plural), association: :emails, value_method: :email },
+      { name: :phones, type: :has_many, label: l(:label_phone_plural), association: :phones, value_method: :phone }
+    ]
+  %>
+
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title"><%= l(:title_conflicting_fields) %></h3>
+      <p class="card-subtitle"><%= l(:subtitle_conflicting_fields) %></p>
+    </div>
+    <div class="card-body">
+      <% field_schema.each do |field| %>
+        <%= render partial: 'data_quality/merge_rows/conflict_field', locals: { f: f, field: field, contact1: @contact1, contact2: @contact2 } %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="action-buttons">
+    <%= f.submit l(:button_preview_merge), class: 'btn btn-primary', data: { 'turbo-frame': 'merge_preview' } %>
+    <%= link_to l(:button_cancel), data_quality_index_path, class: 'btn btn-secondary' %>
+  </div>
+<% end %>
+
+<hr/>
+
+<%= turbo_frame_tag "merge_preview" %>
+
+<hr/>
+
+<%= turbo_frame_tag "merge_preview" %>

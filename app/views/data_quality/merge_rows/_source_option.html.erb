@@ -1,0 +1,11 @@
+<div class="source-option <%= 'recommended' if option[:recommended] %>" data-action="click->merge#select">
+  <% if option[:recommended] %>
+    <div class="recommended-marker"><%= l(:label_recommended_short) %></div>
+  <% end %>
+  <div class="source-label"><%= option[:source].name %></div>
+  <div class="source-value">
+    <%= radio_button_tag "attributes[#{field[:name]}]", option[:value], option[:recommended], style: 'display: none;' %>
+    <%= option[:value] %>
+  </div>
+  <div class="source-date"><%= format_time(option[:source].updated_at) %></div>
+</div>

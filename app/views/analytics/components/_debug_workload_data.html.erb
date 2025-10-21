@@ -1,0 +1,38 @@
+<h3>Debug Output for @workload</h3>
+<div class="box" style="max-height: 400px; overflow-y: auto;">
+  <p><strong>Period:</strong> <%= workload[:period] %></p>
+  <p><strong>Date Range:</strong> <%= workload[:date_range].inspect %></p>
+
+  <h4>Contacts (<%= workload[:contacts].count %>)</h4>
+  <ul>
+    <% workload[:contacts].each do |contact| %>
+      <li><%= contact.name %> (ID: <%= contact.id %>)</li>
+    <% end %>
+  </ul>
+
+  <h4>Workload Data Raw</h4>
+  <pre><%= JSON.pretty_generate(workload[:data]) %></pre>
+
+  <h4>Iterating Data</h4>
+  <table class="list">
+    <thead>
+      <tr>
+        <th>Contact</th>
+        <th>Date</th>
+        <th>Data</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% workload[:contacts].each do |contact| %>
+        <% workload[:date_range].each do |day| %>
+          <% day_data = workload[:data].dig(contact, day) %>
+          <tr class="<%= cycle('odd', 'even') %>">
+            <td><%= contact.name %></td>
+            <td><%= day.to_s %></td>
+            <td style="color: <%= day_data.present? ? 'green' : 'red' %>;"><%= day_data.inspect %></td>
+          </tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+</div>

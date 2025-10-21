@@ -1,0 +1,11 @@
+<div class="attribute-row">
+  <label><%= field[:label] %></label>
+  <div class="options">
+    <% case field[:type] %>
+    <% when :string, :text %>
+      <%= render partial: 'data_quality/merge_rows/string_field', locals: { f: f, field: field, contact1: contact1, contact2: contact2 } %>
+    <% when :has_many %>
+      <%= render partial: 'data_quality/merge_rows/has_many_field', locals: { f: f, field: field, contact1: contact1, contact2: contact2 } %>
+    <% end %>
+  </div>
+</div>

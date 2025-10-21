@@ -1,0 +1,23 @@
+<div class="row mb-4">
+  <div class="col-md-4">
+    <div class="card metric-card">
+      <div class="metric-value risk-high"><%= quality_data[:orphan_contacts] %></div>
+      <div class="metric-label">Contatos Órfãos</div>
+      <small class="text-muted">Sem empresas vinculadas</small>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card metric-card">
+      <div class="metric-value risk-medium"><%= quality_data[:unstandardized_roles_count] %></div>
+      <div class="metric-label">Funções a Padronizar</div>
+      <small class="text-muted">Variações de nomenclatura</small>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card metric-card">
+      <div class="metric-value risk-medium"><%= quality_data[:outdated_contacts_count] %></div>
+      <div class="metric-label">Contatos Desatualizados</div>
+      <small class="text-muted">Sem atualização há mais de 1 ano</small>
+    </div>
+  </div>
+</div>

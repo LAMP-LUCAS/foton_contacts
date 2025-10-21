@@ -1,0 +1,4 @@
+<%# This view acts as the container for the turbo-frame response %>
+<%= turbo_frame_tag "contact_search_results" do %>
+  <%= render partial: 'contact_groups/search_results', locals: { contacts: @contacts, contact_group: @contact_group } %>
+<% end %>

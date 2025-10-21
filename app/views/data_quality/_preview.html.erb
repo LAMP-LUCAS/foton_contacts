@@ -1,0 +1,20 @@
+<%= turbo_frame_tag "merge_preview" do %>
+  <div class="card">
+    <div class="card-body confirmation-content">
+      <h3 class="card-title"><%= l(:label_merge_result) %></h3>
+      
+      <div class="result-preview" style="margin: 1rem auto;">
+        <%= render partial: 'data_quality/contact_comparison_panel', locals: { contact: @merged_contact, is_recommended: false } %>
+      </div>
+
+      <%= form_with url: merge_data_quality_path(id: @contact1.id, other_id: @contact2.id), method: :post do |f| %>
+        <%= hidden_field_tag 'attributes', @final_attributes.to_json %>
+        
+        <div class="action-buttons">
+          <p class="warning"><%= l(:text_merge_warning) %></p>
+          <%= f.submit l(:button_merge_definitively), class: 'btn btn-success' %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>

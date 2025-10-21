@@ -1,0 +1,12 @@
+<% association1 = contact1.send(field[:association]) %>
+<% association2 = contact2.send(field[:association]) %>
+
+<% (association1 + association2).uniq.each do |record| %>
+  <div class="option">
+    <%= check_box_tag "attributes[#{field[:association]}][values][]", record.send(field[:value_method]), false, id: "record_#{record.id}" %>
+    <label for="record_#{record.id}"><%= record.send(field[:value_method]) %></label>
+  </div>
+<% end %>
+
+<%# Hidden field to indicate that this attribute is being handled %>
+<%= hidden_field_tag "attributes[#{field[:association]}][present]", 1 %>

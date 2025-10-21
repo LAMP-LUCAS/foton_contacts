@@ -1,0 +1,12 @@
+<%# app/views/contacts/new.turbo_stream.erb %>
+<%= turbo_stream.update "modal" do %>
+  <%= render "contacts/modal" do %>
+    <%= form_with(model: @contact, url: contacts_path) do |f| %>
+      <%= render partial: "contacts/form", locals: { f: f } %>
+      <p class="buttons">
+        <%= f.submit l(:button_create) %>
+        <%= link_to l(:button_cancel), '#', onclick: 'hideModal(this); return false;' %>
+      </p>
+    <% end %>
+  <% end %>
+<% end %>

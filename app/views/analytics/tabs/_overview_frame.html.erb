@@ -1,0 +1,14 @@
+  <details class="box"> 
+    <summary class="title">Sobre a Visão Geral</summary>
+    <p>Esta aba apresenta uma visão macro da saúde e dos riscos da sua rede de contatos e parceiros, permitindo identificar rapidamente os pontos que necessitam de atenção.</p>
+    <ul>
+      <li><b>O que é analisado:</b> A performance histórica dos contatos, a qualidade dos dados cadastrais e a estabilidade das equipes parceiras.</li>
+      <li><b>Dados de Entrada:</b> Histórico de tarefas (issues), dados de cadastro de contatos e empresas, e vínculos empregatícios.</li>
+      <li><b>Cálculos:</b> O sistema calcula o <strong>Índice de Risco (IRPA)</strong> de cada contato, verifica a <strong>qualidade dos dados</strong> (contatos órfãos, desatualizados) e mede a <strong>estabilidade e experiência</strong> das empresas parceiras.</li>
+      <li><b>Dados de Saída:</b> Você verá uma tabela de contatos ordenada por risco, métricas de qualidade dos dados e um gráfico de bolhas para comparar empresas parceiras.</li>
+    </ul>
+  </details>
+
+<%= turbo_frame_tag "overview_tab_content", src: url_for(controller: 'analytics', action: 'overview_tab'), loading: :lazy do %>
+  <p><%= l(:label_loading) %>...</p>
+<% end %>

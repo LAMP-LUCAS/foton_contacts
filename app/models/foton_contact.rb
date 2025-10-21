@@ -1,8 +1,8 @@
-## `./app/models/contact.rb`
+## `./app/models/foton_contact.rb`
 '''
-### Contact
+### FotonContact
 
-  **Descrição:**  
+  **Descrição:**
   Modelo principal que representa um Contato no sistema. Pode ser uma Pessoa ou uma Empresa, com atributos, relacionamentos e comportamentos específicos.
 
   **Principais Funcionalidades:**
@@ -16,6 +16,9 @@
   - `belongs_to :author` (User que criou o contato)
   - `belongs_to :project` (opcional)
   - `belongs_to :user` (opcional - vinculação com usuário do sistema)
+  - `has_many :emails`
+  - `has_many :phones`
+  - `has_many :addresses`
   - `has_many :contact_group_memberships` (vinculação com grupos)
   - `has_many :contact_groups` (grupos aos quais pertence)
   - `has_many :contact_issue_links` (vinculação com issues)
@@ -29,7 +32,6 @@
   - Nome obrigatório
   - Tipo de contato obrigatório (person/company)
   - Status obrigatório (active/inactive/discontinued)
-  - Formato de email válido (quando preenchido)
 
   **Scopes:**
   - `persons`: Filtra apenas contatos do tipo pessoa
@@ -52,7 +54,9 @@
 '''
 require 'csv'
 
-class Contact < ActiveRecord::Base
+class FotonContact < ActiveRecord::Base
+  self.table_name = 'foton_contacts'
+
   include Redmine::SafeAttributes
   include Redmine::Acts::Customizable
   include Redmine::Acts::Attachable
@@ -62,26 +66,40 @@ class Contact < ActiveRecord::Base
   acts_as_customizable
   acts_as_attachable
   include ActsAsJournalizedConcern # Add this line
-  acts_as_journalized watch: %w(name email phone address contact_type status is_private project_id description) # This line now calls our custom method
-  acts_as_searchable columns: %w(name email address description),
-                     preload: [:author],
-                     date_column: :created_at
+  acts_as_journalized watch: %w(name contact_type status is_private project_id description) # This line now calls our custom method
+  acts_as_searchable columns: %w(name description),
+                     preload: [:author]
   acts_as_event title: Proc.new { |o| "#{l(:label_contact)}: #{o.name}" },
                 description: :description,
                 datetime: :created_at,
                 type: 'contact',
                 url: Proc.new { |o| { controller: 'contacts', action: 'show', id: o.id } }
-  
+
+  # Override model_name to use 'Contact' for routing and form helpers
+  def self.model_name
+    ActiveModel::Name.new(self, nil, "Contact")
+  end
+
+  attr_accessor :available_hours_per_day # Temporarily add accessor for form handling
+
   belongs_to :author, class_name: 'User'
   belongs_to :project, optional: true
   belongs_to :user, optional: true
-  
-  has_many :contact_group_memberships, class_name: 'ContactGroupMembership', dependent: :destroy
+
+  has_many :emails, class_name: 'FotonContactEmail', foreign_key: 'contact_id', dependent: :destroy
+  has_many :phones, class_name: 'FotonContactPhone', foreign_key: 'contact_id', dependent: :destroy
+  has_many :addresses, class_name: 'FotonContactAddress', foreign_key: 'contact_id', dependent: :destroy
+
+  accepts_nested_attributes_for :emails, allow_destroy: true, reject_if: :all_blank
+  accepts_nested_attributes_for :phones, allow_destroy: true, reject_if: :all_blank
+  accepts_nested_attributes_for :addresses, allow_destroy: true, reject_if: :all_blank
+
+  has_many :contact_group_memberships, class_name: 'ContactGroupMembership', dependent: :destroy, foreign_key: 'contact_id'
   has_many :contact_groups, through: :contact_group_memberships, source: :contact_group
-  
-  has_many :contact_issue_links, class_name: 'ContactIssueLink', dependent: :destroy
+
+  has_many :contact_issue_links, class_name: 'ContactIssueLink', dependent: :destroy, foreign_key: 'contact_id'
   has_many :issues, through: :contact_issue_links
-  
+
   # Associações para vínculos com empresas
   has_many :employments_as_person,
           class_name: 'ContactEmployment',
@@ -100,13 +118,12 @@ class Contact < ActiveRecord::Base
   accepts_nested_attributes_for :employments_as_person, allow_destroy: true, reject_if: :all_blank
 
   validates :name, presence: true
-  enum :contact_type, [:person, :company]
-  enum :status, [:active, :inactive, :discontinued]
-  
+  enum :contact_type, [:person, :company], default: :person
+  enum :status, [:active, :inactive, :discontinued], default: :active
+
   validates :contact_type, presence: true
   validates :status, presence: true
-  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP, allow_blank: true }
-  
+
   scope :persons, -> { where(contact_type: contact_types[:person]) }
   scope :companies, -> { where(contact_type: contact_types[:company]) }
   scope :active, -> { where(status: statuses[:active]) }
@@ -117,46 +134,58 @@ class Contact < ActiveRecord::Base
       where(is_private: false).or(where(author_id: user&.id))
     end
   end
-  
+
   safe_attributes 'name',
-                 'email',
-                 'phone',
-                 'address',
                  'contact_type',
                  'status',
                  'is_private',
                  'project_id',
                  'description',
-                 'employments_as_person_attributes'
+                 'employments_as_person_attributes',
+                 'emails_attributes',
+                 'phones_attributes',
+                 'addresses_attributes'
+
+  def email
+    emails.find_by(is_primary: true)&.email || emails.first&.email
+  end
+
+  def phone
+    phones.find_by(is_primary: true)&.phone || phones.first&.phone
+  end
+
+  def address
+    addresses.find_by(is_primary: true)&.address || addresses.first&.address
+  end
 
   def allowed_target_projects
     Project.allowed_to(User.current, :manage_contacts)
   end
-  
+
   def company?
     contact_type == 'company'
   end
-  
+
   def person?
     contact_type == 'person'
   end
-  
+
   def active?
     status == 'active'
   end
-  
+
   def attachments_visible?(user=User.current)
     visible?(user)
   end
-  
+
   def attachments_editable?(user=User.current)
     visible?(user)
   end
-  
+
   def notified_users
     []
   end
-  
+
   def notified_watchers
     [] # Contacts do not have watchers in the same way as Issues, so return an empty array.
   end
@@ -164,20 +193,20 @@ class Contact < ActiveRecord::Base
   def notified_mentions
     [] # Contacts do not have a mention system, so return an empty array.
   end
-  
+
   def recipients
     notified_users.map(&:mail)
   end
-  
+
   def visible?(user)
     return true if user&.admin?
     !is_private || author_id == user&.id
   end
-  
+
   def to_s
     name
   end
-  
+
   def css_classes
     [contact_type, status].join(' ')
   end

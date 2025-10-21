@@ -1,0 +1,79 @@
+<% 
+  field_name = field[:name]
+  field_type = field[:type]
+  field_label = field[:label]
+
+  is_resolved = false
+  value1 = nil
+  value2 = nil
+
+  if field_type == :has_many
+    association = field[:association]
+    value_method = field[:value_method]
+    values1 = contact1.send(association).map(&value_method).sort
+    values2 = contact2.send(association).map(&value_method).sort
+    is_resolved = (values1 == values2)
+  else
+    value1 = contact1.send(field_name)
+    value2 = contact2.send(field_name)
+    is_resolved = (value1 == value2)
+  end
+%>
+
+<div class="conflict-field" data-controller="conflict-resolver">
+  <div class="conflict-header">
+    <div class="conflict-title"><%= field_label %></div>
+    <% if is_resolved %>
+      <span class="tag is-success"><%= l(:label_resolved) %></span>
+    <% end %>
+  </div>
+
+  <% if is_resolved %>
+    <div class="source-option-resolved">
+      <%= value1.is_a?(Array) ? values1.join(', ') : value1 %>
+    </div>
+    <%= hidden_field_tag "attributes[#{field_name}]", value1 %>
+  <% else %>
+    <div class="source-comparison">
+      <% if field_type == :has_many %>
+        <div class="source-option-group">
+          <% contact1.send(field[:association]).each do |record| %>
+            <div class="source-option" data-action="click->merge#toggleCheckbox">
+              <div class="source-value">
+                <%= check_box_tag "attributes[#{field_name}][values][]", record.send(field[:value_method]), true, id: "record_#{record.id}" %>
+                <label for="record_<%= record.id %>"><%= record.send(field[:value_method]) %></label>
+              </div>
+            </div>
+          <% end %>
+        </div>
+        <div class="source-option-group">
+          <% contact2.send(field[:association]).each do |record| %>
+            <div class="source-option" data-action="click->merge#toggleCheckbox">
+              <div class="source-value">
+                <%= check_box_tag "attributes[#{field_name}][values][]", record.send(field[:value_method]), false, id: "record_#{record.id}" %>
+                <label for="record_<%= record.id %>"><%= record.send(field[:value_method]) %></label>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="source-option <%= @contact1.updated_at >= @contact2.updated_at ? 'recommended' : '' %>" data-action="click->merge#select">
+          <div class="source-label"><%= @contact1.name %></div>
+          <div class="source-value">
+            <%= radio_button_tag "attributes[#{field_name}]", value1, @contact1.updated_at >= @contact2.updated_at, style: 'display: none;' %>
+            <%= value1 %>
+          </div>
+          <div class="source-date"><%= format_time(@contact1.updated_at) %></div>
+        </div>
+        <div class="source-option <%= @contact2.updated_at > @contact1.updated_at ? 'recommended' : '' %>" data-action="click->merge#select">
+          <div class="source-label"><%= @contact2.name %></div>
+          <div class="source-value">
+            <%= radio_button_tag "attributes[#{field_name}]", value2, @contact2.updated_at > @contact1.updated_at, style: 'display: none;' %>
+            <%= value2 %>
+          </div>
+          <div class="source-date"><%= format_time(@contact2.updated_at) %></div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

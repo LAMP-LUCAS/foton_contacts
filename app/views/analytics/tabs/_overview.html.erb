@@ -1,0 +1,15 @@
+<%= turbo_frame_tag "overview_tab_content" do %>
+  <div class="analytics-grid-layout-2-1">
+    <div>
+      <%= render partial: 'analytics/components/irpa_table', locals: { irpa_data: irpa_data } %>
+    </div>
+    <div>
+      <%= render partial: 'analytics/components/data_quality', locals: { quality_data: quality_data } %>
+      
+      <%# O componente de análise de parceiros agora é carregado em seu próprio frame %>
+      <%= turbo_frame_tag "partner_analysis_widget_frame", src: analytics_partner_analysis_widget_path do %>
+        <div class="card mt-4"><div class="card-body text-center"><%= l(:label_loading) %>...</div></div>
+      <% end %>
+    </div>
+  </div>
+<% end %>

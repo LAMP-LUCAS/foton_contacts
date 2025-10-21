@@ -1,50 +1,36 @@
-## `./app/models/contact_issue_link.rb`
-
-'''
-### ContactIssueLink
-
-  **Descrição:**  
-  Modelo que representa o vínculo entre um Contato e uma Issue. Permite associar contatos a tickets/issues com informações contextuais.
-
-  **Relacionamentos:**
-  - `belongs_to :contact`
-  - `belongs_to :issue`
-
-  **Validações:**
-  - `contact_id` e `issue_id` obrigatórios
-  - Combinação `contact_id` + `issue_id` única
-
-  **Atributos Seguros:**
-  - `contact_id`, `issue_id`, `role`, `notes`
-
-  **Métodos Principais:**
-  - `visible?`: Verifica se o vínculo é visível para o usuário (baseado na visibilidade do contato e issue)
-  - `to_s`: Representação em string formatada
-
----
-
-'''
-
 class ContactIssueLink < ActiveRecord::Base
   include Redmine::SafeAttributes
-  
-  belongs_to :contact
+  include ActsAsJournalizedConcern
+  include JournalizableDummiesConcern
+  acts_as_journalized watch: ['role']
+
   belongs_to :issue
-  
-  validates :contact_id, presence: true
+  belongs_to :contact, class_name: 'FotonContact', optional: true
+  belongs_to :contact_group, optional: true
+
   validates :issue_id, presence: true
-  validates :contact_id, uniqueness: { scope: :issue_id }
-  
-  safe_attributes 'contact_id',
-                 'issue_id',
-                 'role',
-                 'notes'
-  
-  def to_s
-    "#{contact} (#{role})"
+  validate :contact_or_group_present
+
+  # The associated object (contact or group)
+  def linked_object
+    contact || contact_group
   end
-  
-  def visible?(user)
-    contact.visible?(user) && issue.visible?(user)
+
+  def to_s
+    linked_object.to_s
+  end
+
+  def visible?(user = User.current)
+    issue.visible?(user) && linked_object.try(:visible?, user)
+  end
+
+  private
+
+  def contact_or_group_present
+    if contact_id.blank? && contact_group_id.blank?
+      errors.add(:base, :must_be_linked_to_contact_or_group)
+    elsif contact_id.present? && contact_group_id.present?
+      errors.add(:base, :cannot_be_linked_to_both_contact_and_group)
+    end
   end
 end
