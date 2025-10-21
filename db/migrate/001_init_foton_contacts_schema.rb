@@ -96,10 +96,14 @@ class InitFotonContactsSchema < ActiveRecord::Migration[7.1]
       t.string :email
       t.string :phone
       t.text :description
+      t.text :additional_emails
+      t.text :additional_phones
+      t.string :contact_type, default: 'person'
       t.timestamps
     end
     add_index :imported_contacts, :import_batch_id, if_not_exists: true
     add_index :imported_contacts, :status, if_not_exists: true
     add_index :imported_contacts, :potential_duplicate_id, if_not_exists: true
+
   end
 end

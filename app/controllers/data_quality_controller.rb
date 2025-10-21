@@ -118,15 +118,13 @@ class DataQualityController < ApplicationController
         contact1 = FotonContact.find(contact_ids[0])
         contact2 = FotonContact.find(contact_ids[1])
 
-        # Determine the recommended (primary) and the duplicate
         primary_contact, duplicate_contact = [contact1, contact2].sort_by(&:updated_at).reverse
 
-        # For batch merge, we assume we want to keep all data from the primary contact
         attributes_to_keep = {
           name: primary_contact.name,
           description: primary_contact.description,
-          emails: { values: primary_contact.emails.map(&:email) },
-          phones: { values: primary_contact.phones.map(&:phone) }
+          emails_attributes: primary_contact.emails.map { |e| { email: e.email, is_primary: e.is_primary } },
+          phones_attributes: primary_contact.phones.map { |p| { phone: p.phone, is_primary: p.is_primary } }
         }
 
         if Contacts::MergeService.call(primary_contact, duplicate_contact, attributes_to_keep)
@@ -152,17 +150,15 @@ class DataQualityController < ApplicationController
 
     if action == 'create'
       created_count = 0
-      ImportedContact.where(id: ids).each do |ic|
-        contact_attributes = {
-          name: ic.name,
-          description: ic.description,
-          author: User.current,
-          emails_attributes: [{ email: ic.email, is_primary: true }],
-          phones_attributes: [{ phone: ic.phone, is_primary: true }]
-        }
+      ImportedContact.where(id: ids).each do |imported_contact|
+        # ✅ Usar o método to_foton_contact_attributes que inclui múltiplos emails/telefones
+        contact_attributes = imported_contact.to_foton_contact_attributes.merge(
+          author: User.current
+        )
+        
         contact = FotonContact.new(contact_attributes)
         if contact.save
-          ic.update(status: 'created')
+          imported_contact.update(status: 'created')
           created_count += 1
         end
       end

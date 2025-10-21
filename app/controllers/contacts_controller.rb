@@ -397,17 +397,16 @@ class ContactsController < ApplicationController
   
   def import
     if request.post? && params[:file].present?
-      format = params[:format] || 'google_csv'
-      result = Contacts::ImportService.call(params[:file], format, User.current)
-      
-      if Setting.plugin_foton_contacts['enable_async_analysis']
-        # In a real app with a job backend, this would be: 
-        # Analytics::DuplicateAnalysisJob.perform_later(result[:batch_id])
-        Analytics::DuplicateAnalysisJob.perform(result[:batch_id]) # Simulate for now
+      Rails.logger.info "[ETL-TRACE] ContactsController#import - ENTER - file: #{params[:file].original_filename}, content_type: #{params[:file].content_type}"
+      result = Contacts::ImportService.call(file: params[:file])
+      Rails.logger.info "[ETL-TRACE] ContactsController#import - EXIT - Service result: #{result.inspect}"
+
+      if Setting.plugin_foton_contacts['enable_async_analysis'] && result[:batch_id]
+        Analytics::DuplicateAnalysisJob.perform_now(result[:batch_id])
       end
 
-      redirect_to data_quality_index_path(tab: 'import_review'), 
-                  notice: l(:notice_import_successful, count: result[:stats][:created])
+      redirect_to data_quality_index_path(tab: 'import_review'),
+                  notice: l(:notice_import_successful, count: result[:created_count])
     end
   end
 
